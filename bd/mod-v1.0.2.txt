@@ -1,0 +1,3 @@
+USE `ariagroutil`;
+
+alter table `sparam` add column `numserietel` varchar (1)   NOT NULL  after `ctaventatel`;

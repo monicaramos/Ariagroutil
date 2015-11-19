@@ -1,0 +1,12 @@
+USE `ariagroutil`;
+
+alter table `sparam` add column  `sercontatel` varchar(20) default NULL COMMENT 'servidor conta Telefonia'  after `raizctasocseg`;
+alter table `sparam` add column  `usucontatel` varchar(20) default NULL COMMENT 'usuario conta Telefonia' after  `sercontatel`;
+alter table `sparam` add column  `pascontatel` varchar(20) default NULL COMMENT 'pwd conta Telefonia' after  `usucontatel`;
+alter table `sparam` add column  `numcontatel` smallint(2) default NULL COMMENT 'numconta Telefonia' after  `pascontatel`;
+alter table `sparam` add column  `concedebetel` smallint(4) NOT NULL default '0' COMMENT 'Conce Debe Telefonia' after  `numcontatel`;
+alter table `sparam` add column  `concehabertel` smallint(4) NOT NULL default '0' COMMENT 'Conce Haber Telefonia' after  `concedebetel`;
+alter table `sparam` add column  `numdiariotel` smallint(4) NOT NULL default '0' COMMENT 'Numdiario Telefonia' after  `concehabertel`;
+alter table `sparam` add column  `raizctasoctel` varchar(10) default NULL COMMENT 'Raiz Cta Socios Telefonia' after  `numdiariotel`;
+alter table `sparam` add column  `ctabancotel` varchar(10) default NULL COMMENT 'CtaBanco Telefonia' after  `raizctasoctel`;
+alter table `sparam` add column  `ctaventatel` varchar(10) default NULL COMMENT 'CtaVenta Telefonia' after  `ctabancotel`;
