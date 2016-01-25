@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmTrasDatosSeg 
    BorderStyle     =   3  'Fixed Dialog
@@ -508,7 +508,10 @@ Dim Sql2 As String
             'NifSocio = RecuperaValor(cad, 4, ";")
             '[Monica]15/05/2014: han cambiado de aseguradora
             'NifSocio = RecuperaValor(cad, 7, ";")
-            NifSocio = RecuperaValor(cad, 2, ";")
+            '[Monica]25/01/2016: han vuelto a cambiar de aseguradora
+            'NifSocio = RecuperaValor(cad, 2, ";")
+            NifSocio = RecuperaValor(cad, 7, ";")
+            
             'MIRAMOS SI EXISTE EL NIF
             CtaSocio = CtaContableSocio(NifSocio, cContaSeg)
 
@@ -520,11 +523,16 @@ Dim Sql2 As String
                 conn.Execute Sql
             End If
             
-            '[Monica]15/05/2014: han cambiado de empresa
-            Referencia = RecuperaValor(cad, 3, ";") ' antes 2
-            Referencia = Replace(Referencia, ".", "") ' me viene ahora con un punto
-            Plan = RecuperaValor(cad, 4, ";")       ' antes 5
-            Linea = RecuperaValor(cad, 5, ";")      ' antes 6
+'            '[Monica]15/05/2014: han cambiado de empresa
+'            Referencia = RecuperaValor(cad, 3, ";") ' antes 2
+'            Referencia = Replace(Referencia, ".", "") ' me viene ahora con un punto
+'            Plan = RecuperaValor(cad, 4, ";")       ' antes 5
+'            Linea = RecuperaValor(cad, 5, ";")      ' antes 6
+            
+            '[Monica]25/01/2016: han cambiado de empresa
+            Referencia = RecuperaValor(cad, 2, ";")
+            Plan = RecuperaValor(cad, 5, ";")
+            Linea = RecuperaValor(cad, 6, ";")
             
             If Trim(Referencia) = "" Or Len(Referencia) = 1 Then
                 Mens = "No hay Referencia"
@@ -632,17 +640,31 @@ Dim NuevoImporte As Currency
 '    ImpNeto = RecuperaValor(cad, 10, ";")
 '    Referencia = RecuperaValor(cad, 2, ";")
 '[Monica]15/05/2014: han cambiado de aseguradora
-    Plan = RecuperaValor(cad, 4, ";")
-    Linea = RecuperaValor(cad, 5, ";")
-    Colectivo = RecuperaValor(cad, 8, ";")
-    Colectivo = Replace(Colectivo, ".", "")
-    nif = RecuperaValor(cad, 2, ";")
-    Nombre = RecuperaValor(cad, 1, ";")
-    Estado = RecuperaValor(cad, 12, ";")
-    FechaEnvio = RecuperaValor(cad, 7, ";") ' cogemos la fecha de pago del fichero
-    ImpNeto = RecuperaValor(cad, 21, ";")
-    Referencia = RecuperaValor(cad, 3, ";")
+'    Plan = RecuperaValor(cad, 4, ";")
+'    Linea = RecuperaValor(cad, 5, ";")
+'    Colectivo = RecuperaValor(cad, 8, ";")
+'    Colectivo = Replace(Colectivo, ".", "")
+'    nif = RecuperaValor(cad, 2, ";")
+'    Nombre = RecuperaValor(cad, 1, ";")
+'    Estado = RecuperaValor(cad, 12, ";")
+'    FechaEnvio = RecuperaValor(cad, 7, ";") ' cogemos la fecha de pago del fichero
+'    ImpNeto = RecuperaValor(cad, 21, ";")
+'    Referencia = RecuperaValor(cad, 3, ";")
+'    Referencia = Replace(Referencia, ".", "")
+
+'[Monica]25/01/2016: han cambiado de aseguradora
+    Plan = RecuperaValor(cad, 5, ";")
+    Linea = RecuperaValor(cad, 6, ";")
+    Colectivo = RecuperaValor(cad, 3, ";")
+    nif = RecuperaValor(cad, 7, ";")
+    Nombre = RecuperaValor(cad, 8, ";")
+    Estado = RecuperaValor(cad, 9, ";")
+    FechaEnvio = RecuperaValor(cad, 12, ";") ' cogemos la fecha de pago del fichero
+    ImpNeto = RecuperaValor(cad, 10, ";")
+    Referencia = RecuperaValor(cad, 2, ";")
     Referencia = Replace(Referencia, ".", "")
+
+
 
     
     'MIRAMOS SI EXISTE EL NIF
