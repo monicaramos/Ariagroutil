@@ -1447,7 +1447,8 @@ Public Sub KEYpressGnral(KeyAscii As Integer, Modo As Byte, cerrar As Boolean)
     cerrar = False
     If KeyAscii = 13 Then 'ENTER
         KeyAscii = 0
-        SendKeys "{tab}"
+'        SendKeys "{tab}"
+        CreateObject("WScript.Shell").SendKeys "{tab}"
     ElseIf KeyAscii = 27 Then 'ESC
         If (Modo = 0 Or Modo = 2) Then cerrar = True
     End If

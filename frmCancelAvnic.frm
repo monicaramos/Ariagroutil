@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "comdlg32.ocx"
+Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmCancelAvnic 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Cancelación de Avnics"
@@ -407,11 +407,10 @@ Dim Orden2 As String 'Campo de Ordenacion (por nombre) para Cristal Report
 Dim PrimeraVez As Boolean
 
 Private Sub KEYpress(KeyAscii As Integer)
-    If KeyAscii = 13 Then 'ENTER
-        KeyAscii = 0
-        SendKeys "{tab}"
-    ElseIf KeyAscii = 27 Then Unload Me  'ESC
-    End If
+Dim cerrar As Boolean
+
+    KEYpressGnral KeyAscii, 2, cerrar
+    If cerrar Then Unload Me
 End Sub
 
 Private Sub cmdAceptar_Click()
@@ -420,20 +419,20 @@ Dim nDesde As String, nHasta As String 'cadena Descripcion Desde/Hasta
 Dim cadTABLA As String, cOrden As String
 Dim i As Byte
 Dim NReg As Long
-Dim cadwhere As String
-Dim cad As String
+Dim cadWhere As String
+Dim Cad As String
 
     If Not DatosOk Then Exit Sub
     
     ' el avnic no tiene que haber sido cancelado en el ejercicio
-    cadwhere = "anoejerc = year(" & DBSet(txtCodigo(0).Text, "F") & ") and codialta <> 2 "
-    cadwhere = cadwhere & " and codavnic = " & DBSet(txtCodigo(5).Text, "N")
+    cadWhere = "anoejerc = year(" & DBSet(txtCodigo(0).Text, "F") & ") and codialta <> 2 "
+    cadWhere = cadWhere & " and codavnic = " & DBSet(txtCodigo(5).Text, "N")
     
-    cad = "select count(*) from avnic where " & cadwhere
-    NReg = TotalRegistros(cad)
+    Cad = "select count(*) from avnic where " & cadWhere
+    NReg = TotalRegistros(Cad)
     
     If NReg <> 0 Then
-        If CalculoPenalizacion(cadwhere) Then
+        If CalculoPenalizacion(cadWhere) Then
 '            MsgBox "Proceso realizado correctamente", vbExclamation
             VisualizarFrameResultado (True)
 '            cmdCancel_Click
@@ -606,7 +605,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -765,7 +764,7 @@ Dim b As Boolean
     
 End Function
 
-Private Function CalculoPenalizacion(cadwhere As String) As Boolean
+Private Function CalculoPenalizacion(cadWhere As String) As Boolean
 Dim Sql As String
 Dim DiasPen As Integer
 Dim DiasInt As Integer
@@ -777,7 +776,7 @@ Dim retencion As Currency
 
 Dim RS As ADODB.Recordset
 Dim b As Boolean
-Dim mens As String
+Dim Mens As String
 
     On Error GoTo eCalculoPenalizacion
 
@@ -787,7 +786,7 @@ Dim mens As String
     
     conn.BeginTrans
     b = True
-    Sql = "select * from avnic where " & cadwhere
+    Sql = "select * from avnic where " & cadWhere
     RS.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
 
     txtCodigo(1).Text = Format(0, "###,###,##0.00")
@@ -811,12 +810,12 @@ Dim mens As String
             txtCodigo(7).Text = Format(retencion, "###,###,##0.00")
             txtCodigo(8).Text = Format(neto, "###,###,##0.00")
             
-            mens = "Insertar movimiento y actualizar avnic "
-            b = InsertarMovimiento(RS!codavnic, RS!anoejerc, bruto, retencion, neto, mens)
+            Mens = "Insertar movimiento y actualizar avnic "
+            b = InsertarMovimiento(RS!codavnic, RS!anoejerc, bruto, retencion, neto, Mens)
         End If
         If b Then
             Sql = "update avnic set codialta = 2 "
-            Sql = Sql & "where " & cadwhere
+            Sql = Sql & "where " & cadWhere
             conn.Execute Sql
         End If
     End If
@@ -827,12 +826,12 @@ Dim mens As String
     End If
 eCalculoPenalizacion:
     If Err.Number <> 0 Or Not b Then
-        MuestraError Err.Number, mens
+        MuestraError Err.Number, Mens
         conn.RollbackTrans
     End If
 End Function
 
-Private Function InsertarMovimiento(codavnic As Long, anoejerc As Integer, bruto As Currency, retencion As Currency, neto As Currency, ByRef mens As String) As Boolean
+Private Function InsertarMovimiento(codavnic As Long, anoejerc As Integer, bruto As Currency, retencion As Currency, neto As Currency, ByRef Mens As String) As Boolean
 Dim Sql As String
 
     On Error GoTo eInsertarMovimiento
@@ -860,7 +859,7 @@ Dim Sql As String
     
 eInsertarMovimiento:
     If Err.Number <> 0 Then
-        mens = mens & vbCrLf & Err.Description
+        Mens = Mens & vbCrLf & Err.Description
     End If
 End Function
 

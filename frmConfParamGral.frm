@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{67397AA1-7FB1-11D0-B148-00A0C922E820}#6.0#0"; "MSADODC.OCX"
 Begin VB.Form frmConfParamGral 
    BorderStyle     =   3  'Fixed Dialog
@@ -472,7 +472,7 @@ Private Sub cmdAceptar_Click()
             If Not ModificaDesdeFormulario(Me) Then Exit Sub
             
             'Actualizar campos de la clase
-            vEmpresa.nomEmpre = text1(1).Text
+            vEmpresa.nomEmpre = Text1(1).Text
             vEmpresa.ModificarDatos
     '
     '        vParam.NombreEmpresa = Text1(1).Text
@@ -579,8 +579,8 @@ End Sub
 Private Sub PonerCampos()
     If Data1.Recordset.EOF Then Exit Sub
     PonerCamposForma Me, Data1
-    If Trim(text1(3).Text) = "0" Then text1(3).Text = ""
-    If Trim(text1(6).Text) = "0" Then text1(6).Text = ""
+    If Trim(Text1(3).Text) = "0" Then Text1(3).Text = ""
+    If Trim(Text1(6).Text) = "0" Then Text1(6).Text = ""
 End Sub
 
 Private Sub imgMail_Click(Index As Integer)
@@ -591,7 +591,7 @@ Dim dirMail As String
     Screen.MousePointer = vbHourglass
     
     Select Case Index
-        Case 0: dirMail = text1(10).Text
+        Case 0: dirMail = Text1(10).Text
     End Select
 
     If LanzaMailGnral(dirMail) Then espera 2
@@ -604,7 +604,7 @@ Private Sub imgWeb_Click()
 '    If Modo = 0 Then Exit Sub
     Screen.MousePointer = vbHourglass
 
-    If LanzaHomeGnral(text1(9).Text) Then espera 2
+    If LanzaHomeGnral(Text1(9).Text) Then espera 2
     Screen.MousePointer = vbDefault
 End Sub
 
@@ -617,7 +617,7 @@ Private Sub mnSalir_Click()
 End Sub
 
 Private Sub Text1_GotFocus(Index As Integer)
-    ConseguirFoco text1(Index), 3
+    ConseguirFoco Text1(Index), 3
 End Sub
 
 Private Sub Text1_KeyDown(Index As Integer, KeyCode As Integer, Shift As Integer)
@@ -645,7 +645,7 @@ Private Sub BotonModificar()
 '    Me.lblIndicador.Caption = "MODIFICAR"
     PonerModo 4
     'Me.imgBuscar.Enabled = True
-    PonerFoco text1(1)
+    PonerFoco Text1(1)
 End Sub
 
 Private Function DatosOk() As Boolean
@@ -717,12 +717,11 @@ End Sub
 
 
 Private Sub KEYpress(KeyAscii As Integer)
-    If KeyAscii = 13 Then 'ENTER
-        KeyAscii = 0
-        SendKeys "{tab}"
-    ElseIf KeyAscii = 27 Then 'ESC
-        If (Modo = 0 Or Modo = 2) Then Unload Me
-    End If
+Dim cerrar As Boolean
+
+    KEYpressGnral KeyAscii, Modo, cerrar
+    If cerrar Then Unload Me
+
 End Sub
 
 ' ### [Monica] 13/11/2006
@@ -731,8 +730,8 @@ End Sub
 Private Sub BotonAnyadir()
     'LimpiarCampos
     PonerModo 3
-    text1(0).Text = 1
-    PonerFoco text1(1)
+    Text1(0).Text = 1
+    PonerFoco Text1(1)
 End Sub
 
 Private Sub PonerModoOpcionesMenu()

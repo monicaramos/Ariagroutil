@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "comdlg32.ocx"
+Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmAyudaMod123 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Ayuda Modelo 123"
@@ -235,7 +235,7 @@ Dim indCodigo As Integer 'indice para txtCodigo
 Dim indFrame As Single 'nº de frame en el que estamos
 
 'Se inicializan para cada Informe (tabla de BD a la que hace referencia
-Dim tabla As String
+Dim Tabla As String
 Dim Codigo As String 'Código para FormulaSelection de Crystal Report
 Dim TipCod As String
 Dim Orden1 As String 'Campo de Ordenacion (por codigo) para Cristal Report
@@ -252,20 +252,20 @@ Dim Total2 As Currency
 
 
 Private Sub KEYpress(KeyAscii As Integer)
-    If KeyAscii = 13 Then 'ENTER
-        KeyAscii = 0
-        SendKeys "{tab}"
-    ElseIf KeyAscii = 27 Then Unload Me  'ESC
-    End If
+Dim cerrar As Boolean
+
+    KEYpressGnral KeyAscii, 2, cerrar
+    If cerrar Then Unload Me
+
 End Sub
 
 Private Sub cmdAceptar_Click()
 Dim i As Byte
-Dim SQl As String
+Dim Sql As String
 Dim cadWhere As String
 Dim nRegs As Long
-Dim c As Object
-Dim Rs As ADODB.Recordset
+Dim C As Object
+Dim RS As ADODB.Recordset
 Dim nReceptores As Long
 Dim Mens As String
 
@@ -274,9 +274,9 @@ Dim Mens As String
     If txtCodigo(0).Text <> "" Then cadWhere = cadWhere & " and movim.fechamov >= " & DBSet(txtCodigo(0).Text, "F")
     If txtCodigo(1).Text <> "" Then cadWhere = cadWhere & " and movim.fechamov <= " & DBSet(txtCodigo(1).Text, "F")
 
-    SQl = "SELECT  count(*) from movim where " & cadWhere
+    Sql = "SELECT  count(*) from movim where " & cadWhere
 
-    nRegs = TotalRegistros(SQl)
+    nRegs = TotalRegistros(Sql)
 
     If nRegs <> 0 Then
         Screen.MousePointer = vbHourglass
@@ -285,14 +285,14 @@ Dim Mens As String
         nReceptores = TotalReceptores(cadWhere, Mens)
         
         If nReceptores <> 0 Then
-            Set Rs = New ADODB.Recordset
-            SQl = "select sum(timport1), sum(timport2) from movim where " & cadWhere
-            Rs.Open SQl, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+            Set RS = New ADODB.Recordset
+            Sql = "select sum(timport1), sum(timport2) from movim where " & cadWhere
+            RS.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
     
-            If Not Rs.EOF Then
+            If Not RS.EOF Then
                 txtCodigo(2).Text = Format(nReceptores, "###,###,##0")
-                txtCodigo(3).Text = Format(Rs.Fields(0).Value, "###,###,##0.00")
-                txtCodigo(4).Text = Format(Rs.Fields(1).Value, "###,###,##0.00")
+                txtCodigo(3).Text = Format(RS.Fields(0).Value, "###,###,##0.00")
+                txtCodigo(4).Text = Format(RS.Fields(1).Value, "###,###,##0.00")
                 
                 FrameResultados.visible = True
                 imgFec(0).Enabled = False
@@ -341,7 +341,7 @@ Dim List As Collection
 
     FrameCobrosVisible True, h, w
     indFrame = 5
-    tabla = "slhfac"
+    Tabla = "slhfac"
     FrameResultados.visible = False
     'Esto se consigue poneinedo el cancel en el opcion k corresponda
     Me.cmdCancel.Cancel = True
@@ -431,7 +431,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -463,8 +463,8 @@ End Sub
 
 
 Private Function TotalReceptores(cadWhere As String, Mens As String) As Long
-Dim Rs As ADODB.Recordset
-Dim SQl As String
+Dim RS As ADODB.Recordset
+Dim Sql As String
 Dim Sql2 As String
 
     On Error GoTo eTotalReceptores
@@ -474,30 +474,30 @@ Dim Sql2 As String
     BorrarTMPavnics
     
     If CrearTMPavnics Then
-        Set Rs = New ADODB.Recordset
-        SQl = "select distinct nifperso, nifrepre from movim, avnic where " & cadWhere
-        SQl = SQl & " and movim.codavnic = avnic.codavnic and movim.anoejerc = avnic.anoejerc "
+        Set RS = New ADODB.Recordset
+        Sql = "select distinct nifperso, nifrepre from movim, avnic where " & cadWhere
+        Sql = Sql & " and movim.codavnic = avnic.codavnic and movim.anoejerc = avnic.anoejerc "
         
-        Rs.Open SQl, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
-        While Not Rs.EOF
-            If DBLet(Rs.Fields(0).Value, "T") <> "" Then
-                Sql2 = "insert into tmpavnics (nif) values (" & DBSet(Rs.Fields(0).Value, "T") & ")"
+        RS.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+        While Not RS.EOF
+            If DBLet(RS.Fields(0).Value, "T") <> "" Then
+                Sql2 = "insert into tmpavnics (nif) values (" & DBSet(RS.Fields(0).Value, "T") & ")"
                 conn.Execute Sql2
             End If
-            If DBLet(Rs.Fields(1).Value, "T") <> "" Then
-                Sql2 = "insert into tmpavnics (nif) values (" & DBSet(Rs.Fields(1).Value, "T") & ")"
+            If DBLet(RS.Fields(1).Value, "T") <> "" Then
+                Sql2 = "insert into tmpavnics (nif) values (" & DBSet(RS.Fields(1).Value, "T") & ")"
                 conn.Execute Sql2
             End If
             
-            Rs.MoveNext
+            RS.MoveNext
         Wend
-        Rs.Close
-        SQl = "select count(distinct nif) from tmpavnics"
-        Rs.Open SQl, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+        RS.Close
+        Sql = "select count(distinct nif) from tmpavnics"
+        RS.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
         
-        If Not Rs.EOF Then TotalReceptores = DBLet(Rs.Fields(0).Value, "N")
+        If Not RS.EOF Then TotalReceptores = DBLet(RS.Fields(0).Value, "N")
         
-        Set Rs = Nothing
+        Set RS = Nothing
     End If
 
 eTotalReceptores:
@@ -514,14 +514,14 @@ End Sub
 
 Private Function CrearTMPavnics() As Boolean
 'Crea una temporal donde insertara los nifs tanto de personas como de representantes
-Dim SQl As String
+Dim Sql As String
     
     On Error GoTo ECrear
     
     CrearTMPavnics = False
     
-    SQl = "CREATE TEMPORARY TABLE tmpavnics ( nif varchar(9) )"
-    conn.Execute SQl
+    Sql = "CREATE TEMPORARY TABLE tmpavnics ( nif varchar(9) )"
+    conn.Execute Sql
      
     CrearTMPavnics = True
     
@@ -529,8 +529,8 @@ ECrear:
      If Err.Number <> 0 Then
         CrearTMPavnics = False
         'Borrar la tabla temporal
-        SQl = " DROP TABLE IF EXISTS tmpavnics;"
-        conn.Execute SQl
+        Sql = " DROP TABLE IF EXISTS tmpavnics;"
+        conn.Execute Sql
     End If
 End Function
 

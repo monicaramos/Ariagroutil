@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmIntContaSeg 
    BorderStyle     =   3  'Fixed Dialog
@@ -353,18 +353,18 @@ Dim TipCod As String
 
 Dim PrimeraVez As Boolean
 Dim NRegSelec As Integer
-Dim cadwhere As String
+Dim cadWhere As String
 
 Private Sub KEYpress(KeyAscii As Integer)
-    If KeyAscii = 13 Then 'ENTER
-        KeyAscii = 0
-        SendKeys "{tab}"
-    ElseIf KeyAscii = 27 Then Unload Me  'ESC
-    End If
+Dim cerrar As Boolean
+
+    KEYpressGnral KeyAscii, 2, cerrar
+    If cerrar Then Unload Me
+
 End Sub
 
 Private Sub cmdAceptar_Click(Index As Integer)
-Dim SQL As String
+Dim Sql As String
 Dim i As Byte
 'Dim cadwhere As String
 
@@ -373,11 +373,11 @@ Dim i As Byte
         Case 0
             If Not DatosOk Then Exit Sub
                      
-            cadwhere = "intconta = 0 "
-            If txtCodigo(0).Text <> "" Then cadwhere = cadwhere & " and fechaenv >= " & DBSet(txtCodigo(0).Text, "F")
-            If txtCodigo(1).Text <> "" Then cadwhere = cadwhere & " and fechaenv <= " & DBSet(txtCodigo(1).Text, "F")
+            cadWhere = "intconta = 0 "
+            If txtCodigo(0).Text <> "" Then cadWhere = cadWhere & " and fechaenv >= " & DBSet(txtCodigo(0).Text, "F")
+            If txtCodigo(1).Text <> "" Then cadWhere = cadWhere & " and fechaenv <= " & DBSet(txtCodigo(1).Text, "F")
             
-            If CargarListView(cadwhere) = 0 Then
+            If CargarListView(cadWhere) = 0 Then
                 VisualizarListview False
                 MsgBox "No existen datos entre esos límites.", vbExclamation
             Else
@@ -389,7 +389,7 @@ Dim i As Byte
                 Exit Sub
             Else
                 If MsgBox("Desea continuar con el proceso de contabilizacion de pólizas de cliente.", vbQuestion + vbYesNo + vbDefaultButton2) = vbYes Then
-                    ContabilizarAsiento (cadwhere)
+                    ContabilizarAsiento (cadWhere)
                      'Eliminar la tabla TMP
                     BorrarTMPErrComprob
                     DesBloqueoManual ("CONASI") 'CONtabilizacion de asiento
@@ -517,7 +517,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -574,20 +574,20 @@ Dim devuelve2 As String
     End If
 End Function
 
-Private Sub ContabilizarAsiento(cadwhere As String)
+Private Sub ContabilizarAsiento(cadWhere As String)
 'Contabiliza Facturas de Clientes o de Proveedores
-Dim SQL As String
+Dim Sql As String
 Dim b As Boolean
 Dim tmpErrores As Boolean 'Indica si se creo correctamente la tabla de errores
 Dim CCoste As String
 Dim cadTABLA As String
 Dim cadWhere1 As String
 
-    SQL = "CONASI" 'contabilizar Poliza de seguros
+    Sql = "CONASI" 'contabilizar Poliza de seguros
 
     'Bloquear para que nadie mas pueda contabilizar
-    DesBloqueoManual (SQL)
-    If Not BloqueoManual(SQL, "1") Then
+    DesBloqueoManual (Sql)
+    If Not BloqueoManual(Sql, "1") Then
         MsgBox "No se pueden Contabilizar las Pólizas. Hay otro usuario contabilizándolo.", vbExclamation
         Screen.MousePointer = vbDefault
         Exit Sub
@@ -617,7 +617,7 @@ Dim cadWhere1 As String
     '-----------------------------------------------------------------------------
     Me.lblProgres(1).Caption = "Comprobando Cuenta Ctble de Pólizas ..."
     
-    cadWhere1 = "codmacta in (" & CargarCtas(cadwhere) & ")"
+    cadWhere1 = "codmacta in (" & CargarCtas(cadWhere) & ")"
     
     b = ComprobarCtaContable(cadTABLA, 2, cadWhere1, cContaSeg)
     IncrementarProgres Me.Pb1, 50
@@ -650,7 +650,7 @@ Dim cadWhere1 As String
     Me.lblProgres(1).Caption = "Insertando Asiento en Contabilidad..."
     
     
-    b = PasarAContabNew(cadwhere)
+    b = PasarAContabNew(cadWhere)
     
     If Not b Then
         If tmpErrores Then
@@ -698,8 +698,8 @@ Dim FFinSeg As Date
    
 End Function
 
-Private Function PasarAContab(cadwhere As String) As Boolean
-Dim SQL As String
+Private Function PasarAContab(cadWhere As String) As Boolean
+Dim Sql As String
 Dim RS As ADODB.Recordset
 Dim b As Boolean
 Dim i As Long
@@ -715,7 +715,7 @@ Dim ImporteH As Currency
 Dim Diferencia As Currency
 Dim Obs As String
 Dim cadMen As String
-Dim cad As String
+Dim Cad As String
 Dim CtaDifer As String
 Dim Codmacta As String
 Dim Importe As Currency
@@ -768,27 +768,27 @@ Dim Importe As Currency
                     ' ******************IMPORTE de la poliza
                     i = i + 1
                     
-                    cad = DBSet(vParamAplic.NumDiarioSeg, "N") & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
-                    cad = cad & DBSet(i, "N") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7), "T") & "," & DBSet(numdocum, "T") & ","
+                    Cad = DBSet(vParamAplic.NumDiarioSeg, "N") & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+                    Cad = Cad & DBSet(i, "N") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7), "T") & "," & DBSet(numdocum, "T") & ","
                     
                     ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
                     If Me.ListView1.ListItems(J).SubItems(6) > 0 Then
                         ' importe al debe en positivo
-                        cad = cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(6), "N") & "," & ValorNulo & ","
-                        cad = cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
+                        Cad = Cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(6), "N") & "," & ValorNulo & ","
+                        Cad = Cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
                     
                         ImporteD = ImporteD + CCur(Me.ListView1.ListItems(J).SubItems(6))
                     Else
                         ' importe al haber en positivo, cambiamos el signo
-                        cad = cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7) * (-1), "N") & ","
-                        cad = cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
+                        Cad = Cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7) * (-1), "N") & ","
+                        Cad = Cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
                     
                         ImporteH = ImporteH + (CCur(Me.ListView1.ListItems(J).SubItems(7)) * (-1))
                     End If
                     
-                    cad = "(" & cad & ")"
+                    Cad = "(" & Cad & ")"
                     
-                    b = InsertarLinAsientoDia(cad, cadMen, cContaSeg)
+                    b = InsertarLinAsientoDia(Cad, cadMen, cContaSeg)
                     cadMen = "Insertando Lin. Asiento: " & i
                 
                     IncrementarProgres Me.Pb1, 1
@@ -801,23 +801,23 @@ Dim Importe As Currency
             
             i = i + 1
             
-            cad = vParamAplic.NumDiario & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
-            cad = cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & DBSet(numdocum, "T") & ","
+            Cad = vParamAplic.NumDiario & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+            Cad = Cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & DBSet(numdocum, "T") & ","
             
             ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
             If Importe > 0 Then
                 ' importe al haber en positivo
-                cad = cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Importe, "N") & ","
-                cad = cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                Cad = Cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Importe, "N") & ","
+                Cad = Cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
             Else
                 ' importe al debe en positivo, cambiamos el signo
-                cad = cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Importe * (-1), "N") & "," & ValorNulo & ","
-                cad = cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                Cad = Cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Importe * (-1), "N") & "," & ValorNulo & ","
+                Cad = Cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
             End If
             
-            cad = "(" & cad & ")"
+            Cad = "(" & Cad & ")"
             
-            b = InsertarLinAsientoDia(cad, cadMen, cContaSeg)
+            b = InsertarLinAsientoDia(Cad, cadMen, cContaSeg)
             cadMen = "Insertando Lin. Asiento: " & i
         
             IncrementarProgres Me.Pb1, 1
@@ -828,7 +828,7 @@ Dim Importe As Currency
 ' de momento comentado para hacer pruebas
             If b Then
                  'Poner intconta=1 en ariagroutil.segpoliz
-                 b = ActualizarIntPolizas(cadwhere, cadMen)
+                 b = ActualizarIntPolizas(cadWhere, cadMen)
                  cadMen = "Actualizando Pólizas: " & cadMen
             End If
             
@@ -877,8 +877,8 @@ Dim TotalImporte As Currency
     
 End Sub
 
-Private Function CargarCtas(cadwhere) As String
-Dim SQL As String
+Private Function CargarCtas(cadWhere) As String
+Dim Sql As String
 Dim i As Long
 Dim Codmacta As String
 
@@ -896,12 +896,12 @@ Dim Codmacta As String
     CargarCtas = Mid(CargarCtas, 1, Len(CargarCtas) - 1)
 End Function
 
-Private Function CargarListView(cadwhere As String) As Integer
+Private Function CargarListView(cadWhere As String) As Integer
 'Muestra la lista Detallada de Facturas que dieron error al contabilizar
 'en un ListView
 Dim RS As ADODB.Recordset
 Dim ItmX As ListItem
-Dim SQL As String
+Dim Sql As String
 Dim HayReg As Integer
 
     On Error GoTo ECargarList
@@ -917,12 +917,12 @@ Dim HayReg As Integer
     Me.Height = 6120
     Me.Width = 8370
     
-    SQL = " SELECT  codrefer, codiplan, codlinea, colectiv, nifasegu, nomasegu, imppoliz, codmacta "
-    SQL = SQL & " FROM segpoliza where " & cadwhere
-    SQL = SQL & " order by codrefer, codiplan, codlinea "
+    Sql = " SELECT  codrefer, codiplan, codlinea, colectiv, nifasegu, nomasegu, imppoliz, codmacta "
+    Sql = Sql & " FROM segpoliza where " & cadWhere
+    Sql = Sql & " order by codrefer, codiplan, codlinea "
     
     Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    RS.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not RS.EOF Then
         VisualizarListview True
     
@@ -1006,9 +1006,9 @@ Dim TotalImporte As Currency
     Text1(1).Text = TotalImporte
 End Sub
 
-Private Function ActualizarIntPolizas(cadwhere As String, caderr As String) As Boolean
+Private Function ActualizarIntPolizas(cadWhere As String, caderr As String) As Boolean
 'Poner el movimiento como contabilizada
-Dim SQL As String
+Dim Sql As String
 Dim J As Integer
 
     On Error GoTo EActualizar
@@ -1016,12 +1016,12 @@ Dim J As Integer
     
     For J = 1 To Me.ListView1.ListItems.Count
         If Me.ListView1.ListItems(J).Checked Then
-            SQL = "UPDATE segpoliza SET intconta=1 "
-            SQL = SQL & " WHERE codrefer = " & DBSet(Me.ListView1.ListItems(J).Text, "T") & " and "
-            SQL = SQL & " codiplan = " & DBSet(Me.ListView1.ListItems(J).SubItems(1), "N") & " and "
-            SQL = SQL & " codlinea = " & DBSet(Me.ListView1.ListItems(J).SubItems(2), "N")
+            Sql = "UPDATE segpoliza SET intconta=1 "
+            Sql = Sql & " WHERE codrefer = " & DBSet(Me.ListView1.ListItems(J).Text, "T") & " and "
+            Sql = Sql & " codiplan = " & DBSet(Me.ListView1.ListItems(J).SubItems(1), "N") & " and "
+            Sql = Sql & " codlinea = " & DBSet(Me.ListView1.ListItems(J).SubItems(2), "N")
     
-            conn.Execute SQL
+            conn.Execute Sql
         End If
     Next J
     
@@ -1035,8 +1035,8 @@ EActualizar:
 End Function
 
 'se crea un asiento por cada cargo que se hace a la cuenta de banco
-Private Function PasarAContabNew(cadwhere As String) As Boolean
-Dim SQL As String
+Private Function PasarAContabNew(cadWhere As String) As Boolean
+Dim Sql As String
 Dim RS As ADODB.Recordset
 Dim b As Boolean
 Dim i As Long
@@ -1052,7 +1052,7 @@ Dim ImporteH As Currency
 Dim Diferencia As Currency
 Dim Obs As String
 Dim cadMen As String
-Dim cad As String
+Dim Cad As String
 Dim CtaDifer As String
 Dim Codmacta As String
 Dim Importe As Currency
@@ -1078,94 +1078,97 @@ Dim Importe As Currency
         
         Obs = "Asiento de Contabilizacion de Pólizas de Seguros Agrarios de fecha " & Format(txtCodigo(2).Text, "dd/mm/yyyy")
         
-        For J = 1 To Me.ListView1.ListItems.Count
-            If Me.ListView1.ListItems(J).Checked Then
         
-                Set Mc = New CContadorContab
-                
-                If Mc.ConseguirContador("0", (CDate(txtCodigo(2).Text) <= CDate(FFinSeg)), True, cContaSeg) = 0 Then
-            
-                'Insertar en la conta Cabecera Asiento
-                b = InsertarCabAsientoDia(vParamAplic.NumDiarioSeg, Mc.Contador, txtCodigo(2).Text, Obs, cadMen, cContaSeg)
-                cadMen = "Insertando Cab. Asiento: " & cadMen
+        Set Mc = New CContadorContab
         
-                If b Then
-                    i = 0
-                    ImporteD = 0
-                    ImporteH = 0
-                    
-                    ampliacion = "Pólizas Seguros"
-                    ampliaciond = Trim(DevuelveDesdeBDNew(cConta, "conceptos", "nomconce", "codconce", vParamAplic.ConceDebeSeg, "N")) & " " & ampliacion
-                    ampliacionh = Trim(DevuelveDesdeBDNew(cConta, "conceptos", "nomconce", "codconce", vParamAplic.ConceHaberSeg, "N")) & " " & ampliacion
+        If Mc.ConseguirContador("0", (CDate(txtCodigo(2).Text) <= CDate(FFinSeg)), True, cContaSeg) = 0 Then
+
+            'Insertar en la conta Cabecera Asiento
+            b = InsertarCabAsientoDia(vParamAplic.NumDiarioSeg, Mc.Contador, txtCodigo(2).Text, Obs, cadMen, cContaSeg)
+            cadMen = "Insertando Cab. Asiento: " & cadMen
             
-                    numdocum = DBLet(Me.ListView1.ListItems(J).Text, "T")
-                    ' ******************IMPORTE de la poliza
-                    i = i + 1
-                    
-                    cad = DBSet(vParamAplic.NumDiarioSeg, "N") & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
-                    cad = cad & DBSet(i, "N") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7), "T") & "," & DBSet(numdocum, "T") & ","
-                    
-                    ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
-                    If Me.ListView1.ListItems(J).SubItems(6) > 0 Then
-                        ' importe al debe en positivo
-                        cad = cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(6), "N") & "," & ValorNulo & ","
-                        cad = cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
-                    
-                        ImporteD = ImporteD + CCur(Me.ListView1.ListItems(J).SubItems(6))
-                    Else
-                        ' importe al haber en positivo, cambiamos el signo
-                        cad = cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7) * (-1), "N") & ","
-                        cad = cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
-                    
-                        ImporteH = ImporteH + (CCur(Me.ListView1.ListItems(J).SubItems(7)) * (-1))
-                    End If
-                    
-                    cad = "(" & cad & ")"
-                    
-                    b = InsertarLinAsientoDia(cad, cadMen, cContaSeg)
-                    cadMen = "Insertando Lin. Asiento: " & i
+            If b Then
+                i = 0
+                ImporteD = 0
+                ImporteH = 0
                 
-                    ' CONTRAPARTIDA
-                    ' insertamos la contrapartida con la diferencia entre imported y importeh al debe
-                    Importe = ImporteD - ImporteH
+                For J = 1 To Me.ListView1.ListItems.Count
                     
-                    i = i + 1
-                    
-                    cad = vParamAplic.NumDiario & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
-                    cad = cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & DBSet(numdocum, "T") & ","
-                    
-                    ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
-                    If Importe > 0 Then
-                        ' importe al haber en positivo
-                        cad = cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Importe, "N") & ","
-                        cad = cad & ValorNulo & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7), "T") & "," & ValorNulo & ",0"
-                    Else
-                        ' importe al debe en positivo, cambiamos el signo
-                        cad = cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Importe * (-1), "N") & "," & ValorNulo & ","
-                        cad = cad & ValorNulo & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7), "T") & "," & ValorNulo & ",0"
-                    End If
-                    
-                    cad = "(" & cad & ")"
-                    
-                    b = InsertarLinAsientoDia(cad, cadMen, cContaSeg)
-                    cadMen = "Insertando Lin. Asiento: " & i
-                
                     IncrementarProgres Me.Pb1, 1
                     Me.lblProgres(1).Caption = "Insertando Asiento en Contabilidad...   (" & J & " de " & NumLinea & ")"
                     Me.Refresh
-                
-                
-                    If b Then
-                         'Poner intconta=1 en ariagroutil.segpoliz
-                         b = ActualizarIntPolizas(cadwhere, cadMen)
-                         cadMen = "Actualizando Pólizas: " & cadMen
-                    End If
-                
-                End If
-            End If
-            End If
-        Next J
+                    
+                    
+                    If Me.ListView1.ListItems(J).Checked Then
             
+                        
+                        ampliacion = "Pólizas Seguros"
+                        ampliaciond = Trim(DevuelveDesdeBDNew(cConta, "conceptos", "nomconce", "codconce", vParamAplic.ConceDebeSeg, "N")) & " " & ampliacion
+                        ampliacionh = Trim(DevuelveDesdeBDNew(cConta, "conceptos", "nomconce", "codconce", vParamAplic.ConceHaberSeg, "N")) & " " & ampliacion
+                
+                        numdocum = DBLet(Me.ListView1.ListItems(J).Text, "T")
+                        ' ******************IMPORTE de la poliza
+                        i = i + 1
+                        
+                        Cad = DBSet(vParamAplic.NumDiarioSeg, "N") & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+                        Cad = Cad & DBSet(i, "N") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7), "T") & "," & DBSet(numdocum, "T") & ","
+                        
+                        ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
+                        If Me.ListView1.ListItems(J).SubItems(6) > 0 Then
+                            ' importe al debe en positivo
+                            Cad = Cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Me.ListView1.ListItems(J).SubItems(6), "N") & "," & ValorNulo & ","
+                            Cad = Cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
+                        
+                            ImporteD = ImporteD + CCur(Me.ListView1.ListItems(J).SubItems(6))
+                        Else
+                            ' importe al haber en positivo, cambiamos el signo
+                            Cad = Cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Me.ListView1.ListItems(J).SubItems(7) * (-1), "N") & ","
+                            Cad = Cad & ValorNulo & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & ValorNulo & ",0"
+                        
+                            ImporteH = ImporteH + (CCur(Me.ListView1.ListItems(J).SubItems(7)) * (-1))
+                        End If
+                        
+                        Cad = "(" & Cad & ")"
+                        
+                        b = InsertarLinAsientoDia(Cad, cadMen, cContaSeg)
+                        cadMen = "Insertando Lin. Asiento: " & i
+                    
+                    
+                    End If
+                Next J
+            
+                If b Then
+                     'Poner intconta=1 en ariagroutil.segpoliz
+                     b = ActualizarIntPolizas(cadWhere, cadMen)
+                     cadMen = "Actualizando Pólizas: " & cadMen
+                End If
+            
+                ' CONTRAPARTIDA
+                ' insertamos la contrapartida con la diferencia entre imported y importeh al debe
+                Importe = ImporteD - ImporteH
+                
+                i = i + 1
+                
+                Cad = vParamAplic.NumDiario & "," & DBSet(txtCodigo(2).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+                Cad = Cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaBancoSeg, "T") & "," & DBSet(numdocum, "T") & ","
+                
+                ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
+                If Importe > 0 Then
+                    ' importe al haber en positivo
+                    Cad = Cad & DBSet(vParamAplic.ConceHaberSeg, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Importe, "N") & ","
+                    Cad = Cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                Else
+                    ' importe al debe en positivo, cambiamos el signo
+                    Cad = Cad & DBSet(vParamAplic.ConceDebeSeg, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Importe * (-1), "N") & "," & ValorNulo & ","
+                    Cad = Cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                End If
+                
+                Cad = "(" & Cad & ")"
+                
+                b = InsertarLinAsientoDia(Cad, cadMen, cContaSeg)
+                cadMen = "Insertando Lin. Asiento: " & i
+            End If
+        End If
    End If
    
 EPasarCal:

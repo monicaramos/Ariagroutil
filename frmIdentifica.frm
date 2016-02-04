@@ -225,16 +225,16 @@ Private Sub Text1_GotFocus(Index As Integer)
 End Sub
 
 Private Sub Text1_KeyPress(Index As Integer, KeyAscii As Integer)
-    If KeyAscii = 13 Then
-        KeyAscii = 0
-        SendKeys "{tab}"
-    Else
-        If KeyAscii = 27 Then
-            Unload Me
-        End If
-    End If
+    KEYpress KeyAscii
 End Sub
 
+Private Sub KEYpress(KeyAscii As Integer)
+Dim cerrar As Boolean
+
+    KEYpressGnral KeyAscii, 2, cerrar
+    If cerrar Then Unload Me
+
+End Sub
 
 Private Sub Text1_LostFocus(Index As Integer)
     Text1(Index).Text = Trim(Text1(Index).Text)
