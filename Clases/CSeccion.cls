@@ -20,8 +20,11 @@ Private mvarContador As Long  'copia local
 Private mvarBDConta As Integer 'copia local
 Private mvarLetraSerie As String * 1 'Letra Serie Ariconta
 
-Private RS As ADODB.Recordset
-Private SQL As String
+Private mvarESMaterna As Integer 'es materna
+
+
+Private Rs As ADODB.Recordset
+Private Sql As String
 Private Mens As String
 
 
@@ -72,30 +75,41 @@ Public Property Get BdConta() As Integer
 End Property
 
 
+Public Property Let EsMaterna(ByVal vData As Integer)
+    mvarESMaterna = vData
+End Property
+
+
+Public Property Get EsMaterna() As Integer
+    EsMaterna = mvarESMaterna
+End Property
+
+
+
 '//////////////////////////////////////////////////////////////////7
 '//
 '//     Si es el ultimo numero de la serie devuelve el anterior
-Public Function DevolverContador(vCodigo As String, Contador As Long) As Byte
+Public Function DevolverContador(vcodigo As String, Contador As Long) As Byte
 Dim OK As Boolean
-Dim C1 As Long
+Dim c1 As Long
 On Error GoTo Err1
     
     'Abrimos bloqueando
-    SQL = "Select * from seccion WHERE codsecci = " & vCodigo & " FOR UPDATE " ' "' FOR UPDATE"
+    Sql = "Select * from seccion WHERE codsecci = " & vcodigo & " FOR UPDATE " ' "' FOR UPDATE"
     'Esto esba asi antes, sin comentar
     'Conn.Execute "Set autocommit = 0"
     DevolverContador = 1
     OK = False
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
-    If Not RS.EOF Then
-        mvarSeccion = vCodigo
-        mvarNombreSec = RS!nomsecci
-        C1 = RS!Contador
+    Set Rs = New ADODB.Recordset
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    If Not Rs.EOF Then
+        mvarSeccion = vcodigo
+        mvarNombreSec = Rs!nomsecci
+        c1 = Rs!Contador
         OK = True
     End If
-    RS.Close
-    Set RS = Nothing
+    Rs.Close
+    Set Rs = Nothing
     If Not OK Then
         conn.Execute "commit"
         Exit Function
@@ -103,15 +117,15 @@ On Error GoTo Err1
 
     OK = False
 
-    OK = (C1 = Contador)
+    OK = (c1 = Contador)
     If OK Then
         'Actualizamos el contador
-        SQL = "UPDATE seccion set "
+        Sql = "UPDATE seccion set "
 
-        C1 = C1 - 1
-        SQL = SQL & " contador=" & C1
-        SQL = SQL & " WHERE codsecci = " & vCodigo
-        conn.Execute SQL
+        c1 = c1 - 1
+        Sql = Sql & " contador=" & c1
+        Sql = Sql & " WHERE codsecci = " & vcodigo
+        conn.Execute Sql
     End If
 
     'Desbloqueamos
@@ -128,29 +142,29 @@ Err1:
 End Function
 
 
-Public Function ConseguirContador(vCodigo As String) As Long
+Public Function ConseguirContador(vcodigo As String) As Long
 Dim OK As Boolean
-Dim C1 As Long 'contador
-Dim RS As ADODB.Recordset
+Dim c1 As Long 'contador
+Dim Rs As ADODB.Recordset
 On Error GoTo Err1
     
     ConseguirContador = 1
     
     'Abrimos bloqueando
-    SQL = "Select * from seccion WHERE codsecci=" & vCodigo & " FOR UPDATE"
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
-    If Not RS.EOF Then
-        mvarSeccion = vCodigo
-        mvarNombreSec = RS!nomsecci
-        mvarContador = RS!Contador
-        C1 = RS!Contador
+    Sql = "Select * from seccion WHERE codsecci=" & vcodigo & " FOR UPDATE"
+    Set Rs = New ADODB.Recordset
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    If Not Rs.EOF Then
+        mvarSeccion = vcodigo
+        mvarNombreSec = Rs!nomsecci
+        mvarContador = Rs!Contador
+        c1 = Rs!Contador
         OK = True
     End If
-    RS.Close
-    Set RS = Nothing
+    Rs.Close
+    Set Rs = Nothing
     
-    If OK Then ConseguirContador = C1 + 1
+    If OK Then ConseguirContador = c1 + 1
     Exit Function
 Err1:
     Mens = "Error: " & Err.Number & " : " & Err.Description
@@ -159,20 +173,20 @@ Err1:
 End Function
 
 
-Public Function IncrementarContador(vCodigo As String) As Boolean
-Dim C1 As Long 'contador1: recibo de entrada
+Public Function IncrementarContador(vcodigo As String) As Boolean
+Dim c1 As Long 'contador1: recibo de entrada
 On Error GoTo Err1
     
       
     'Actualizamos el contador
-    C1 = Contador
-    SQL = "UPDATE seccion set "
-    C1 = C1 + 1
-    mvarContador = C1
-    SQL = SQL & " contador=" & C1
+    c1 = Contador
+    Sql = "UPDATE seccion set "
+    c1 = c1 + 1
+    mvarContador = c1
+    Sql = Sql & " contador=" & c1
     
-    SQL = SQL & " WHERE codsecci=" & vCodigo
-    conn.Execute SQL
+    Sql = Sql & " WHERE codsecci=" & vcodigo
+    conn.Execute Sql
     IncrementarContador = True
     Exit Function
 Err1:
@@ -185,29 +199,30 @@ End Function
 
 
 
-Public Function Leer(vCodigo As String) As Boolean
+Public Function leer(vcodigo As String) As Boolean
 On Error GoTo Err3
     
-    SQL = "SELECT * FROM seccion WHERE codsecci=" & vCodigo
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic
+    Sql = "SELECT * FROM seccion WHERE codsecci=" & vcodigo
+    Set Rs = New ADODB.Recordset
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockOptimistic
 
-    If RS.EOF Then
-        Leer = False
+    If Rs.EOF Then
+        leer = False
         'No existe la sección
-        SQL = "No existe la Sección: " & vCodigo
-        MsgBox SQL, vbCritical
+        Sql = "No existe la Sección: " & vcodigo
+        MsgBox Sql, vbCritical
     Else
-        mvarSeccion = RS!codsecci
-        mvarNombreSec = RS!nomsecci
-        mvarContador = RS!Contador
-        mvarLetraSerie = DBLet(Trim(RS!letraser), "T")
-        mvarBDConta = RS!NumConta
-        Leer = True
+        mvarSeccion = Rs!codsecci
+        mvarNombreSec = Rs!nomsecci
+        mvarContador = Rs!Contador
+        mvarLetraSerie = DBLet(Trim(Rs!letraser), "T")
+        mvarBDConta = Rs!NumConta
+        mvarESMaterna = Rs!EsMaterna
+        leer = True
     End If
 
-    RS.Close
-    Set RS = Nothing
+    Rs.Close
+    Set Rs = Nothing
     Exit Function
 
 Err3:
@@ -216,7 +231,9 @@ Err3:
         Mens = Mens & "Número: " & Err.Number & vbCrLf
         Mens = Mens & "Descripción: " & Err.Description
         MsgBox Mens, vbExclamation
-        RS.Close
-        Leer = False
+        Rs.Close
+        leer = False
     End If
 End Function
+
+

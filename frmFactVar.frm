@@ -537,6 +537,10 @@ Dim b As Boolean
         
         indRPT = 1 'Facturas Varias
         
+        '[Monica]26/05/2016: otro report para materna
+        If EsSeccionMaterna(txtCodigo(8).Text) Then indRPT = 4
+        
+        
        If Not PonerParamRPT(indRPT, cadParam, numParam, nomDocu) Then Exit Sub
        ' he añadido estas dos lineas para que llame al rpt correspondiente
        frmImprimir.NombreRPT = nomDocu
@@ -623,12 +627,12 @@ Private Sub frmCtas_DatoSeleccionado(CadenaSeleccion As String)
 End Sub
 
 Private Sub frmSec_DatoSeleccionado(CadenaSeleccion As String)
-Dim cad As String
+Dim Cad As String
     txtCodigo(indCodigo).Text = RecuperaValor(CadenaSeleccion, 1) 'codsecci
     txtNombre(indCodigo).Text = RecuperaValor(CadenaSeleccion, 2) 'nomsecci
     
-    cad = RecuperaValor(CadenaSeleccion, 5)  'numconta
-    If cad <> "" Then BdConta = CByte(cad)  'numero de conta
+    Cad = RecuperaValor(CadenaSeleccion, 5)  'numconta
+    If Cad <> "" Then BdConta = CByte(Cad)  'numero de conta
 End Sub
 
 Private Sub imgFec_Click(Index As Integer)
@@ -715,7 +719,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -756,8 +760,8 @@ Dim cad As String, cadTipo As String 'tipo cliente
             If txtCodigo(Index).Text <> "" Then
                 txtCodigo(Index).Text = Format(txtCodigo(Index).Text, "000")
             
-                cad = DevuelveDesdeBDNew(cPTours, "seccion", "numconta", "codsecci", txtCodigo(8).Text, "N") 'numconta
-                If cad <> "" Then BdConta = CByte(cad)  'numero de conta
+                Cad = DevuelveDesdeBDNew(cPTours, "seccion", "numconta", "codsecci", txtCodigo(8).Text, "N") 'numconta
+                If Cad <> "" Then BdConta = CByte(Cad)  'numero de conta
             Else
                 MsgBox "Debe introducir un código existente en la sección.", vbExclamation
             End If
@@ -896,7 +900,7 @@ End Sub
 
 Public Function InsertarNrosFacturaEnTemporal(cTabla As String, cWhere As String) As Boolean
 'Comprobar si hay registros a Mostrar antes de abrir el Informe
-Dim SQL As String
+Dim Sql As String
 Dim sql2 As String
 
     On Error GoTo eInsertarNrosFacturaEnTemporal
@@ -906,15 +910,15 @@ Dim sql2 As String
     sql2 = "delete from tmpfacturas where codusu = " & vSesion.Codigo
     conn.Execute sql2
 
-    SQL = "Select distinct " & vSesion.Codigo & "," & tabla & ".letraser," & tabla & ".numfactu" & "," & tabla & ".fecfactu " & " FROM " & QuitarCaracterACadena(cTabla, "_1")
+    Sql = "Select distinct " & vSesion.Codigo & "," & tabla & ".letraser," & tabla & ".numfactu" & "," & tabla & ".fecfactu " & " FROM " & QuitarCaracterACadena(cTabla, "_1")
     If cWhere <> "" Then
         cWhere = QuitarCaracterACadena(cWhere, "{")
         cWhere = QuitarCaracterACadena(cWhere, "}")
         cWhere = QuitarCaracterACadena(cWhere, "_1")
-        SQL = SQL & " WHERE " & cWhere
+        Sql = Sql & " WHERE " & cWhere
     End If
     
-    sql2 = "insert into tmpfacturas (codusu, letraser, numfactu, fecfactu) " & SQL
+    sql2 = "insert into tmpfacturas (codusu, letraser, numfactu, fecfactu) " & Sql
     conn.Execute sql2
     
 eInsertarNrosFacturaEnTemporal:

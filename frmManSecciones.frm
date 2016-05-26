@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{67397AA1-7FB1-11D0-B148-00A0C922E820}#6.0#0"; "MSADODC.OCX"
 Object = "{CDE57A40-8B86-11D0-B3C6-00A0C90AEA82}#1.0#0"; "MSDATGRD.OCX"
 Begin VB.Form frmManSecciones 
@@ -8,15 +8,26 @@ Begin VB.Form frmManSecciones
    ClientHeight    =   5955
    ClientLeft      =   45
    ClientTop       =   330
-   ClientWidth     =   8835
+   ClientWidth     =   9075
    Icon            =   "frmManSecciones.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
    ScaleHeight     =   5955
-   ScaleWidth      =   8835
+   ScaleWidth      =   9075
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'CenterScreen
+   Begin VB.CheckBox chkAux 
+      BackColor       =   &H80000005&
+      Height          =   255
+      Index           =   1
+      Left            =   7740
+      TabIndex        =   7
+      Tag             =   "Es materna|N|N|0|1|seccion|esmaterna|||"
+      Top             =   3960
+      Visible         =   0   'False
+      Width           =   255
+   End
    Begin VB.CommandButton btnBuscar 
       Appearance      =   0  'Flat
       Caption         =   "+"
@@ -24,7 +35,7 @@ Begin VB.Form frmManSecciones
       Index           =   1
       Left            =   7485
       MaskColor       =   &H00000000&
-      TabIndex        =   19
+      TabIndex        =   20
       ToolTipText     =   "Buscar Raiz Cta."
       Top             =   3915
       Visible         =   0   'False
@@ -37,8 +48,8 @@ Begin VB.Form frmManSecciones
       Index           =   7
       Left            =   6930
       MaxLength       =   10
-      TabIndex        =   18
-      Tag             =   "Raiz Cuenta|T|S|||seccion|raizctaret|||"
+      TabIndex        =   6
+      Tag             =   "Raiz Cuenta Ret|T|S|||seccion|raizctaret|||"
       Text            =   "Raiz"
       Top             =   3915
       Width           =   555
@@ -46,15 +57,15 @@ Begin VB.Form frmManSecciones
    Begin VB.Frame Frame2 
       Height          =   870
       Left            =   135
-      TabIndex        =   15
+      TabIndex        =   17
       Top             =   4410
-      Width           =   8430
+      Width           =   8820
       Begin VB.TextBox txtAux 
          Height          =   285
          Index           =   8
          Left            =   2340
          MaxLength       =   30
-         TabIndex        =   20
+         TabIndex        =   21
          Top             =   495
          Width           =   5550
       End
@@ -63,7 +74,7 @@ Begin VB.Form frmManSecciones
          Index           =   6
          Left            =   2340
          MaxLength       =   30
-         TabIndex        =   16
+         TabIndex        =   18
          Top             =   180
          Width           =   5550
       End
@@ -71,7 +82,7 @@ Begin VB.Form frmManSecciones
          Caption         =   "Cuenta Contable Retención"
          Height          =   195
          Left            =   135
-         TabIndex        =   21
+         TabIndex        =   22
          Top             =   540
          Width           =   2085
       End
@@ -79,7 +90,7 @@ Begin VB.Form frmManSecciones
          Caption         =   "Cuenta Contable"
          Height          =   195
          Left            =   135
-         TabIndex        =   17
+         TabIndex        =   19
          Top             =   225
          Width           =   1275
       End
@@ -104,7 +115,7 @@ Begin VB.Form frmManSecciones
       Index           =   0
       Left            =   6720
       MaskColor       =   &H00000000&
-      TabIndex        =   14
+      TabIndex        =   16
       ToolTipText     =   "Buscar Raiz Cta."
       Top             =   3915
       Visible         =   0   'False
@@ -182,8 +193,8 @@ Begin VB.Form frmManSecciones
    Begin VB.CommandButton cmdAceptar 
       Caption         =   "&Aceptar"
       Height          =   375
-      Left            =   6300
-      TabIndex        =   6
+      Left            =   6750
+      TabIndex        =   8
       Top             =   5415
       Visible         =   0   'False
       Width           =   1035
@@ -192,8 +203,8 @@ Begin VB.Form frmManSecciones
       Cancel          =   -1  'True
       Caption         =   "&Cancelar"
       Height          =   375
-      Left            =   7425
-      TabIndex        =   7
+      Left            =   7875
+      TabIndex        =   9
       Top             =   5415
       Visible         =   0   'False
       Width           =   1095
@@ -202,10 +213,10 @@ Begin VB.Form frmManSecciones
       Bindings        =   "frmManSecciones.frx":000C
       Height          =   3780
       Left            =   120
-      TabIndex        =   10
+      TabIndex        =   12
       Top             =   540
-      Width           =   8445
-      _ExtentX        =   14896
+      Width           =   8805
+      _ExtentX        =   15531
       _ExtentY        =   6668
       _Version        =   393216
       AllowUpdate     =   0   'False
@@ -271,9 +282,9 @@ Begin VB.Form frmManSecciones
    Begin VB.CommandButton cmdRegresar 
       Caption         =   "&Regresar"
       Height          =   375
-      Left            =   7425
-      TabIndex        =   13
-      Top             =   5385
+      Left            =   7875
+      TabIndex        =   15
+      Top             =   5415
       Visible         =   0   'False
       Width           =   1095
    End
@@ -281,7 +292,7 @@ Begin VB.Form frmManSecciones
       Height          =   555
       Index           =   1
       Left            =   120
-      TabIndex        =   8
+      TabIndex        =   10
       Top             =   5310
       Width           =   2385
       Begin VB.Label lblIndicador 
@@ -298,7 +309,7 @@ Begin VB.Form frmManSecciones
          EndProperty
          Height          =   255
          Left            =   40
-         TabIndex        =   9
+         TabIndex        =   11
          Top             =   240
          Width           =   2295
       End
@@ -354,10 +365,10 @@ Begin VB.Form frmManSecciones
       Align           =   1  'Align Top
       Height          =   360
       Left            =   0
-      TabIndex        =   11
+      TabIndex        =   13
       Top             =   0
-      Width           =   8835
-      _ExtentX        =   15584
+      Width           =   9075
+      _ExtentX        =   16007
       _ExtentY        =   635
       ButtonWidth     =   609
       ButtonHeight    =   582
@@ -416,7 +427,7 @@ Begin VB.Form frmManSecciones
          Caption         =   "Vista previa"
          Height          =   195
          Left            =   5580
-         TabIndex        =   12
+         TabIndex        =   14
          Top             =   90
          Visible         =   0   'False
          Width           =   1215
@@ -517,6 +528,7 @@ Attribute frmCtas.VB_VarHelpID = -1
 Dim indice As Byte 'Index del text1 on es poses els datos retornats des d'atres Formularis de Mtos
 
 Private kCampo As Integer
+Private BuscaChekc As String
 
 Dim Modo As Byte
 '----------- MODOS --------------------------------
@@ -534,6 +546,7 @@ Dim i As Integer
     
     Modo = vModo
 '    PonerIndicador lblIndicador, Modo
+    BuscaChekc = ""
     
     b = (Modo = 2)
     If b Then
@@ -550,6 +563,8 @@ Dim i As Integer
     txtAux(4).visible = Not b
     txtAux(5).visible = Not b
     txtAux(7).visible = Not b
+    chkAux(1).visible = Not b
+    
     btnBuscar(0).visible = (Modo = 3 Or Modo = 4)
     btnBuscar(0).Enabled = (Modo = 3 Or Modo = 4)
     btnBuscar(1).visible = (Modo = 3 Or Modo = 4)
@@ -645,6 +660,7 @@ Dim i As Integer
         txtAux(i).Text = ""
     Next i
     ' **************************************************
+    chkAux(1).Value = 0
 
     LLamaLineas anc, 3
        
@@ -674,6 +690,7 @@ Private Sub BotonBuscar()
     For i = 0 To 6
         txtAux(i).Text = ""
     Next i
+    chkAux(1).Value = 0
 
     LLamaLineas DataGrid1.Top + 206, 1
     
@@ -709,6 +726,8 @@ Private Sub BotonModificar()
     txtAux(5).Text = DataGrid1.Columns(5).Text
     txtAux(7).Text = DataGrid1.Columns(6).Text
     ' ********************************************************
+    '[Monica]26/05/2016: nuevo campo de materna
+    Me.chkAux(1).Value = Me.adodc1.Recordset!esmaterna
 
     LLamaLineas anc, 4 'modo 4
    
@@ -732,6 +751,10 @@ Dim i As Integer
     txtAux(7).Top = alto
     btnBuscar(0).Top = alto - 10
     btnBuscar(1).Top = alto - 10
+    
+    Me.chkAux(1).Top = alto
+    
+    
     ' ***************************************************
 End Sub
 
@@ -884,7 +907,7 @@ Dim i As Long
             End If
             
         Case 1  'BUSQUEDA
-            CadB = ObtenerBusqueda(Me)
+            CadB = ObtenerBusqueda(Me, BuscaChekc)
             If CadB <> "" Then
                 CargaGrid CadB
                 PonerModo 2
@@ -925,7 +948,7 @@ Private Sub cmdCancelar_Click()
 End Sub
 
 Private Sub cmdRegresar_Click()
-Dim cad As String
+Dim Cad As String
 Dim i As Integer
 Dim J As Integer
 Dim Aux As String
@@ -934,7 +957,7 @@ Dim Aux As String
         MsgBox "Ningún registro devuelto.", vbExclamation
         Exit Sub
     End If
-    cad = ""
+    Cad = ""
     i = 0
     Do
         J = i + 1
@@ -942,13 +965,13 @@ Dim Aux As String
         If i > 0 Then
             Aux = Mid(DatosADevolverBusqueda, J, i - J)
             J = Val(Aux)
-            cad = cad & adodc1.Recordset.Fields(J) & "|"
+            Cad = Cad & adodc1.Recordset.Fields(J) & "|"
         End If
     Loop Until i = 0
     ' *** adrede: per a tornar el TipoSuplem ***
     ' cad = cad & TipoSuplem & "|"
     ' ******************************************
-    RaiseEvent DatoSeleccionado(cad)
+    RaiseEvent DatoSeleccionado(Cad)
     Unload Me
 End Sub
 
@@ -997,7 +1020,10 @@ Dim i As Integer
     
     '****************** canviar la consulta *********************************+
     CadenaConsulta = "SELECT codsecci, nomsecci, contador, letraser, "
-    CadenaConsulta = CadenaConsulta & "numconta, raizcta, raizctaret "
+    CadenaConsulta = CadenaConsulta & "numconta, raizcta, raizctaret, "
+    '[Monica]26/05/2016: es o no seccion de materna
+    CadenaConsulta = CadenaConsulta & " esmaterna, IF(esmaterna=1,'*','') as desmaterna "
+    
     CadenaConsulta = CadenaConsulta & " FROM seccion "
     '************************************************************************
     
@@ -1155,6 +1181,10 @@ Private Sub CargaGrid(Optional vSQL As String)
     tots = tots & "S|txtAux(3)|T|Serie|600|;S|txtAux(4)|T|Conta|600|;"
     tots = tots & "S|txtAux(5)|T|Raiz Cuenta|1200|;S|btnBuscar(0)|B|||;"
     tots = tots & "S|txtAux(7)|T|Raiz Cta.Ret|1200|;S|btnBuscar(1)|B|||;"
+    '[Monica]26/05/2016: Es materna
+    tots = tots & "N||||0|;S|chkAux(1)|CB|EM|360|;"
+    
+    
 '    For i = 1 To 11
 '        tots = tots & "N||||0|;"
 '    Next i
@@ -1259,8 +1289,8 @@ Private Function DatosOk() As Boolean
 Dim Datos As String
 Dim b As Boolean
 ' *** només per ad este manteniment ***
-Dim RS As Recordset
-Dim cad As String
+Dim Rs As Recordset
+Dim Cad As String
 'Dim exped As String
 ' *************************************
 
@@ -1329,20 +1359,21 @@ Dim i As Byte
 End Sub
 
 Private Sub CargaForaGrid()
-        If adodc1.Recordset.EOF Then Exit Sub
-        
-        If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, Me.adodc1.Recordset.Fields(4).Value) Then
-            Set vEmpresaFac = New CempresaFac
-            If vEmpresaFac.LeerNiveles Then
-                txtAux(6) = DevuelveDesdeBDNewFac("cuentas", "nommacta", "codmacta", Me.adodc1.Recordset.Fields(5).Value, "T")
-                txtAux(8).Text = ""
-                If DBLet(Me.adodc1.Recordset.Fields(6).Value) <> "" Then
-                    txtAux(8) = DevuelveDesdeBDNewFac("cuentas", "nommacta", "codmacta", Me.adodc1.Recordset.Fields(6).Value, "T")
-                End If
+    
+    If adodc1.Recordset.EOF Then Exit Sub
+    
+    If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, Me.adodc1.Recordset.Fields(4).Value) Then
+        Set vEmpresaFac = New CempresaFac
+        If vEmpresaFac.LeerNiveles Then
+            txtAux(6) = DevuelveDesdeBDNewFac("cuentas", "nommacta", "codmacta", Me.adodc1.Recordset.Fields(5).Value, "T")
+            txtAux(8).Text = ""
+            If DBLet(Me.adodc1.Recordset.Fields(6).Value) <> "" Then
+                txtAux(8) = DevuelveDesdeBDNewFac("cuentas", "nommacta", "codmacta", Me.adodc1.Recordset.Fields(6).Value, "T")
             End If
-            Set vEmpresaFac = Nothing
-            CerrarConexionContaFac
         End If
+        Set vEmpresaFac = Nothing
+        CerrarConexionContaFac
+    End If
         ' *** posar als camps de fora del grid el valor de la columna corresponent ***
         
 '        txtAux(6) = PonerNombreCuenta(txtAux(4), Modo, cContaFac)
@@ -1362,6 +1393,8 @@ On Error Resume Next
     ' *** posar a huit tots els camps de fora del grid ***
     txtAux(6).Text = ""
     txtAux(8).Text = ""
+    Me.chkAux(1).Value = 0
+
     ' ****************************************************
 '    text2(12).Text = "" ' el nombre de la cuenta contable la ponemos a cero
 
@@ -1421,4 +1454,15 @@ End Sub
 'Private Sub DataGrid1_Lostfocus()
 '  WheelUnHook
 'End Sub
+
+Private Sub chkAux_Click(Index As Integer)
+    If Modo = 1 Then
+        'Buscqueda
+        If InStr(1, BuscaChekc, "chkAux(" & Index & ")") = 0 Then BuscaChekc = BuscaChekc & "chkAux(" & Index & ")|"
+    End If
+End Sub
+
+Private Sub chkAux_KeyPress(Index As Integer, KeyAscii As Integer)
+    KEYpress KeyAscii
+End Sub
 

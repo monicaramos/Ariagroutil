@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmListadoOfer 
    BorderStyle     =   3  'Fixed Dialog
@@ -655,12 +655,12 @@ End Sub
 
 Private Sub cmdAceptarAlbCom_Click()
 'Solicitar datos para Generar Albaran  a partir de Pedido de Compras
-Dim cad As String
+Dim Cad As String
 
-    cad = "" 'txtCodigo(47).Text & "|"
-    cad = cad & txtCodigo(48).Text & "|"
-    cad = cad & txtCodigo(49).Text & "|"
-    RaiseEvent DatoSeleccionado(cad)
+    Cad = "" 'txtCodigo(47).Text & "|"
+    Cad = Cad & txtCodigo(48).Text & "|"
+    Cad = Cad & txtCodigo(49).Text & "|"
+    RaiseEvent DatoSeleccionado(Cad)
     Unload Me
 End Sub
 
@@ -675,7 +675,7 @@ End Sub
 Private Sub cmdEnvioMail_Click()
 Dim cDesde As String, cHasta As String 'cadena codigo Desde/Hasta
 Dim nDesde As String, nHasta As String 'cadena Descripcion Desde/Hasta
-Dim cadTabla As String, cOrden As String
+Dim cadTABLA As String, cOrden As String
 Dim i As Byte
 Dim b As Boolean
 
@@ -945,7 +945,7 @@ Private Function GeneracionEnvioMail(ByRef Rs As ADODB.Recordset) As Boolean
         
         If Dir(App.path & "\docum.pdf", vbArchive) <> "" Then Kill App.path & "\docum.pdf"
     
-        Label14(22).Caption = "Factura: " & Rs!Importe1 & " " & Rs!nombre2
+        Label14(22).Caption = "Factura: " & Rs!importe1 & " " & Rs!nombre2
         Label14(22).Refresh
         
         Dim indRPT As Byte 'Indica el tipo de Documento en la tabla "scryst"
@@ -953,12 +953,15 @@ Private Function GeneracionEnvioMail(ByRef Rs As ADODB.Recordset) As Boolean
         
         indRPT = 1 'Facturas Varias
         
+        '[Monica]26/05/2016: otro report para materna
+        If EsSeccionMaterna(txtCodigo(8).Text) Then indRPT = 4
+        
        If Not PonerParamRPT(1, cadParam, numParam, nomDocu) Then Exit Function
         
        cadFormula = "({cabfact.codsecci}=" & CLng(txtCodigo(8).Text) & ") "
        cadFormula = cadFormula & " AND ({cabfact.letraser}='" & Trim(Rs!nombre2) & "') "
-       cadFormula = cadFormula & " AND ({cabfact.numfactu}=" & Rs!Importe1 & ") "
-       cadFormula = cadFormula & " AND ({cabfact.fecfactu}= Date(" & Year(Rs!Fecha1) & "," & Month(Rs!Fecha1) & "," & Day(Rs!Fecha1) & "))"
+       cadFormula = cadFormula & " AND ({cabfact.numfactu}=" & Rs!importe1 & ") "
+       cadFormula = cadFormula & " AND ({cabfact.fecfactu}= Date(" & Year(Rs!fecha1) & "," & Month(Rs!fecha1) & "," & Day(Rs!fecha1) & "))"
 
    
         With frmImprimir
@@ -991,7 +994,7 @@ Private Function GeneracionEnvioMail(ByRef Rs As ADODB.Recordset) As Boolean
         
         
         'FileCopy App.Path & "\docum.pdf", App.Path & "\temp\" & RS!NumAlbar & Format(RS!codProve, "0000000") & Format(RS!codArtic, "0000000") & Format(RS!FechaAlb, "yymmdd") & ".pdf"
-        FileCopy App.path & "\docum.pdf", App.path & "\temp\" & Trim(Rs!nombre2) & Format(Rs!Importe1, "0000000") & ".pdf"
+        FileCopy App.path & "\docum.pdf", App.path & "\temp\" & Trim(Rs!nombre2) & Format(Rs!importe1, "0000000") & ".pdf"
         
         Rs.MoveNext
     Wend
@@ -1062,12 +1065,12 @@ Private Sub frmCtas_DatoSeleccionado(CadenaSeleccion As String)
 End Sub
 
 Private Sub frmSec_DatoSeleccionado(CadenaSeleccion As String)
-Dim cad As String
+Dim Cad As String
     txtCodigo(indCodigo).Text = RecuperaValor(CadenaSeleccion, 1) 'codsecci
     txtNombre(indCodigo).Text = RecuperaValor(CadenaSeleccion, 2) 'nomsecci
     
-    cad = RecuperaValor(CadenaSeleccion, 5)  'numconta
-    If cad <> "" Then BdConta = CByte(cad)  'numero de conta
+    Cad = RecuperaValor(CadenaSeleccion, 5)  'numconta
+    If Cad <> "" Then BdConta = CByte(Cad)  'numero de conta
 End Sub
 
 Private Sub frmF_Selec(vFecha As Date)
@@ -1244,7 +1247,7 @@ Dim codCampo As String, nomcampo As String
 Dim TipCampo As String, Formato As String
 Dim Titulo As String
 Dim EsNomCod As Boolean
-Dim cad As String
+Dim Cad As String
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -1273,8 +1276,8 @@ Dim cad As String
             If txtCodigo(Index).Text <> "" Then
                 txtCodigo(Index).Text = Format(txtCodigo(Index).Text, "000")
             
-                cad = DevuelveDesdeBDNew(cPTours, "seccion", "numconta", "codsecci", txtCodigo(8).Text, "N") 'numconta
-                If cad <> "" Then BdConta = CByte(cad)  'numero de conta
+                Cad = DevuelveDesdeBDNew(cPTours, "seccion", "numconta", "codsecci", txtCodigo(8).Text, "N") 'numconta
+                If Cad <> "" Then BdConta = CByte(Cad)  'numero de conta
             Else
                 MsgBox "Debe introducir un código existente en la sección.", vbExclamation
             End If

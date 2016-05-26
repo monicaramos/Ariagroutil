@@ -825,7 +825,7 @@ Dim enc As String
         While Not Rs.EOF 'And b
             If Opcion = 3 Then
                 SQL = Rs!Codmacta & " o " & Rs!CodmacCl
-                SQL = "La cuenta " & SQL & " del articulo " & Rs!codartic & " no es del grupo correcto."
+                SQL = "La cuenta " & SQL & " del articulo " & Rs!CodArtic & " no es del grupo correcto."
                 InsertarError SQL
             Else
                 If Opcion = 11 Then
@@ -1171,7 +1171,7 @@ End Function
 
 
 
-Public Function ComprobarTiposIVA() As Boolean
+Public Function ComprobarTiposIVA(Seccion As String) As Boolean
 'Comprobar que todos los Tipos de IVA de las distintas facturas (scafac.codigiva1, codigiv2,codigiv3)
 'que vamos a contabilizar existan en la contabilidad
 Dim SQL As String
@@ -1197,7 +1197,9 @@ Dim i As Byte
             SQL = SQL & " FROM cabfact "
             SQL = SQL & " INNER JOIN tmpfactu ON cabfact.letraser=tmpfactu.numserie AND cabfact.numfactu=tmpfactu.numfactu AND cabfact.fecfactu=tmpfactu.fecfactu "
             SQL = SQL & " WHERE not isnull(tipoiva" & i & ")"
-
+            '[Monica]19/05/2016: pasamos la seccion
+            If Seccion <> "" Then SQL = SQL & " and cabfact.codsecci = " & DBSet(Seccion, "N")
+            
             Set Rs = New ADODB.Recordset
             Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
             b = True
@@ -1465,7 +1467,7 @@ Dim codsoc As Long
 Dim Rs As ADODB.Recordset
 
 Dim Rsx As ADODB.Recordset
-Dim Sql2 As String
+Dim sql2 As String
 Dim codfor As Integer
 Dim TipForpa As String
 Dim PorIva As String
@@ -1551,7 +1553,7 @@ Dim codsoc As Long
 Dim Rs As ADODB.Recordset
 
 Dim Rsx As ADODB.Recordset
-Dim Sql2 As String
+Dim sql2 As String
 Dim codfor As Integer
 Dim TipForpa As String
 Dim PorIva As String
@@ -1643,7 +1645,7 @@ Dim codsoc As Long
 Dim Rs As ADODB.Recordset
 
 Dim Rsx As ADODB.Recordset
-Dim Sql2 As String
+Dim sql2 As String
 Dim codfor As Integer
 Dim TipForpa As String
 Dim PorIva As String
@@ -1717,7 +1719,7 @@ Dim codsoc As Long
 Dim Rs As ADODB.Recordset
 
 Dim Rsx As ADODB.Recordset
-Dim Sql2 As String
+Dim sql2 As String
 Dim codfor As Integer
 Dim TipForpa As String
 'Dim PorIva As String
@@ -1767,18 +1769,18 @@ Dim Cad As String
         Cad = Cad & DBSet(NumLinea, "N") & "," & DBSet(CuentaSocio, "T") & "," & DBSet(numdocum, "T") & ","
         
         ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
-        If DBLet(Rs!Total, "N") < 0 Then
+        If DBLet(Rs!total, "N") < 0 Then
             ' importe al debe en negativo, cambiamos el signo
-            Cad = Cad & DBSet(vParamAplic.ConceDebeGas, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Rs!Total * (-1), "N") & "," & ValorNulo & ","
+            Cad = Cad & DBSet(vParamAplic.ConceDebeGas, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Rs!total * (-1), "N") & "," & ValorNulo & ","
             Cad = Cad & DBSet(CodCCost, "T") & "," & DBSet(vParamAplic.CtaContraGas, "T") & "," & ValorNulo & ",0"
         
-            ImporteD = ImporteD + (CCur(Rs!Total) * (-1))
+            ImporteD = ImporteD + (CCur(Rs!total) * (-1))
         Else
             ' importe al haber en positivo
-            Cad = Cad & DBSet(vParamAplic.ConceHaberGas, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Rs!Total, "N") & ","
+            Cad = Cad & DBSet(vParamAplic.ConceHaberGas, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(Rs!total, "N") & ","
             Cad = Cad & DBSet(CodCCost, "T") & "," & DBSet(vParamAplic.CtaContraGas, "T") & "," & ValorNulo & ",0"
         
-            ImporteH = ImporteH + CCur(Rs!Total)
+            ImporteH = ImporteH + CCur(Rs!total)
         End If
         
         Diferencia = Diferencia + (ImporteH - ImporteD)
@@ -1887,7 +1889,7 @@ Dim codsoc As Long
 Dim Rs As ADODB.Recordset
 
 Dim Rsx As ADODB.Recordset
-Dim Sql2 As String
+Dim sql2 As String
 Dim codfor As Integer
 Dim TipForpa As String
 
@@ -1912,9 +1914,9 @@ Dim TipForpa As String
     
         
         ' insertar en tesoreria
-        Sql2 = "select codforpa from schfacr where " & cadwhere
+        sql2 = "select codforpa from schfacr where " & cadwhere
         Set Rsx = New ADODB.Recordset
-        Rsx.Open Sql2, conn, adOpenStatic, adLockPessimistic, adCmdText
+        Rsx.Open sql2, conn, adOpenStatic, adLockPessimistic, adCmdText
         
         If Not Rsx.EOF Then codfor = Rsx.Fields(0).Value
         TipForpa = DevuelveDesdeBDNew(cPTours, "sforpa", "tipforpa", "codforpa", DBSet(Rsx.Fields(0).Value, "N"), "N")
@@ -1958,7 +1960,7 @@ EContab:
     End If
 End Function
 
-Private Function InsertarCabFact(cadwhere As String, TipoIva As String, cadErr As String, PorcIva As String) As Boolean
+Private Function InsertarCabFact(cadwhere As String, TipoIva As String, caderr As String, PorcIva As String) As Boolean
 'Insertando en tabla conta.cabfact
 Dim SQL As String
 Dim Rs As ADODB.Recordset
@@ -2003,13 +2005,13 @@ Dim Cad As String
 EInsertar:
     If Err.Number <> 0 Then
         InsertarCabFact = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarCabFact = True
     End If
 End Function
 
-Private Function InsertarFacturaCV(cadwhere As String, tipo As String, cadErr As String) As Boolean
+Private Function InsertarFacturaCV(cadwhere As String, tipo As String, caderr As String) As Boolean
 'Insertando en tabla conta.cabfact
 Dim SQL As String
 Dim Rs As ADODB.Recordset
@@ -2163,7 +2165,7 @@ Dim Mc As CContadorContab
 EInsertar:
     If Err.Number <> 0 Then
         InsertarFacturaCV = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarFacturaCV = True
     End If
@@ -2172,7 +2174,7 @@ End Function
 
 
 
-Private Function InsertarCabFactGas(cadwhere As String, TipoIva As String, cadErr As String) As Boolean
+Private Function InsertarCabFactGas(cadwhere As String, TipoIva As String, caderr As String) As Boolean
 'Insertando en tabla conta.cabfact
 Dim SQL As String
 Dim Rs As ADODB.Recordset
@@ -2220,7 +2222,7 @@ Dim Codmacta As String
 EInsertar:
     If Err.Number <> 0 Then
         InsertarCabFactGas = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarCabFactGas = True
     End If
@@ -2228,7 +2230,7 @@ End Function
 
 
 
-Private Function InsertarCabFactFac(cadwhere As String, cadErr As String) As Boolean
+Private Function InsertarCabFactFac(cadwhere As String, caderr As String) As Boolean
 'Insertando en tabla conta.cabfact
 Dim SQL As String
 Dim Rs As ADODB.Recordset
@@ -2277,7 +2279,7 @@ Dim Cad As String
 EInsertar:
     If Err.Number <> 0 Then
         InsertarCabFactFac = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarCabFactFac = True
     End If
@@ -2285,16 +2287,16 @@ End Function
 
 
 
-Private Function InsertarLinFact(cadTABLA As String, cadwhere As String, cadErr As String, CtaVenta As String, CCoste As String) As Boolean
+Private Function InsertarLinFact(cadTABLA As String, cadwhere As String, caderr As String, CtaVenta As String, CCoste As String) As Boolean
 'cadWHere: selecciona un registro de scafac
 'codtipom=x and numfactu=y and fecfactu=z
 Dim SQL As String
 Dim Rs As ADODB.Recordset
 Dim Cad As String, Aux As String
 Dim i As Long
-Dim totimp As Currency, Implinea As Currency
+Dim totimp As Currency, ImpLinea As Currency
 Dim CodIVA As String
-Dim iva As String
+Dim Iva As String
 Dim vIva As Currency
 
 
@@ -2343,7 +2345,7 @@ Dim vIva As Currency
 EInLinea:
     If Err.Number <> 0 Then
         InsertarLinFact = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarLinFact = True
     End If
@@ -2352,16 +2354,16 @@ End Function
 
 
 
-Private Function InsertarLinFactGas(cadTABLA As String, cadwhere As String, cadErr As String, CCoste As String) As Boolean
+Private Function InsertarLinFactGas(cadTABLA As String, cadwhere As String, caderr As String, CCoste As String) As Boolean
 'cadWHere: selecciona un registro de gascabfac
 'codtipom=x and numfactu=y and fecfactu=z
 Dim SQL As String
 Dim Rs As ADODB.Recordset
 Dim Cad As String, Aux As String
 Dim i As Long
-Dim totimp As Currency, Implinea As Currency
+Dim totimp As Currency, ImpLinea As Currency
 Dim CodIVA As String
-Dim iva As String
+Dim Iva As String
 Dim vIva As Currency
 
 
@@ -2410,7 +2412,7 @@ Dim vIva As Currency
 EInLinea:
     If Err.Number <> 0 Then
         InsertarLinFactGas = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarLinFactGas = True
     End If
@@ -2418,16 +2420,16 @@ End Function
 
 
 
-Private Function InsertarLinFactFac(cadTABLA As String, cadwhere As String, cadErr As String, CCoste As String) As Boolean
+Private Function InsertarLinFactFac(cadTABLA As String, cadwhere As String, caderr As String, CCoste As String) As Boolean
 'cadWHere: selecciona un registro de scafac
 'codtipom=x and numfactu=y and fecfactu=z
 Dim SQL As String
 Dim Rs As ADODB.Recordset
 Dim Cad As String, Aux As String
 Dim i As Long
-Dim totimp As Currency, Implinea As Currency
+Dim totimp As Currency, ImpLinea As Currency
 Dim CodIVA As String
-Dim iva As String
+Dim Iva As String
 Dim vIva As Currency
 
 
@@ -2494,7 +2496,7 @@ Dim vIva As Currency
 EInLinea:
     If Err.Number <> 0 Then
         InsertarLinFactFac = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarLinFactFac = True
     End If
@@ -2502,16 +2504,16 @@ End Function
 
 
 
-Private Function InsertarLinFact2(cadTABLA As String, cadwhere As String, cadErr As String, ByRef vsocio As CSocio, Optional numRegis As Long) As Boolean
+Private Function InsertarLinFact2(cadTABLA As String, cadwhere As String, caderr As String, ByRef vsocio As CSocio, Optional numRegis As Long) As Boolean
 'cadWHere: selecciona un registro de scafac
 'codtipom=x and numfactu=y and fecfactu=z
 Dim SQL As String
 Dim Rs As ADODB.Recordset
 Dim Cad As String, Aux As String
 Dim i As Long
-Dim totimp As Currency, Implinea As Currency
+Dim totimp As Currency, ImpLinea As Currency
 Dim CodIVA As String
-Dim iva As String
+Dim Iva As String
 Dim vIva As Currency
 
 
@@ -2545,10 +2547,10 @@ Dim vIva As Currency
         'Let v_base = Round(basesfac / (1 + (porc_iva / 100)), 2)
 '        Implinea = CCur(CalcularBase(CStr(RS!Importe), CStr(RS!codartic)))
         
-        Implinea = CCur(CalcularBase(CStr(Rs.Fields(5).Value), CStr(Rs!codartic)))
+        ImpLinea = CCur(CalcularBase(CStr(Rs.Fields(5).Value), CStr(Rs!CodArtic)))
         
-        Implinea = Round2(Implinea, 2)
-        totimp = totimp + Implinea
+        ImpLinea = Round2(ImpLinea, 2)
+        totimp = totimp + ImpLinea
         
         'concatenamos linea para insertar en la tabla de conta.linfact
         SQL = ""
@@ -2561,7 +2563,7 @@ Dim vIva As Currency
             SQL = SQL & DBSet(Rs!CodmacCl, "T")
         End If
         
-        SQL = SQL & "," & DBSet(Implinea, "N") & ","
+        SQL = SQL & "," & DBSet(ImpLinea, "N") & ","
         
         If CCoste = "" Then
             SQL = SQL & ValorNulo
@@ -2584,8 +2586,8 @@ Dim vIva As Currency
 '        MsgBox "FALTA cuadrar bases imponibles!!!!!!!!!"
         'en SQL esta la ult linea introducida
         totimp = BaseImp - totimp
-        totimp = Implinea + totimp '(+- diferencia)
-        Aux = Replace(SQL, DBSet(Implinea, "N"), DBSet(totimp, "N"))
+        totimp = ImpLinea + totimp '(+- diferencia)
+        Aux = Replace(SQL, DBSet(ImpLinea, "N"), DBSet(totimp, "N"))
         Cad = Replace(Cad, SQL, Aux)
     End If
 
@@ -2603,7 +2605,7 @@ Dim vIva As Currency
 EInLinea:
     If Err.Number <> 0 Then
         InsertarLinFact2 = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarLinFact2 = True
     End If
@@ -2612,7 +2614,7 @@ End Function
 
 
 
-Private Function InsertarLinFactReg(cadTABLA As String, cadwhere As String, cadErr As String, ByRef vsocio As CSocio, Optional numRegis As Long) As Boolean
+Private Function InsertarLinFactReg(cadTABLA As String, cadwhere As String, caderr As String, ByRef vsocio As CSocio, Optional numRegis As Long) As Boolean
 'cadWHere: selecciona un registro de scafac
 'codtipom=x and numfactu=y and fecfactu=z
 Dim SQL As String
@@ -2620,9 +2622,9 @@ Dim SQL1 As String
 Dim Rs As ADODB.Recordset
 Dim Cad As String, Aux As String
 Dim i As Long
-Dim totimp As Currency, Implinea As Currency
+Dim totimp As Currency, ImpLinea As Currency
 Dim CodIVA As String
-Dim iva As String
+Dim Iva As String
 Dim vIva As Currency
 Dim impuesto As Currency
 Dim Impue As Currency
@@ -2670,23 +2672,23 @@ Dim fecfactu As Date
         
         ' se quita el impuesto por linea
         SQL1 = ""
-        SQL1 = DevuelveDesdeBD("impuesto", "sartic", "codartic", DBLet(Rs!codartic), "N")
+        SQL1 = DevuelveDesdeBD("impuesto", "sartic", "codartic", DBLet(Rs!CodArtic), "N")
         If SQL1 = "" Then
             impuesto = 0
         Else
             impuesto = CCur(SQL1) ' Comprueba si es nulo y lo pone a 0 o ""
         End If
         
-        If EsArticuloCombustible(Rs!codartic) Then
+        If EsArticuloCombustible(Rs!CodArtic) Then
             Impue = Round2((Rs.Fields(6).Value * impuesto), 2)
             TotalImpuesto = TotalImpuesto + Impue
         End If
         
         
-        Implinea = CCur(CalcularBase(CStr(Rs.Fields(5).Value), CStr(Rs!codartic))) - Impue
-        Implinea = Round2(Implinea, 2)
+        ImpLinea = CCur(CalcularBase(CStr(Rs.Fields(5).Value), CStr(Rs!CodArtic))) - Impue
+        ImpLinea = Round2(ImpLinea, 2)
         
-        totimp = totimp + Implinea
+        totimp = totimp + ImpLinea
         
         'concatenamos linea para insertar en la tabla de conta.linfact
         SQL = ""
@@ -2699,7 +2701,7 @@ Dim fecfactu As Date
             SQL = SQL & DBSet(Rs!CodmacCl, "T")
         End If
         
-        SQL = SQL & "," & DBSet(Implinea, "N") & ","
+        SQL = SQL & "," & DBSet(ImpLinea, "N") & ","
         
         If CCoste = "" Then
             SQL = SQL & ValorNulo
@@ -2724,8 +2726,8 @@ Dim fecfactu As Date
 '        MsgBox "FALTA cuadrar bases imponibles!!!!!!!!!"
         'en SQL esta la ult linea introducida
         totimp = BaseImp - totimp
-        totimp = Implinea + totimp '(+- diferencia)
-        Aux = Replace(SQL, DBSet(Implinea, "N"), DBSet(totimp, "N"))
+        totimp = ImpLinea + totimp '(+- diferencia)
+        Aux = Replace(SQL, DBSet(ImpLinea, "N"), DBSet(totimp, "N"))
         Cad = Replace(Cad, SQL, Aux)
     End If
 
@@ -2754,7 +2756,7 @@ Dim fecfactu As Date
 EInLinea:
     If Err.Number <> 0 Then
         InsertarLinFactReg = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarLinFactReg = True
     End If
@@ -2766,7 +2768,7 @@ End Function
 
 
 
-Private Function ActualizarCabFact(cadTABLA As String, cadwhere As String, cadErr As String) As Boolean
+Private Function ActualizarCabFact(cadTABLA As String, cadwhere As String, caderr As String) As Boolean
 'Poner la factura como contabilizada
 Dim SQL As String
 
@@ -2780,7 +2782,7 @@ Dim SQL As String
 EActualizar:
     If Err.Number <> 0 Then
         ActualizarCabFact = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         ActualizarCabFact = True
     End If
@@ -2796,7 +2798,7 @@ Dim b As Boolean
 Dim Rs As ADODB.Recordset
 Dim Rsx As ADODB.Recordset
 Dim SQL As String, textcsb33 As String, textcsb41 As String
-Dim Sql2 As String
+Dim sql2 As String
 Dim Sql3 As String
 Dim Sql4 As String
 Dim Rs3 As ADODB.Recordset
@@ -2867,16 +2869,16 @@ Dim ForPago As String
         End If
         If TotalRegistros(SQL) <= 15 Then
 '            cadwhere2 = Replace(cadwhere, "schfac", "slhfac")
-            Sql2 = "select numalbar, fecalbar, sum(implinea) "
+            sql2 = "select numalbar, fecalbar, sum(implinea) "
             If vTabla = "schfac" Then
-                Sql2 = Sql2 & " from slhfac where " & cadWHERE2
+                sql2 = sql2 & " from slhfac where " & cadWHERE2
             Else
-                Sql2 = Sql2 & " from slhfacr where " & cadWHERE2
+                sql2 = sql2 & " from slhfacr where " & cadWHERE2
             End If
             
-            Sql2 = Sql2 & " group by numalbar, fecalbar order by numalbar, fecalbar "
+            sql2 = sql2 & " group by numalbar, fecalbar order by numalbar, fecalbar "
             Set Rsx = New ADODB.Recordset
-            Rsx.Open Sql2, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+            Rsx.Open sql2, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
             n_linea = 0
             While Not Rsx.EOF
                 n_linea = n_linea + 1
@@ -3017,7 +3019,7 @@ Dim SQL As String
 End Sub
 
 
-Public Function InsertarCabAsientoDia(Diario As String, Asiento As String, Fecha As String, Obs As String, cadErr As String, bd As Byte) As Boolean
+Public Function InsertarCabAsientoDia(Diario As String, Asiento As String, Fecha As String, Obs As String, caderr As String, bd As Byte) As Boolean
 'Insertando en tabla conta.cabfact
 Dim SQL As String
 Dim Rs As ADODB.Recordset
@@ -3046,14 +3048,14 @@ Dim Nulo3 As String
 EInsertar:
     If Err.Number <> 0 Then
         InsertarCabAsientoDia = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarCabAsientoDia = True
     End If
 End Function
 
 
-Public Function InsertarLinAsientoDia(Cad As String, cadErr As String, bd As Byte) As Boolean
+Public Function InsertarLinAsientoDia(Cad As String, caderr As String, bd As Byte) As Boolean
 ' el Tipo me indica desde donde viene la llamada
 ' tipo = 0 srecau.codmacta
 ' tipo = 1 scaalb.codmacta
@@ -3062,7 +3064,7 @@ Dim Rs As ADODB.Recordset
 Dim Aux As String
 Dim SQL As String
 Dim i As Byte
-Dim totimp As Currency, Implinea As Currency
+Dim totimp As Currency, ImpLinea As Currency
 
     On Error GoTo EInLinea
 
@@ -3083,13 +3085,13 @@ Dim totimp As Currency, Implinea As Currency
 EInLinea:
     If Err.Number <> 0 Then
         InsertarLinAsientoDia = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarLinAsientoDia = True
     End If
 End Function
 
-Public Function ActualizarMovimientos(cadwhere As String, cadErr As String) As Boolean
+Public Function ActualizarMovimientos(cadwhere As String, caderr As String) As Boolean
 'Poner el movimiento como contabilizada
 Dim SQL As String
 
@@ -3103,7 +3105,7 @@ Dim SQL As String
 EActualizar:
     If Err.Number <> 0 Then
         ActualizarMovimientos = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         ActualizarMovimientos = True
     End If
@@ -3281,7 +3283,7 @@ Dim b As Boolean
 Dim Rs As ADODB.Recordset
 Dim Rsx As ADODB.Recordset
 Dim SQL As String, text1csb As String, text2csb As String
-Dim Sql2 As String
+Dim sql2 As String
 Dim Sql3 As String
 Dim Sql4 As String
 Dim Rs3 As ADODB.Recordset
@@ -3398,7 +3400,7 @@ Dim vrefer As String
     If Not Rs4.EOF Then
         text33csb = "'Nro:" & DBLet(Rsx!Codrefer, "T") & " " & Format(DBLet(Rsx!FechaEnv, "F"), "dd/mm/yy")
         text33csb = text33csb & " de " & DBSet(Rsx!imppoliz, "N") & "'"
-        text41csb = "Linea:" & Format(Rsx!CodLinea, "0000") & " Plan:" & Format(Rsx!CodiPlan, "0000")
+        text41csb = "Linea:" & Format(Rsx!codlinea, "0000") & " Plan:" & Format(Rsx!CodiPlan, "0000")
         text41csb = text41csb & " Colectivo:" & Format(Rsx!Colectiv, "0000000")
         
               
@@ -3748,7 +3750,7 @@ End Function
 
 Public Function ComprobarFormadePago(cadCC As String) As Boolean
 Dim SQL As String
-Dim Sql2 As String
+Dim sql2 As String
 Dim Rs As ADODB.Recordset
 Dim b As Boolean
 
@@ -3756,8 +3758,8 @@ Dim b As Boolean
     SQL = DevuelveDesdeBDNew(cContaFacSoc, "sforpa", "codforpa", "codforpa", cadCC, "N")
     If SQL = "" Then
         b = False
-        Sql2 = "No existe la forma de Pago: " & cadCC
-        InsertarError Sql2
+        sql2 = "No existe la forma de Pago: " & cadCC
+        InsertarError sql2
     Else
         b = True
     End If
@@ -3842,7 +3844,7 @@ EContab:
 End Function
 
 
-Private Function InsertarCabFactSoc(cadwhere As String, cadErr As String, ByRef Mc As CContadorContab) As Boolean
+Private Function InsertarCabFactSoc(cadwhere As String, caderr As String, ByRef Mc As CContadorContab) As Boolean
 'Insertando en tabla conta.cabfact
 '(OUT) AnyoFacPr: aqui devolvemos el año de fecha recepcion para insertarlo en las lineas de factura de proveedor de la conta
 Dim SQL As String
@@ -3910,7 +3912,7 @@ Dim TotalFac As Currency
 EInsertar:
     If Err.Number <> 0 Then
         InsertarCabFactSoc = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarCabFactSoc = True
     End If
@@ -3924,7 +3926,7 @@ Dim b As Boolean
 Dim Rs As ADODB.Recordset
 Dim Rsx As ADODB.Recordset
 Dim SQL As String, text1csb As String, text2csb As String
-Dim Sql2 As String
+Dim sql2 As String
 Dim Sql3 As String
 Dim Sql4 As String
 Dim Rs3 As ADODB.Recordset
@@ -4014,16 +4016,16 @@ EInsertarTesoreriaNew:
     InsertarEnTesoreriaFacSoc = b
 End Function
 
-Private Function InsertarLinFactSoc(cadTABLA As String, cadwhere As String, cadErr As String, Optional numRegis As Long) As Boolean
+Private Function InsertarLinFactSoc(cadTABLA As String, cadwhere As String, caderr As String, Optional numRegis As Long) As Boolean
 'cadWHere: selecciona un registro de scafac
 'codtipom=x and numfactu=y and fecfactu=z
 Dim SQL As String
 Dim SQLaux As String
-Dim Sql2 As String
+Dim sql2 As String
 Dim Rs As ADODB.Recordset
 Dim Cad As String, Aux As String
 Dim i As Byte
-Dim totimp As Currency, Implinea As Currency
+Dim totimp As Currency, ImpLinea As Currency
 
     On Error GoTo EInLinea
 
@@ -4044,16 +4046,16 @@ Dim totimp As Currency, Implinea As Currency
     SQLaux = Cad
     'calculamos la Base Imp del total del importe para cada cta cble ventas
     '---- Laura: 10/10/2006
-    Implinea = DBLet(Rs!Importe, "N")
+    ImpLinea = DBLet(Rs!Importe, "N")
     '----
-    totimp = totimp + Implinea
+    totimp = totimp + ImpLinea
     
     'concatenamos linea para insertar en la tabla de conta.linfact
     ' linea de base sobre la cta contable de la variedad
     SQL = ""
     SQL = numRegis & "," & Year(Rs!fecfactu) & "," & i & ","
     SQL = SQL & DBSet(Rs!Codmacta, "T")
-    SQL = SQL & "," & DBSet(Implinea, "N") & ","
+    SQL = SQL & "," & DBSet(ImpLinea, "N") & ","
     
     If CCoste = "" Then
         SQL = SQL & ValorNulo
@@ -4082,11 +4084,11 @@ Dim totimp As Currency, Implinea As Currency
         
         'linea de base del importe de retencion en negativo sobre la cuenta de retencion de parametros
         i = i + 1
-        Implinea = DBLet(Rs!ImpReten, "N") * (-1)
+        ImpLinea = DBLet(Rs!ImpReten, "N") * (-1)
         SQL = ""
         SQL = numRegis & "," & Year(Rs!fecfactu) & "," & i & ","
         SQL = SQL & DBSet(vParamAplic.CtaRetenFacSoc, "T")
-        SQL = SQL & "," & DBSet(Implinea, "N") & ","
+        SQL = SQL & "," & DBSet(ImpLinea, "N") & ","
         
         If CCoste = "" Then
             SQL = SQL & ValorNulo
@@ -4107,7 +4109,7 @@ Dim totimp As Currency, Implinea As Currency
 EInLinea:
     If Err.Number <> 0 Then
         InsertarLinFactSoc = False
-        cadErr = Err.Description
+        caderr = Err.Description
     Else
         InsertarLinFactSoc = True
     End If

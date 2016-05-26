@@ -306,12 +306,12 @@ Private Sub Form_Load()
 End Sub
 
 Private Sub frmSec_DatoSeleccionado(CadenaSeleccion As String)
-Dim cad As String
+Dim Cad As String
     txtCodigo(6).Text = RecuperaValor(CadenaSeleccion, 1) 'codsecci
     txtNombre(6).Text = RecuperaValor(CadenaSeleccion, 2) 'nomsecci
     
-    cad = RecuperaValor(CadenaSeleccion, 5)  'numconta
-    If cad <> "" Then BdConta = CInt(cad)  'numero de conta
+    Cad = RecuperaValor(CadenaSeleccion, 5)  'numconta
+    If Cad <> "" Then BdConta = CInt(Cad)  'numero de conta
 
 End Sub
 
@@ -379,12 +379,12 @@ Private Sub txtCarp_KeyPress(Index As Integer, KeyAscii As Integer)
 End Sub
 
 Private Sub txtCarp_LostFocus(Index As Integer)
-Dim cad As String
+Dim Cad As String
 
     If Index = 0 Then
         If txtCarp(0) <> "" Then 'txtCarp(1) = impor.nombreCarpeta(CLng(txtCarp(0)))
-            cad = CargaPath(txtCarp(Index))
-            txtCarp(1).Text = Mid(cad, 2, Len(cad))
+            Cad = CargaPath(txtCarp(Index))
+            txtCarp(1).Text = Mid(Cad, 2, Len(Cad))
         End If
     End If
 End Sub
@@ -425,7 +425,7 @@ Private Sub KEYpress(KeyAscii As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -445,8 +445,8 @@ Dim cad As String, cadTipo As String 'tipo cliente
             If txtCodigo(Index).Text <> "" Then
                 txtCodigo(Index).Text = Format(txtCodigo(Index).Text, "000")
             
-                cad = DevuelveDesdeBDNew(cPTours, "seccion", "numconta", "codsecci", txtCodigo(6).Text, "N") 'numconta
-                If cad <> "" Then BdConta = CByte(cad)  'numero de conta
+                Cad = DevuelveDesdeBDNew(cPTours, "seccion", "numconta", "codsecci", txtCodigo(6).Text, "N") 'numconta
+                If Cad <> "" Then BdConta = CByte(Cad)  'numero de conta
             Else
                 MsgBox "Debe introducir un código existente en la sección. Revise.", vbExclamation
             End If
@@ -458,8 +458,8 @@ End Sub
 
 Private Sub CargaFacturas(DFecha As Date, HFecha As Date)
     Dim db As BaseDatos
-    Dim SQL As String
-    Dim RS As ADODB.Recordset
+    Dim Sql As String
+    Dim Rs As ADODB.Recordset
     Dim Rs2 As ADODB.Recordset
     Dim i As Long
     Dim FicheroPDF As String
@@ -488,18 +488,18 @@ Dim NomClien As String
 
 
 '    db.abrir "accArigasol", "", ""
-    SQL = "select cabfact.*" & _
+    Sql = "select cabfact.*" & _
             " from cabfact where fecfactu >= " & db.Fecha(CDate(txtCodigo(0).Text)) & _
             " and fecfactu <= " & db.Fecha(CDate(txtCodigo(1).Text)) & _
             " and cabfact.codsecci = " & DBSet(txtCodigo(6).Text, "N") & _
             " and cabfact.pasaridoc = 0"
             
-    Set RS = db.cursor(SQL)
+    Set Rs = db.cursor(Sql)
     
     
-    If Not RS.EOF Then
-        RS.MoveFirst
-        While Not RS.EOF
+    If Not Rs.EOF Then
+        Rs.MoveFirst
+        While Not Rs.EOF
             i = i + 1
             lblInf.Caption = "Procesando registro " & CStr(i)
             lblInf.Refresh
@@ -516,17 +516,22 @@ Dim NomClien As String
             '++monica: seleccionamos que rpt se ha de ejecutar
             cadParam = "|pEmpresa=" & vEmpresa.nomEmpre & "|"
             indRPT = 1 'Impresion de Factura
+            
+            '[Monica]26/05/2016: otro report para materna
+            If EsSeccionMaterna(txtCodigo(6).Text) Then indRPT = 4
+            
+            
             If Not PonerParamRPT(indRPT, cadParam, numParam, nomDocu) Then Exit Sub
             '++
             fr.NumeroParametros = numParam
             fr.OtrosParametros = cadParam
             fr.ConSubInforme = True
             fr.Informe = App.path & "\Informes\" & nomDocu
-            fr.FormulaSeleccion = "{cabfact.codsecci} = " & txtCodigo(6).Text & " and {cabfact.letraser} = '" & RS!letraser & "' and " & _
-                                  "{cabfact.numfactu} =" & CStr(RS!numfactu) & " and " & _
-                                  "{cabfact.fecfactu} = Date(" & Format(RS!fecfactu, "yyyy") & _
-                                                                    "," & Format(RS!fecfactu, "mm") & _
-                                                                    "," & Format(RS!fecfactu, "dd") & ")"
+            fr.FormulaSeleccion = "{cabfact.codsecci} = " & txtCodigo(6).Text & " and {cabfact.letraser} = '" & Rs!letraser & "' and " & _
+                                  "{cabfact.numfactu} =" & CStr(Rs!numfactu) & " and " & _
+                                  "{cabfact.fecfactu} = Date(" & Format(Rs!fecfactu, "yyyy") & _
+                                                                    "," & Format(Rs!fecfactu, "mm") & _
+                                                                    "," & Format(Rs!fecfactu, "dd") & ")"
                                                                     
             '[Monica]18/11/2013: falta indicarle cual es la contabilidad
             fr.Contabilidad = BdConta
@@ -540,32 +545,32 @@ Dim NomClien As String
             If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, BdConta) Then
                 Set vEmpresaFac = New CempresaFac
                 If vEmpresaFac.LeerNiveles Then
-                    NomClien = DevuelveDesdeBDNewFac("cuentas", "nommacta", "codmacta", CStr(RS!ctaclien), "T") ' PonerNombreCuenta( CStr(RS!ctaclien), 0, , BdConta, True)
+                    NomClien = DevuelveDesdeBDNewFac("cuentas", "nommacta", "codmacta", CStr(Rs!ctaclien), "T") ' PonerNombreCuenta( CStr(RS!ctaclien), 0, , BdConta, True)
                 End If
                 Set vEmpresaFac = Nothing
                 CerrarConexionContaFac
             End If
             
             
-            c1 = CargaParametroFac(vParamAplic.C1Factura, RS, NomClien)
-            c2 = CargaParametroFac(vParamAplic.C2Factura, RS, NomClien)
-            c3 = CargaParametroFac(vParamAplic.C3Factura, RS, NomClien)
-            c4 = CargaParametroFac(vParamAplic.C4Factura, RS, NomClien)
+            c1 = CargaParametroFac(vParamAplic.C1Factura, Rs, NomClien)
+            c2 = CargaParametroFac(vParamAplic.C2Factura, Rs, NomClien)
+            c3 = CargaParametroFac(vParamAplic.C3Factura, Rs, NomClien)
+            c4 = CargaParametroFac(vParamAplic.C4Factura, Rs, NomClien)
             
-            f1 = RS!fecfactu
-            i1 = RS!TotalFac
+            f1 = Rs!fecfactu
+            i1 = Rs!TotalFac
             f3 = Now
             If impor.importaFicheroPDF(FicheroPDF, CLng(txtCarp(0)), c1, c2, c3, c4, f1, f3, i1) Then
                 'actualizamos el pasaridoc de facturas
-                SQL = "update cabfact set pasaridoc = 1 where codsecci = " & txtCodigo(6).Text & " and letraser = " & DBSet(RS!letraser, "T")
-                SQL = SQL & " and numfactu = " & DBSet(RS!numfactu, "N") & " and fecfactu = " & DBSet(RS!fecfactu, "F")
-                db.Ejecutar SQL
+                Sql = "update cabfact set pasaridoc = 1 where codsecci = " & txtCodigo(6).Text & " and letraser = " & DBSet(Rs!letraser, "T")
+                Sql = Sql & " and numfactu = " & DBSet(Rs!numfactu, "N") & " and fecfactu = " & DBSet(Rs!fecfactu, "F")
+                db.Ejecutar Sql
             End If
             
             Unload fr
             Set fr = Nothing
             
-            RS.MoveNext
+            Rs.MoveNext
         Wend
     End If
     Exit Sub
@@ -577,12 +582,12 @@ End Sub
 
 
 
-Private Function CargaParametroFac(param As Byte, ByRef RS As ADODB.Recordset, NomClien As String) As String
+Private Function CargaParametroFac(param As Byte, ByRef Rs As ADODB.Recordset, NomClien As String) As String
     Select Case param
         Case 0 'facturas
-            CargaParametroFac = Format(RS!numfactu, "0000000") & "-" & RS!letraser
+            CargaParametroFac = Format(Rs!numfactu, "0000000") & "-" & Rs!letraser
         Case 1 'codigo cliente
-            CargaParametroFac = Mid(RS!ctaclien, Len(RS!ctaclien) - 3, 4)
+            CargaParametroFac = Mid(Rs!ctaclien, Len(Rs!ctaclien) - 3, 4)
         Case 2 'nombre cliente
             CargaParametroFac = NomClien
         Case 3 'procedencia
@@ -603,18 +608,18 @@ Dim campo1 As String
 Dim padre As String
 Dim A As String
 
-Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Sql As String
+Dim Rs As ADODB.Recordset
 
     'distinto del cargapath de parametros de aplicacion
 
-    SQL = "select nombre, padre from carpetas where codcarpeta = " & DBSet(Codigo, "N")
-    Set RS = ardDB.cursor(SQL)
+    Sql = "select nombre, padre from carpetas where codcarpeta = " & DBSet(Codigo, "N")
+    Set Rs = ardDB.cursor(Sql)
 
-    If Not RS.EOF Then
-        C = "\" & RS!Nombre
-        If RS!padre > 0 Then
-            C = CargaPath(CInt(RS!padre)) & C
+    If Not Rs.EOF Then
+        C = "\" & Rs!Nombre
+        If Rs!padre > 0 Then
+            C = CargaPath(CInt(Rs!padre)) & C
         End If
     End If
     
