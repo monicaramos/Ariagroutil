@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmContabFactTel 
    BorderStyle     =   3  'Fixed Dialog
@@ -805,7 +805,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -1132,7 +1132,7 @@ End Sub
 
 Private Function PasarFacturasAContab(cadTABLA As String, FecVenci As String, Banpr As String, CCoste As String) As Boolean
 Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
 Dim numfactu As Integer
@@ -1150,15 +1150,15 @@ Dim codigo1 As String
     SQL = SQL & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
     
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
-    If Not RS.EOF Then
-        numfactu = RS.Fields(0)
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    If Not Rs.EOF Then
+        numfactu = Rs.Fields(0)
     Else
         numfactu = 0
     End If
-    RS.Close
-    Set RS = Nothing
+    Rs.Close
+    Set Rs = Nothing
 
     If numfactu > 0 Then
         CargarProgres Me.Pb1, numfactu
@@ -1166,25 +1166,25 @@ Dim codigo1 As String
         SQL = "SELECT * "
         SQL = SQL & " FROM tmpfactu "
             
-        Set RS = New ADODB.Recordset
-        RS.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
+        Set Rs = New ADODB.Recordset
+        Rs.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
         i = 1
 
         b = True
         'contabilizar cada una de las facturas seleccionadas
-        While Not RS.EOF
-            SQL = cadTABLA & "." & codigo1 & "=" & DBSet(RS.Fields(0), "T") & " and numfactu=" & DBLet(RS!numfactu, "N")
-            SQL = SQL & " and fecfactu=" & DBSet(RS!fecfactu, "F")
+        While Not Rs.EOF
+            SQL = cadTABLA & "." & codigo1 & "=" & DBSet(Rs.Fields(0), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
+            SQL = SQL & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
             If PasarFactura(SQL, FecVenci, txtCodigo(8).Text, txtCodigo(6).Text, txtCodigo(9).Text, txtCodigo(10), CCoste) = False And b Then b = False
             
             IncrementarProgres Me.Pb1, 1
             Me.lblProgres(1).Caption = "Insertando Facturas en Contabilidad...   (" & i & " de " & numfactu & ")"
             Me.Refresh
             i = i + 1
-            RS.MoveNext
+            Rs.MoveNext
         Wend
-        RS.Close
-        Set RS = Nothing
+        Rs.Close
+        Set Rs = Nothing
     End If
     
 EPasarFac:
@@ -1201,7 +1201,7 @@ End Function
 Public Function HayFacturasIncorrectas(cTabla As String, cWhere As String) As Boolean
 'Comprobar si hay registros a Mostrar antes de abrir el Informe
 Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim PorIva As Currency
 
 Dim BaseT As Currency
@@ -1211,7 +1211,7 @@ Dim TotalT As Currency
 Dim IvaCal As Currency
 Dim TotalCal As Currency
 
-Dim cad As String
+Dim Cad As String
 Dim cad1 As String
 
     On Error GoTo eHayFacturasIncorrectas
@@ -1236,15 +1236,15 @@ Dim cad1 As String
     SQL = SQL & " order by numserie, numfactu, fecfactu"
     
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     
-    cad = ""
+    Cad = ""
     
-    While Not RS.EOF
-        BaseT = DBLet(RS!BaseImpo, "N")
-        IvaT = DBLet(RS!CuotaIva, "N")
-        TotalT = DBLet(RS!TotalFac, "N")
+    While Not Rs.EOF
+        BaseT = DBLet(Rs!BaseImpo, "N")
+        IvaT = DBLet(Rs!CuotaIva, "N")
+        TotalT = DBLet(Rs!TotalFac, "N")
         
         IvaCal = Round2(BaseT * PorIva / 100, 2)
         TotalCal = BaseT + IvaT
@@ -1252,15 +1252,15 @@ Dim cad1 As String
 '[Monica]15/09/2011: solo voy a comprobar que base + iva = total factura
 '                    sustituyo la siguiente instruccion por la de abajo
 '        If IvaT <> IvaCal Or TotalT <> TotalCal Then cad = cad & DBLet(Rs!NumFactu, "N") & ", "
-        If BaseT + IvaT <> TotalT Then cad = cad & DBLet(RS!numfactu, "N") & ", "
+        If BaseT + IvaT <> TotalT Then Cad = Cad & DBLet(Rs!numfactu, "N") & ", "
         
-        RS.MoveNext
+        Rs.MoveNext
     Wend
     
-    Set RS = Nothing
+    Set Rs = Nothing
     
-    If cad <> "" Then
-        cad1 = "Las siguientes facturas tienen importes incorrectos. Revise." & vbCrLf & vbCrLf & Mid(cad, 1, Len(cad) - 2)
+    If Cad <> "" Then
+        cad1 = "Las siguientes facturas tienen importes incorrectos. Revise." & vbCrLf & vbCrLf & Mid(Cad, 1, Len(Cad) - 2)
         MsgBox cad1, vbExclamation
         HayFacturasIncorrectas = True
     Else

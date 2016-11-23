@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{67397AA1-7FB1-11D0-B148-00A0C922E820}#6.0#0"; "MSADODC.OCX"
 Object = "{BDC217C8-ED16-11CD-956C-0000C04E4C0A}#1.1#0"; "TABCTL32.OCX"
 Begin VB.Form frmConfParamAplic 
@@ -34,8 +34,8 @@ Begin VB.Form frmConfParamAplic
       TabCaption(0)   =   "Avnics"
       TabPicture(0)   =   "frmConfParamAplic.frx":000C
       Tab(0).ControlEnabled=   0   'False
-      Tab(0).Control(0)=   "Frame2"
-      Tab(0).Control(1)=   "Frame6"
+      Tab(0).Control(0)=   "Frame6"
+      Tab(0).Control(1)=   "Frame2"
       Tab(0).ControlCount=   2
       TabCaption(1)   =   "Seguros"
       TabPicture(1)   =   "frmConfParamAplic.frx":0028
@@ -45,8 +45,8 @@ Begin VB.Form frmConfParamAplic
       TabCaption(2)   =   "Telefonía"
       TabPicture(2)   =   "frmConfParamAplic.frx":0044
       Tab(2).ControlEnabled=   0   'False
-      Tab(2).Control(0)=   "Frame5"
-      Tab(2).Control(1)=   "Frame8"
+      Tab(2).Control(0)=   "Frame8"
+      Tab(2).Control(1)=   "Frame5"
       Tab(2).ControlCount=   2
       TabCaption(3)   =   "Facturas Varias"
       TabPicture(3)   =   "frmConfParamAplic.frx":0060
@@ -56,14 +56,14 @@ Begin VB.Form frmConfParamAplic
       TabCaption(4)   =   "Internet"
       TabPicture(4)   =   "frmConfParamAplic.frx":007C
       Tab(4).ControlEnabled=   0   'False
-      Tab(4).Control(0)=   "Frame7"
-      Tab(4).Control(1)=   "Frame4"
+      Tab(4).Control(0)=   "Frame4"
+      Tab(4).Control(1)=   "Frame7"
       Tab(4).ControlCount=   2
       TabCaption(5)   =   "Gasolinera"
       TabPicture(5)   =   "frmConfParamAplic.frx":0098
       Tab(5).ControlEnabled=   0   'False
-      Tab(5).Control(0)=   "Frame10"
-      Tab(5).Control(1)=   "Frame11"
+      Tab(5).Control(0)=   "Frame11"
+      Tab(5).Control(1)=   "Frame10"
       Tab(5).ControlCount=   2
       TabCaption(6)   =   "Facturas Socios"
       TabPicture(6)   =   "frmConfParamAplic.frx":00B4
@@ -3933,7 +3933,11 @@ Dim Cad As String
         
         Case 71, 72 ' forma de pago
             If PonerFormatoEntero(Text1(Index)) Then
-                Text2(Index) = DevuelveDesdeBDNew(cContaCV, "sforpa", "nomforpa", "codforpa", Text1(Index).Text, "N")
+                If vParamAplic.ContabilidadNueva Then
+                    Text2(Index) = DevuelveDesdeBDNew(cContaCV, "formapago", "nomforpa", "codforpa", Text1(Index).Text, "N")
+                Else
+                    Text2(Index) = DevuelveDesdeBDNew(cContaCV, "sforpa", "nomforpa", "codforpa", Text1(Index).Text, "N")
+                End If
                 If Text2(Index).Text = "" Then
                     MsgBox "Forma de pago no existe. Reintroduzca.", vbExclamation
                     Text1(Index).Text = ""
@@ -3943,7 +3947,11 @@ Dim Cad As String
             
         Case 79, 80 ' forma de pago
             If PonerFormatoEntero(Text1(Index)) Then
-                Text2(Index) = DevuelveDesdeBDNew(cContaCVV, "sforpa", "nomforpa", "codforpa", Text1(Index).Text, "N")
+                If vParamAplic.ContabilidadNueva Then
+                    Text2(Index) = DevuelveDesdeBDNew(cContaCVV, "formapago", "nomforpa", "codforpa", Text1(Index).Text, "N")
+                Else
+                    Text2(Index) = DevuelveDesdeBDNew(cContaCVV, "sforpa", "nomforpa", "codforpa", Text1(Index).Text, "N")
+                End If
                 If Text2(Index).Text = "" Then
                     MsgBox "Forma de pago no existe. Reintroduzca.", vbExclamation
                     PonerFoco Text1(Index)
@@ -4128,9 +4136,13 @@ On Error GoTo EPonerCampos
         ' raiz de la cta contable de socio
         Text2(64).Text = DevuelveDesdeBDNew(cContaCV, "cuentas", "nommacta", "codmacta", Text1(64).Text, "T")
         'formas de pago
-        Text2(71) = DevuelveDesdeBDNew(cContaCV, "sforpa", "nomforpa", "codforpa", Text1(71).Text, "N")
-        Text2(72) = DevuelveDesdeBDNew(cContaCV, "sforpa", "nomforpa", "codforpa", Text1(72).Text, "N")
-        
+        If vParamAplic.ContabilidadNueva Then
+            Text2(71) = DevuelveDesdeBDNew(cContaCV, "formapago", "nomforpa", "codforpa", Text1(71).Text, "N")
+            Text2(72) = DevuelveDesdeBDNew(cContaCV, "formapago", "nomforpa", "codforpa", Text1(72).Text, "N")
+        Else
+            Text2(71) = DevuelveDesdeBDNew(cContaCV, "sforpa", "nomforpa", "codforpa", Text1(71).Text, "N")
+            Text2(72) = DevuelveDesdeBDNew(cContaCV, "sforpa", "nomforpa", "codforpa", Text1(72).Text, "N")
+        End If
         Text2(73).Text = PonerNombreCuenta(Text1(73), Modo, , cContaCV)
         Text2(74).Text = PonerNombreCuenta(Text1(74), Modo, , cContaCV)
      End If
@@ -4140,8 +4152,13 @@ On Error GoTo EPonerCampos
             Text2(i).Text = PonerNombreCuenta(Text1(i), Modo, , cContaCVV)
         Next i
         'formas de pago
-        Text2(79) = DevuelveDesdeBDNew(cContaCVV, "sforpa", "nomforpa", "codforpa", Text1(79).Text, "N")
-        Text2(80) = DevuelveDesdeBDNew(cContaCVV, "sforpa", "nomforpa", "codforpa", Text1(80).Text, "N")
+        If vParamAplic.ContabilidadNueva Then
+            Text2(79) = DevuelveDesdeBDNew(cContaCVV, "formapago", "nomforpa", "codforpa", Text1(79).Text, "N")
+            Text2(80) = DevuelveDesdeBDNew(cContaCVV, "formapago", "nomforpa", "codforpa", Text1(80).Text, "N")
+        Else
+            Text2(79) = DevuelveDesdeBDNew(cContaCVV, "sforpa", "nomforpa", "codforpa", Text1(79).Text, "N")
+            Text2(80) = DevuelveDesdeBDNew(cContaCVV, "sforpa", "nomforpa", "codforpa", Text1(80).Text, "N")
+        End If
      End If
      
     End If

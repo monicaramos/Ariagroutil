@@ -1981,25 +1981,25 @@ Private Function MontaSQLCarga(Index As Integer, enlaza As Boolean) As String
 ' Si ENLAZA -> Enlaza con el data1
 '           -> Si no lo cargamos sin enlazar a ningun campo
 '--------------------------------------------------------------------
-Dim Sql As String
+Dim SQL As String
 Dim tabla As String
     
     Select Case Index
         Case 0 'Lineas de factura
                 tabla = "linfact"
-                Sql = "SELECT codsecci,letraser,numfactu,fecfactu,numlinea,linfact.codconce,concefact.nomconce, linfact.tipoiva, ampliaci,"
-                Sql = Sql & "cantidad, precio, importe"
-                Sql = Sql & " FROM linfact, concefact "
-                Sql = Sql & " WHERE linfact.codconce = concefact.codconce "
+                SQL = "SELECT codsecci,letraser,numfactu,fecfactu,numlinea,linfact.codconce,concefact.nomconce, linfact.tipoiva, ampliaci,"
+                SQL = SQL & "cantidad, precio, importe"
+                SQL = SQL & " FROM linfact, concefact "
+                SQL = SQL & " WHERE linfact.codconce = concefact.codconce "
     
                 If enlaza Then
-                    Sql = Sql & " AND " & ObtenerWhereCab(False)
+                    SQL = SQL & " AND " & ObtenerWhereCab(False)
                 Else
-                    Sql = Sql & " AND codsecci = -1"
+                    SQL = SQL & " AND codsecci = -1"
                 End If
-                Sql = Sql & " ORDER BY " & tabla & ".numlinea "
+                SQL = SQL & " ORDER BY " & tabla & ".numlinea "
     End Select
-    MontaSQLCarga = Sql
+    MontaSQLCarga = SQL
 End Function
 
 Private Sub frmB_Selecionado(CadenaDevuelta As String)
@@ -2709,7 +2709,11 @@ Dim vSec As CSeccion
                 Set vEmpresaFac = New CempresaFac
                 If vEmpresaFac.LeerNiveles Then
                     Text2(4).Text = PonerNombreCuenta(Text1(4), Modo, , CByte(BdConta), True)
-                    Text2(0).Text = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", Text1(25).Text, "N")
+                    If vParamAplic.ContabilidadNueva Then
+                        Text2(0).Text = DevuelveDesdeBDNewFac("formapago", "nomforpa", "codforpa", Text1(25).Text, "N")
+                    Else
+                        Text2(0).Text = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", Text1(25).Text, "N")
+                    End If
                     Text2(27).Text = ""
                     If Text1(27).Text <> "" Then
                         Text2(27).Text = PonerNombreCuenta(Text1(27), Modo, , CByte(BdConta), True)
@@ -2787,7 +2791,7 @@ End Sub
 Private Function DatosOk() As Boolean
 Dim b As Boolean
 Dim Datos As String
-Dim Sql As String
+Dim SQL As String
 Dim UltNiv As Integer
 
     On Error GoTo EDatosOK
@@ -3049,7 +3053,11 @@ Dim i As Integer
             If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, CByte(BdConta)) Then
                 Set vEmpresaFac = New CempresaFac
                 If vEmpresaFac.LeerNiveles Then
-                    Text2(0).Text = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", Text1(25).Text, "N")
+                    If vParamAplic.ContabilidadNueva Then
+                        Text2(0).Text = DevuelveDesdeBDNewFac("formapago", "nomforpa", "codforpa", Text1(25).Text, "N")
+                    Else
+                        Text2(0).Text = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", Text1(25).Text, "N")
+                    End If
                     If Text2(0).Text = "" Then
                         MsgBox "No existe la Forma de Pago. Reintroduzca.", vbExclamation
                         Seguir = False
@@ -3195,7 +3203,7 @@ Dim Cad As String
 End Sub
 
 Private Sub BotonEliminarLinea(Index As Integer)
-Dim Sql As String
+Dim SQL As String
 Dim eliminar As Boolean
 
     On Error GoTo Error2
@@ -3224,21 +3232,21 @@ Dim eliminar As Boolean
 
     Select Case Index
         Case 0 'lineas de factura
-            Sql = "¿Seguro que desea eliminar la línea?"
-            Sql = Sql & vbCrLf & "Nº línea: " & Format(DBLet(AdoAux(Index).Recordset!NumLinea), FormatoCampo(txtAux(4)))
-            Sql = Sql & vbCrLf & "Concepto: " & DBLet(AdoAux(Index).Recordset!codConce) '& "  " & txtAux(4).Text
-            If MsgBox(Sql, vbQuestion + vbYesNo) = vbYes Then
+            SQL = "¿Seguro que desea eliminar la línea?"
+            SQL = SQL & vbCrLf & "Nº línea: " & Format(DBLet(AdoAux(Index).Recordset!NumLinea), FormatoCampo(txtAux(4)))
+            SQL = SQL & vbCrLf & "Concepto: " & DBLet(AdoAux(Index).Recordset!codConce) '& "  " & txtAux(4).Text
+            If MsgBox(SQL, vbQuestion + vbYesNo) = vbYes Then
                 NumRegElim = AdoAux(Index).Recordset.AbsolutePosition
                 eliminar = True
-                Sql = "DELETE FROM linfact"
-                Sql = Sql & ObtenerWhereCab(True) & " AND numlinea= " & AdoAux(Index).Recordset!NumLinea
+                SQL = "DELETE FROM linfact"
+                SQL = SQL & ObtenerWhereCab(True) & " AND numlinea= " & AdoAux(Index).Recordset!NumLinea
             End If
     End Select
 
     If eliminar Then
         TerminaBloquear
 '        conn.Execute Sql
-        CadenaBorrado = Sql
+        CadenaBorrado = SQL
         '16022007
         If BLOQUEADesdeFormulario2(Me, Data1, 1) Then
                 ModificaImportes = True
@@ -3433,7 +3441,7 @@ End Sub
 
 Private Sub txtAux_LostFocus(Index As Integer)
 Dim cadMen As String
-Dim Sql As String
+Dim SQL As String
     txtAux(Index).Text = Trim(txtAux(Index).Text)
 
     Select Case Index
@@ -3842,16 +3850,16 @@ Private Function SumaLineas(NumLin As String) As String
 'Al Insertar o Modificar linea sumamos todas las lineas excepto la que estamos
 'Insertando o modificando que su valor sera el del txtaux(4).text
 'En el DatosOK de la factura sumamos todas las lineas
-Dim Sql As String
+Dim SQL As String
 Dim Rs As ADODB.Recordset
 Dim SumLin As Currency
 
     SumLin = 0
-    Sql = "SELECT SUM(importe) FROM linfact "
-    Sql = Sql & ObtenerWhereCab(True)
-    If NumLin <> "" Then Sql = Sql & " AND numlinea<>" & DBSet(txtAux(4).Text, "N") 'numlinea
+    SQL = "SELECT SUM(importe) FROM linfact "
+    SQL = SQL & ObtenerWhereCab(True)
+    If NumLin <> "" Then SQL = SQL & " AND numlinea<>" & DBSet(txtAux(4).Text, "N") 'numlinea
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         'En SumLin tenemos la suma de las lineas ya insertadas
         SumLin = CCur(DBLet(Rs.Fields(0), "N"))
@@ -3942,7 +3950,7 @@ End Sub
 Private Sub EliminarLinea()
 Dim nomFrame As String
 Dim V As Currency
-Dim Sql As String
+Dim SQL As String
 
     
  

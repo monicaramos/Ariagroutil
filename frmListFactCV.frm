@@ -468,12 +468,12 @@ Dim Tipos As String
 End Sub
 
 Private Function CargarTemporal(cTabla As String, cWhere As String) As Boolean
-Dim RS As ADODB.Recordset
-Dim Sql As String
-Dim Sql1 As String
-Dim Sql2 As String
+Dim Rs As ADODB.Recordset
+Dim SQL As String
+Dim SQL1 As String
+Dim sql2 As String
 
-Dim cad As String
+Dim Cad As String
 Dim HayReg As Boolean
 Dim Nregs As Long
 Dim NumeroConta As Integer
@@ -483,8 +483,8 @@ Dim NumeroConta As Integer
     CargarTemporal = False
 
 
-    Sql2 = "delete from tmpinformes where codusu = " & vSesion.Codigo
-    conn.Execute Sql2
+    sql2 = "delete from tmpinformes where codusu = " & vSesion.Codigo
+    conn.Execute sql2
 
     cTabla = QuitarCaracterACadena(cTabla, "{")
     cTabla = QuitarCaracterACadena(cTabla, "}")
@@ -503,13 +503,17 @@ Dim NumeroConta As Integer
         
     ' insertamos en la temporal con la suma de superficie a cero
     '                                       codforpa,nomforpa
-    Sql = "insert into tmpinformes (codusu, codigo1, nombre1, importe1)    "
-    Sql = Sql & "select " & DBSet(vSesion.Codigo, "N") & ",cvfacturas.codforpa, sforpa.nomforpa, sum(totalfac) from (" & cTabla & ") inner join conta" & NumeroConta & ".sforpa  On cvfacturas.codforpa = conta" & NumeroConta & ".sforpa.codforpa "
-    Sql = Sql & " where " & cWhere
-    Sql = Sql & " group by 1,2,3 "
-    Sql = Sql & " order by 1,2,3 "
+    SQL = "insert into tmpinformes (codusu, codigo1, nombre1, importe1)    "
+    If vParamAplic.ContabilidadNueva Then
+        SQL = SQL & "select " & DBSet(vSesion.Codigo, "N") & ",cvfacturas.codforpa, formapago.nomforpa, sum(totalfac) from (" & cTabla & ") inner join conta" & NumeroConta & ".formapago  On cvfacturas.codforpa = ariconta" & NumeroConta & ".formapago.codforpa "
+    Else
+        SQL = SQL & "select " & DBSet(vSesion.Codigo, "N") & ",cvfacturas.codforpa, sforpa.nomforpa, sum(totalfac) from (" & cTabla & ") inner join conta" & NumeroConta & ".sforpa  On cvfacturas.codforpa = conta" & NumeroConta & ".sforpa.codforpa "
+    End If
+    SQL = SQL & " where " & cWhere
+    SQL = SQL & " group by 1,2,3 "
+    SQL = SQL & " order by 1,2,3 "
     
-    conn.Execute Sql
+    conn.Execute SQL
     
     CargarTemporal = True
     Exit Function
@@ -682,7 +686,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -850,11 +854,11 @@ Private Function GeneraFicheroModelo(tipo As Byte, pTabla As String, pWhere As S
 Dim NFic As Integer
 Dim Regs As Integer
 Dim CodigoOrdenante As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim Rs4 As ADODB.Recordset
 Dim Aux As String
 Dim Aux2 As String
-Dim cad As String
+Dim Cad As String
 Dim Pagos As Boolean
 Dim Concepto As Byte
 Dim b As Boolean
@@ -890,15 +894,15 @@ Dim vWhere As String
             Aux = Aux & " from " & cTabla
             Aux = Aux & " where " & vWhere
                 
-            Set RS = New ADODB.Recordset
-            RS.Open Aux, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+            Set Rs = New ADODB.Recordset
+            Rs.Open Aux, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
                 
             'CABECERA
 ' [Monica] 14/01/2010 : no sé de donde he copiado que habían dos cabeceras
 '            Cabecera190a NFic, CLng(DBLet(Rs.Fields(0).Value, "N"))
-            Cabecera190b NFic, CLng(DBLet(RS.Fields(0).Value, "N")), CCur(DBLet(RS.Fields(1).Value, "N")), CCur(DBLet(RS.Fields(2).Value, "N"))
+            Cabecera190b NFic, CLng(DBLet(Rs.Fields(0).Value, "N")), CCur(DBLet(Rs.Fields(1).Value, "N")), CCur(DBLet(Rs.Fields(2).Value, "N"))
             
-            Set RS = Nothing
+            Set Rs = Nothing
             
             'Imprimimos las lineas
             Aux = "select factsocio.codmacta, sum(factsocio.basereten), sum(factsocio.impreten) "
@@ -908,34 +912,34 @@ Dim vWhere As String
             Aux = Aux & " having sum(factsocio.basereten) <> 0 "
             Aux = Aux & " order by 1 "
             
-            Set RS = New ADODB.Recordset
-            RS.Open Aux, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+            Set Rs = New ADODB.Recordset
+            Rs.Open Aux, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
             
-            If RS.EOF Then
+            If Rs.EOF Then
                 'No hayningun registro
             Else
                 b = True
                 Regs = 0
-                While Not RS.EOF And b
+                While Not Rs.EOF And b
                     Regs = Regs + 1
                     
-                    Sql4 = "select nifdatos, nommacta, codposta from cuentas where codmacta = " & DBLet(RS!Codmacta, "T")
+                    Sql4 = "select nifdatos, nommacta, codposta from cuentas where codmacta = " & DBLet(Rs!Codmacta, "T")
                     Set Rs4 = New ADODB.Recordset
                     
                     Rs4.Open Sql4, ConnContaFacSoc, adOpenForwardOnly, adLockPessimistic, adCmdText
                     
                     If Not Rs4.EOF Then
-                        Linea190 NFic, Rs4, RS
+                        Linea190 NFic, Rs4, Rs
                     Else
                         b = False
                     End If
                     Set Rs4 = Nothing
                     
-                    RS.MoveNext
+                    Rs.MoveNext
                 Wend
             End If
-            RS.Close
-            Set RS = Nothing
+            Rs.Close
+            Set Rs = Nothing
             
 '        Case 2 ' MODELO 346
 ''            cTabla = "(" & cTabla & ") INNER JOIN variedades ON rfactsoc_variedad.codvarie = variedades.codvarie "
@@ -1009,62 +1013,62 @@ Dim vWhere As String
     Exit Function
     
 EGen:
-    Set RS = Nothing
+    Set Rs = Nothing
     Close (NFic)
     MuestraError Err.Number, Err.Description
 End Function
 
 
 Private Sub Cabecera190b(NFich As Integer, Nregs As Currency, ImpReten As Currency, BaseReten As Currency)
-Dim cad As String
+Dim Cad As String
 
 'TIPO DE REGISTRO 1:REGISTRO DEL RETENEDOR}
     
-    cad = "1190"                                                  'p.1
-    cad = cad & Format(txtCodigo(30).Text, "0000")                'p.5 año de ejercicio
-    cad = cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9)        'p.9 cif empresa
-    cad = cad & RellenaABlancos(vEmpresa.nomEmpre, True, 40)   'p.18 nombre de empresa
-    cad = cad & "D"                                               'p.58
-    cad = cad & RellenaAceros(txtCodigo(10).Text, True, 9)        'p.59 telefono
-    cad = cad & RellenaABlancos(txtCodigo(9).Text, True, 40)     'p.68 persona de contacto
-    cad = cad & RellenaAceros(txtCodigo(4).Text, True, 13)       'p.108 nro de justificante
-    cad = cad & Space(2)                                          'p.121 ni es complementaria ni sustitutiva
-    cad = cad & RellenaAceros("0", True, 13)                      'p.123 13 ceros (justificante de la complementaria o sustitutiva)
-    cad = cad & Format(Nregs, "000000000")                        'p.136 nro de registros
+    Cad = "1190"                                                  'p.1
+    Cad = Cad & Format(txtCodigo(30).Text, "0000")                'p.5 año de ejercicio
+    Cad = Cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9)        'p.9 cif empresa
+    Cad = Cad & RellenaABlancos(vEmpresa.nomEmpre, True, 40)   'p.18 nombre de empresa
+    Cad = Cad & "D"                                               'p.58
+    Cad = Cad & RellenaAceros(txtCodigo(10).Text, True, 9)        'p.59 telefono
+    Cad = Cad & RellenaABlancos(txtCodigo(9).Text, True, 40)     'p.68 persona de contacto
+    Cad = Cad & RellenaAceros(txtCodigo(4).Text, True, 13)       'p.108 nro de justificante
+    Cad = Cad & Space(2)                                          'p.121 ni es complementaria ni sustitutiva
+    Cad = Cad & RellenaAceros("0", True, 13)                      'p.123 13 ceros (justificante de la complementaria o sustitutiva)
+    Cad = Cad & Format(Nregs, "000000000")                        'p.136 nro de registros
 
     If BaseReten < 0 Then
-        cad = cad & "N"                                           'p.145 signo de retenciones
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(BaseReten * (-1) * 100)), False, 15)    'p.146
+        Cad = Cad & "N"                                           'p.145 signo de retenciones
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(BaseReten * (-1) * 100)), False, 15)    'p.146
     Else
-        cad = cad & " "                                           'p.145
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(BaseReten * 100)), False, 15)           'p.146
+        Cad = Cad & " "                                           'p.145
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(BaseReten * 100)), False, 15)           'p.146
     End If
               
     If ImpReten < 0 Then                                          'p.161
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(ImpReten * (-1) * 100)), False, 15)
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(ImpReten * (-1) * 100)), False, 15)
     Else
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(ImpReten * 100)), False, 15)
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(ImpReten * 100)), False, 15)
     End If
-    cad = cad & Space(322) 'p.176 a 487                    'antes:  Space(62)                             'p.176
-    cad = cad & Space(3)   'p.488 a 500 firma digital      'antes:  Space(13)                                         'p.238
+    Cad = Cad & Space(322) 'p.176 a 487                    'antes:  Space(62)                             'p.176
+    Cad = Cad & Space(3)   'p.488 a 500 firma digital      'antes:  Space(13)                                         'p.238
 
-    Print #NFich, cad
+    Print #NFich, Cad
 
 End Sub
 
 
-Private Sub Linea190(NFich As Integer, ByRef Rs4 As ADODB.Recordset, ByRef RS As ADODB.Recordset)
-Dim cad As String
+Private Sub Linea190(NFich As Integer, ByRef Rs4 As ADODB.Recordset, ByRef Rs As ADODB.Recordset)
+Dim Cad As String
 
-    cad = "2190"                                                'p.1
-    cad = cad & Format(txtCodigo(30).Text, "0000")              'p.5 año ejercicio
-    cad = cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9)     'p.9 cif empresa
-    cad = cad & RellenaABlancos(Rs4!nifdatos, True, 9)            'p.18 nifsocio
-    cad = cad & Space(9)                                        'p.27 nif del representante legal
-    cad = cad & RellenaABlancos(Rs4!Nommacta, True, 40)        'p.36 nombre socio
-    cad = cad & RellenaABlancos(Mid(Rs4!Codposta, 1, 2), True, 2) 'p.76 codpobla[1,2] codigo de provincia
-    cad = cad & "H"                                             'p.78 clave de percepcion H=actividades agrícolas, ganaderas y forestales
-    cad = cad & "01"                                            'p.79 subclave:
+    Cad = "2190"                                                'p.1
+    Cad = Cad & Format(txtCodigo(30).Text, "0000")              'p.5 año ejercicio
+    Cad = Cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9)     'p.9 cif empresa
+    Cad = Cad & RellenaABlancos(Rs4!nifdatos, True, 9)            'p.18 nifsocio
+    Cad = Cad & Space(9)                                        'p.27 nif del representante legal
+    Cad = Cad & RellenaABlancos(Rs4!Nommacta, True, 40)        'p.36 nombre socio
+    Cad = Cad & RellenaABlancos(Mid(Rs4!Codposta, 1, 2), True, 2) 'p.76 codpobla[1,2] codigo de provincia
+    Cad = Cad & "H"                                             'p.78 clave de percepcion H=actividades agrícolas, ganaderas y forestales
+    Cad = Cad & "01"                                            'p.79 subclave:
 '                                                                       01 =  Se consignará esta subclave cuando se trate de percepciones
 '                                                                        a las que resulte aplicable el tipo de retención establecido
 '                                                                        con carácter general en el artículo 95.4.2º del Reglamento
@@ -1074,40 +1078,40 @@ Dim cad As String
 ' antes no estaba en el if de abajo siempre era un blanco lo he cambiado según el signo.
 '    cad = cad & " "                                             'p.81
     
-    If DBLet(RS.Fields(1).Value, "N") < 0 Then                  'p.82 base de retencion
-        cad = cad & "N"                                             'p.81
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(RS.Fields(1).Value, "N") * (-1) * 100)), False, 13)
+    If DBLet(Rs.Fields(1).Value, "N") < 0 Then                  'p.82 base de retencion
+        Cad = Cad & "N"                                             'p.81
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(Rs.Fields(1).Value, "N") * (-1) * 100)), False, 13)
     Else
-        cad = cad & " "                                             'p.81
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(RS.Fields(1).Value, "N") * 100)), False, 13)
+        Cad = Cad & " "                                             'p.81
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(Rs.Fields(1).Value, "N") * 100)), False, 13)
     End If
     
-    If DBLet(RS.Fields(2).Value, "N") < 0 Then                  'p.95 importe de retencion
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(RS.Fields(2).Value, "N") * (-1) * 100)), False, 13)
+    If DBLet(Rs.Fields(2).Value, "N") < 0 Then                  'p.95 importe de retencion
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(Rs.Fields(2).Value, "N") * (-1) * 100)), False, 13)
     Else
-        cad = cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(RS.Fields(2).Value, "N") * 100)), False, 13)
+        Cad = Cad & RellenaAceros(ImporteSinFormato(CStr(DBLet(Rs.Fields(2).Value, "N") * 100)), False, 13)
     End If
     
-    cad = cad & " "                                             'p.108
-    cad = cad & RellenaAceros("0", True, 13)                    'p.109
-    cad = cad & RellenaAceros("0", True, 13)                    'p.122
-    cad = cad & RellenaAceros("0", True, 13)                    'p.135
-    cad = cad & RellenaAceros("0", True, 4)                     'p.148
-    cad = cad & "0"                                             'p.152
-    cad = cad & RellenaAceros("0", True, 5)                     'p.153
-    cad = cad & RellenaABlancos(" ", True, 9)                   'p.158
-    cad = cad & String(88, "0")                                 'p.167  antes eran 84 ceros
-    cad = cad & Space(246)                                      'p.255 - 500 se rellenan a blancos
+    Cad = Cad & " "                                             'p.108
+    Cad = Cad & RellenaAceros("0", True, 13)                    'p.109
+    Cad = Cad & RellenaAceros("0", True, 13)                    'p.122
+    Cad = Cad & RellenaAceros("0", True, 13)                    'p.135
+    Cad = Cad & RellenaAceros("0", True, 4)                     'p.148
+    Cad = Cad & "0"                                             'p.152
+    Cad = Cad & RellenaAceros("0", True, 5)                     'p.153
+    Cad = Cad & RellenaABlancos(" ", True, 9)                   'p.158
+    Cad = Cad & String(88, "0")                                 'p.167  antes eran 84 ceros
+    Cad = Cad & Space(246)                                      'p.255 - 500 se rellenan a blancos
     
-    Print #NFich, cad
+    Print #NFich, Cad
 End Sub
 
 
 
 Private Function DatosOk() As Boolean
 Dim b As Boolean
-Dim Sql As String
-Dim Sql2 As String
+Dim SQL As String
+Dim sql2 As String
 Dim vClien As CSocio
 ' añadido
 Dim Mens As String

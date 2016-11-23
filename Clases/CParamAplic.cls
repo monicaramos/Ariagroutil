@@ -131,7 +131,7 @@ Private mvarCodforpaBanCVV As String 'forma de pago banco varias
 Private mvarCodforpaConCVV As String 'forma de pago contado varias
 
 
-Private sql As String  'Para la sentencia
+Private SQL As String  'Para la sentencia
 Private Mens As String    'Para los mensajes
 
 
@@ -143,6 +143,7 @@ Private mvarC2Factura As Byte  'Campo 2 Factura
 Private mvarC3Factura As Byte  'Campo 3 Factura
 Private mvarC4Factura As Byte  'Campo 4 Factura
 
+Private mvarContabilidadNueva As Boolean
 
 
 
@@ -966,6 +967,11 @@ Public Property Get C4Factura() As Byte
      C4Factura = mvarC4Factura
 End Property
 
+'[Monica]23/11/2016: si hay contabilidad nueva
+Public Property Get ContabilidadNueva() As Boolean
+     ContabilidadNueva = mvarContabilidadNueva
+End Property
+
 
 
 '******
@@ -978,9 +984,9 @@ Public Function leer() As Byte
 Dim Rs As ADODB.Recordset
 On Error GoTo Err3
     
-    sql = "SELECT * FROM sparam "
+    SQL = "SELECT * FROM sparam "
     Set Rs = New ADODB.Recordset
-    Rs.Open sql, conn, adOpenForwardOnly, adLockOptimistic
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic
 
     If Rs.EOF Then
         leer = 1
@@ -1103,6 +1109,10 @@ On Error GoTo Err3
         mvarC3Factura = DBLet(Rs!c3fvararidoc, "N") 'campo 3 factura
         mvarC4Factura = DBLet(Rs!c4fvararidoc, "N") 'campo 4 factura
        
+        '[Monica]23/11/2016: nueva contabilidad
+        mvarContabilidadNueva = (DBLet(Rs!nuevacontabilidad, "N") = 1)
+       
+       
         leer = 0
     End If
 
@@ -1126,122 +1136,122 @@ Public Function Modificar(Codigo As Byte) As Byte
 'Modifica la Tabla: sparam, BD: Arigasol
 On Error GoTo EModificar
 
-    sql = "UPDATE sparam SET "
-    sql = sql & " serconta= '" & mvarSerConta & "'"
-    sql = sql & ", usuconta= " & DBSet(mvarUsuConta, "T")
-    sql = sql & ", pasconta= " & DBSet(mvarPasConta, "T")
-    sql = sql & ", numconta= " & DBSet(mvarNumConta, "N", "S")
-    sql = sql & ", ctagasto= " & DBSet(mvarCtaGasto, "T")
-    sql = sql & ", ctareten = " & DBSet(mvarCtaReten, "T")
-    sql = sql & ", porcinte= " & DBSet(mvarPorcinte, "N", "S")
-    sql = sql & ", porcrete= " & DBSet(mvarPorcrete, "N", "S")
-    sql = sql & ", websoporte= " & DBSet(mvarWebSoporte, "T")
-    sql = sql & ", diremail= " & DBSet(mvarDireMail, "T")
-    sql = sql & ", smtphost= " & DBSet(mvarSmtphost, "T")
-    sql = sql & ", smtpuser= " & DBSet(mvarSmtpUser, "T")
-    sql = sql & ", smtppass= " & DBSet(mvarSmtpPass, "T")
-    sql = sql & ", concedebe= " & DBSet(mvarConceDebe, "N")
-    sql = sql & ", concehaber= " & DBSet(mvarConceHaber, "N")
-    sql = sql & ", numdiario= " & DBSet(mvarNumDiario, "N")
-    sql = sql & ", seguros= " & DBSet(mvarSeguros, "N")
-    sql = sql & ", avnics= " & DBSet(mvarAvnics, "N")
-    sql = sql & ", telefonia= " & DBSet(mvarTelefonia, "N")
-    sql = sql & ", facturasvarias= " & DBSet(mvarFacturasVarias, "N")
-    sql = sql & ", gasolinera= " & DBSet(mvarGasolinera, "N")
-    sql = sql & ", factsocios= " & DBSet(mvarFactSocios, "N")
-    sql = sql & ", coarval= " & DBSet(mvarCoarval, "N")
+    SQL = "UPDATE sparam SET "
+    SQL = SQL & " serconta= '" & mvarSerConta & "'"
+    SQL = SQL & ", usuconta= " & DBSet(mvarUsuConta, "T")
+    SQL = SQL & ", pasconta= " & DBSet(mvarPasConta, "T")
+    SQL = SQL & ", numconta= " & DBSet(mvarNumConta, "N", "S")
+    SQL = SQL & ", ctagasto= " & DBSet(mvarCtaGasto, "T")
+    SQL = SQL & ", ctareten = " & DBSet(mvarCtaReten, "T")
+    SQL = SQL & ", porcinte= " & DBSet(mvarPorcinte, "N", "S")
+    SQL = SQL & ", porcrete= " & DBSet(mvarPorcrete, "N", "S")
+    SQL = SQL & ", websoporte= " & DBSet(mvarWebSoporte, "T")
+    SQL = SQL & ", diremail= " & DBSet(mvarDireMail, "T")
+    SQL = SQL & ", smtphost= " & DBSet(mvarSmtphost, "T")
+    SQL = SQL & ", smtpuser= " & DBSet(mvarSmtpUser, "T")
+    SQL = SQL & ", smtppass= " & DBSet(mvarSmtpPass, "T")
+    SQL = SQL & ", concedebe= " & DBSet(mvarConceDebe, "N")
+    SQL = SQL & ", concehaber= " & DBSet(mvarConceHaber, "N")
+    SQL = SQL & ", numdiario= " & DBSet(mvarNumDiario, "N")
+    SQL = SQL & ", seguros= " & DBSet(mvarSeguros, "N")
+    SQL = SQL & ", avnics= " & DBSet(mvarAvnics, "N")
+    SQL = SQL & ", telefonia= " & DBSet(mvarTelefonia, "N")
+    SQL = SQL & ", facturasvarias= " & DBSet(mvarFacturasVarias, "N")
+    SQL = SQL & ", gasolinera= " & DBSet(mvarGasolinera, "N")
+    SQL = SQL & ", factsocios= " & DBSet(mvarFactSocios, "N")
+    SQL = SQL & ", coarval= " & DBSet(mvarCoarval, "N")
     'seguros
-    sql = sql & ", sercontaseg= '" & mvarSerContaSeg & "'"
-    sql = sql & ", usucontaseg= " & DBSet(mvarUsuContaSeg, "T")
-    sql = sql & ", pascontaseg= " & DBSet(mvarPasContaSeg, "T")
-    sql = sql & ", numcontaseg= " & DBSet(mvarNumContaSeg, "N", "S")
-    sql = sql & ", concedebeseg= " & DBSet(mvarConceDebeSeg, "N")
-    sql = sql & ", concehaberseg= " & DBSet(mvarConceHaberSeg, "N")
-    sql = sql & ", numdiarioseg= " & DBSet(mvarNumDiarioSeg, "N")
-    sql = sql & ", ctabancoseg= " & DBSet(mvarCtaBancoSeg, "T")
-    sql = sql & ", raizctasocseg= " & DBSet(mvarRaizCtaSocSeg, "T")
+    SQL = SQL & ", sercontaseg= '" & mvarSerContaSeg & "'"
+    SQL = SQL & ", usucontaseg= " & DBSet(mvarUsuContaSeg, "T")
+    SQL = SQL & ", pascontaseg= " & DBSet(mvarPasContaSeg, "T")
+    SQL = SQL & ", numcontaseg= " & DBSet(mvarNumContaSeg, "N", "S")
+    SQL = SQL & ", concedebeseg= " & DBSet(mvarConceDebeSeg, "N")
+    SQL = SQL & ", concehaberseg= " & DBSet(mvarConceHaberSeg, "N")
+    SQL = SQL & ", numdiarioseg= " & DBSet(mvarNumDiarioSeg, "N")
+    SQL = SQL & ", ctabancoseg= " & DBSet(mvarCtaBancoSeg, "T")
+    SQL = SQL & ", raizctasocseg= " & DBSet(mvarRaizCtaSocSeg, "T")
     
     'telefonia
-    sql = sql & ", sercontatel= '" & mvarSerContaTel & "'"
-    sql = sql & ", usucontatel= " & DBSet(mvarUsuContaTel, "T")
-    sql = sql & ", pascontatel= " & DBSet(mvarPasContaTel, "T")
-    sql = sql & ", numcontatel= " & DBSet(mvarNumContaTel, "N", "S")
-    sql = sql & ", concedebetel= " & DBSet(mvarConceDebeTel, "N")
-    sql = sql & ", concehabertel= " & DBSet(mvarConceHaberTel, "N")
-    sql = sql & ", numdiariotel= " & DBSet(mvarNumDiarioTel, "N")
-    sql = sql & ", ctabancotel= " & DBSet(mvarCtaBancoTel, "T")
-    sql = sql & ", raizctasoctel= " & DBSet(mvarRaizCtaSocTel, "T")
-    sql = sql & ", ctaventatel= " & DBSet(mvarCtaVentaTel, "T")
-    sql = sql & ", numserietel= " & DBSet(mvarNumSerieTel, "T")
-    sql = sql & ", tipoficherotel= " & DBSet(mvarTipoFicheroTel, "T")
+    SQL = SQL & ", sercontatel= '" & mvarSerContaTel & "'"
+    SQL = SQL & ", usucontatel= " & DBSet(mvarUsuContaTel, "T")
+    SQL = SQL & ", pascontatel= " & DBSet(mvarPasContaTel, "T")
+    SQL = SQL & ", numcontatel= " & DBSet(mvarNumContaTel, "N", "S")
+    SQL = SQL & ", concedebetel= " & DBSet(mvarConceDebeTel, "N")
+    SQL = SQL & ", concehabertel= " & DBSet(mvarConceHaberTel, "N")
+    SQL = SQL & ", numdiariotel= " & DBSet(mvarNumDiarioTel, "N")
+    SQL = SQL & ", ctabancotel= " & DBSet(mvarCtaBancoTel, "T")
+    SQL = SQL & ", raizctasoctel= " & DBSet(mvarRaizCtaSocTel, "T")
+    SQL = SQL & ", ctaventatel= " & DBSet(mvarCtaVentaTel, "T")
+    SQL = SQL & ", numserietel= " & DBSet(mvarNumSerieTel, "T")
+    SQL = SQL & ", tipoficherotel= " & DBSet(mvarTipoFicheroTel, "T")
     'facturas varias
-    sql = sql & ", sercontafac= '" & mvarSerContaFac & "'"
-    sql = sql & ", usucontafac= " & DBSet(mvarUsuContaFac, "T")
-    sql = sql & ", pascontafac= " & DBSet(mvarPasContaFac, "T")
+    SQL = SQL & ", sercontafac= '" & mvarSerContaFac & "'"
+    SQL = SQL & ", usucontafac= " & DBSet(mvarUsuContaFac, "T")
+    SQL = SQL & ", pascontafac= " & DBSet(mvarPasContaFac, "T")
     'gasolinera
-    sql = sql & ", sercontagas= '" & mvarSerContaGas & "'"
-    sql = sql & ", usucontagas= " & DBSet(mvarUsuContaGas, "T")
-    sql = sql & ", pascontagas= " & DBSet(mvarPasContaGas, "T")
-    sql = sql & ", numcontagas= " & DBSet(mvarNumContaGas, "N", "S")
-    sql = sql & ", concedebegas= " & DBSet(mvarConceDebeGas, "N")
-    sql = sql & ", concehabergas= " & DBSet(mvarConceHaberGas, "N")
-    sql = sql & ", numdiarigas= " & DBSet(mvarNumDiarioGas, "N")
-    sql = sql & ", ctacontragas= " & DBSet(mvarCtaContraGas, "T")
-    sql = sql & ", raizctasocgas= " & DBSet(mvarRaizCtaSocGas, "T")
-    sql = sql & ", ctaventasgas= " & DBSet(mvarCtaVentaGas, "T")
-    sql = sql & ", letrasergas= " & DBSet(mvarNumSerieGas, "T")
+    SQL = SQL & ", sercontagas= '" & mvarSerContaGas & "'"
+    SQL = SQL & ", usucontagas= " & DBSet(mvarUsuContaGas, "T")
+    SQL = SQL & ", pascontagas= " & DBSet(mvarPasContaGas, "T")
+    SQL = SQL & ", numcontagas= " & DBSet(mvarNumContaGas, "N", "S")
+    SQL = SQL & ", concedebegas= " & DBSet(mvarConceDebeGas, "N")
+    SQL = SQL & ", concehabergas= " & DBSet(mvarConceHaberGas, "N")
+    SQL = SQL & ", numdiarigas= " & DBSet(mvarNumDiarioGas, "N")
+    SQL = SQL & ", ctacontragas= " & DBSet(mvarCtaContraGas, "T")
+    SQL = SQL & ", raizctasocgas= " & DBSet(mvarRaizCtaSocGas, "T")
+    SQL = SQL & ", ctaventasgas= " & DBSet(mvarCtaVentaGas, "T")
+    SQL = SQL & ", letrasergas= " & DBSet(mvarNumSerieGas, "T")
     '[Monica]04/07/2013: gasoleo bonificado
-    sql = sql & ", letrasergasB= " & DBSet(mvarNumSerieGasB, "T")
-    sql = sql & ", increfacgas= " & DBSet(mvarIncreFacGas, "N")
-    sql = sql & ", codivagas= " & DBSet(mvarCodIvaGas, "N")
+    SQL = SQL & ", letrasergasB= " & DBSet(mvarNumSerieGasB, "T")
+    SQL = SQL & ", increfacgas= " & DBSet(mvarIncreFacGas, "N")
+    SQL = SQL & ", codivagas= " & DBSet(mvarCodIvaGas, "N")
     'facturas socios
-    sql = sql & ", sercontafacsoc= '" & mvarSerContaFacSoc & "'"
-    sql = sql & ", usucontafacsoc= " & DBSet(mvarUsuContaFacSoc, "T")
-    sql = sql & ", pascontafacsoc= " & DBSet(mvarPasContaFacSoc, "T")
-    sql = sql & ", numcontafacsoc= " & DBSet(mvarNumContaFacSoc, "N", "S")
-    sql = sql & ", ctaretenfacsoc= " & DBSet(mvarCtaRetenFacSoc, "T")
-    sql = sql & ", raizctafacsoc= " & DBSet(mvarRaizCtaFacSoc, "T")
-    sql = sql & ", porcretenfacsoc= " & DBSet(mvarPorcReteFacSoc, "N", "S")
+    SQL = SQL & ", sercontafacsoc= '" & mvarSerContaFacSoc & "'"
+    SQL = SQL & ", usucontafacsoc= " & DBSet(mvarUsuContaFacSoc, "T")
+    SQL = SQL & ", pascontafacsoc= " & DBSet(mvarPasContaFacSoc, "T")
+    SQL = SQL & ", numcontafacsoc= " & DBSet(mvarNumContaFacSoc, "N", "S")
+    SQL = SQL & ", ctaretenfacsoc= " & DBSet(mvarCtaRetenFacSoc, "T")
+    SQL = SQL & ", raizctafacsoc= " & DBSet(mvarRaizCtaFacSoc, "T")
+    SQL = SQL & ", porcretenfacsoc= " & DBSet(mvarPorcReteFacSoc, "N", "S")
     
     'coarval
-    sql = sql & ", sercontacv= '" & mvarSerContaCV & "'"
-    sql = sql & ", usucontacv= " & DBSet(mvarUsuContaCV, "T")
-    sql = sql & ", pascontacv= " & DBSet(mvarPasContaCV, "T")
-    sql = sql & ", numcontacv= " & DBSet(mvarNumContaCV, "N", "S")
-    sql = sql & ", ctabancocv= " & DBSet(mvarCtaBancoCV, "T")
-    sql = sql & ", raizctasoccv= " & DBSet(mvarRaizCtaSocCV, "T")
-    sql = sql & ", ctaventacv= " & DBSet(mvarCtaVentaCV, "T")
-    sql = sql & ", ctaventatickcv= " & DBSet(mvarCtaVentaTickCV, "T")
-    sql = sql & ", ctaclientickcv= " & DBSet(mvarCtaClienTickCV, "T")
-    sql = sql & ", ctaventafaccv= " & DBSet(mvarCtaVentaFacCV, "T")
-    sql = sql & ", ctaventafacincv= " & DBSet(mvarCtaVentaFacInCV, "T")
-    sql = sql & ", letrasercv= " & DBSet(mvarLetraSerCV, "T")
-    sql = sql & ", letraserfcv= " & DBSet(mvarLetraSerFCV, "T")
-    sql = sql & ", letraserfincv= " & DBSet(mvarLetraSerFinCV, "T")
-    sql = sql & ", codforpabancv= " & DBSet(mvarCodforpaBanCV, "T")
-    sql = sql & ", codforpaconcv= " & DBSet(mvarCodforpaConCV, "T")
-    sql = sql & ", numcontacvv= " & DBSet(mvarNumContaCVV, "N", "S")
-    sql = sql & ", ctabancocvv= " & DBSet(mvarCtaBancoCVV, "T")
-    sql = sql & ", letrasercvv= " & DBSet(mvarLetraSerCVV, "T")
-    sql = sql & ", codforpabancvv= " & DBSet(mvarCodforpaBanCVV, "T")
-    sql = sql & ", codforpaconcvv= " & DBSet(mvarCodforpaConCVV, "T")
+    SQL = SQL & ", sercontacv= '" & mvarSerContaCV & "'"
+    SQL = SQL & ", usucontacv= " & DBSet(mvarUsuContaCV, "T")
+    SQL = SQL & ", pascontacv= " & DBSet(mvarPasContaCV, "T")
+    SQL = SQL & ", numcontacv= " & DBSet(mvarNumContaCV, "N", "S")
+    SQL = SQL & ", ctabancocv= " & DBSet(mvarCtaBancoCV, "T")
+    SQL = SQL & ", raizctasoccv= " & DBSet(mvarRaizCtaSocCV, "T")
+    SQL = SQL & ", ctaventacv= " & DBSet(mvarCtaVentaCV, "T")
+    SQL = SQL & ", ctaventatickcv= " & DBSet(mvarCtaVentaTickCV, "T")
+    SQL = SQL & ", ctaclientickcv= " & DBSet(mvarCtaClienTickCV, "T")
+    SQL = SQL & ", ctaventafaccv= " & DBSet(mvarCtaVentaFacCV, "T")
+    SQL = SQL & ", ctaventafacincv= " & DBSet(mvarCtaVentaFacInCV, "T")
+    SQL = SQL & ", letrasercv= " & DBSet(mvarLetraSerCV, "T")
+    SQL = SQL & ", letraserfcv= " & DBSet(mvarLetraSerFCV, "T")
+    SQL = SQL & ", letraserfincv= " & DBSet(mvarLetraSerFinCV, "T")
+    SQL = SQL & ", codforpabancv= " & DBSet(mvarCodforpaBanCV, "T")
+    SQL = SQL & ", codforpaconcv= " & DBSet(mvarCodforpaConCV, "T")
+    SQL = SQL & ", numcontacvv= " & DBSet(mvarNumContaCVV, "N", "S")
+    SQL = SQL & ", ctabancocvv= " & DBSet(mvarCtaBancoCVV, "T")
+    SQL = SQL & ", letrasercvv= " & DBSet(mvarLetraSerCVV, "T")
+    SQL = SQL & ", codforpabancvv= " & DBSet(mvarCodforpaBanCVV, "T")
+    SQL = SQL & ", codforpaconcvv= " & DBSet(mvarCodforpaConCVV, "T")
     
     '[Monica]08/02/2012: arigesmail
-    sql = sql & ", EnvioDesdeOutlook = " & DBSet(Me.EnvioDesdeOutlook, "B")
-    sql = sql & ", arigesmail = " & DBSet(ExeEnvioMail, "T", "S")
+    SQL = SQL & ", EnvioDesdeOutlook = " & DBSet(Me.EnvioDesdeOutlook, "B")
+    SQL = SQL & ", arigesmail = " & DBSet(ExeEnvioMail, "T", "S")
     
     'aridoc
-    sql = sql & ", hayaridoc= " & DBSet(mvarHayAridoc, "N") ' hay aridoc
-    sql = sql & ", codcarpetafvar = " & DBSet(mvarCarpetaFac, "N") 'carpeta facturas varias
-    sql = sql & ", codextension = " & DBSet(mvarExtension, "N") 'extension documento
-    sql = sql & ", c1fvararidoc = " & DBSet(mvarC1Factura, "N") 'campo 1 factura
-    sql = sql & ", c2fvararidoc = " & DBSet(mvarC2Factura, "N") 'campo 2 factura
-    sql = sql & ", c3fvararidoc = " & DBSet(mvarC3Factura, "N") 'campo 3 factura
-    sql = sql & ", c4fvararidoc = " & DBSet(mvarC4Factura, "N") 'campo 4 factura
+    SQL = SQL & ", hayaridoc= " & DBSet(mvarHayAridoc, "N") ' hay aridoc
+    SQL = SQL & ", codcarpetafvar = " & DBSet(mvarCarpetaFac, "N") 'carpeta facturas varias
+    SQL = SQL & ", codextension = " & DBSet(mvarExtension, "N") 'extension documento
+    SQL = SQL & ", c1fvararidoc = " & DBSet(mvarC1Factura, "N") 'campo 1 factura
+    SQL = SQL & ", c2fvararidoc = " & DBSet(mvarC2Factura, "N") 'campo 2 factura
+    SQL = SQL & ", c3fvararidoc = " & DBSet(mvarC3Factura, "N") 'campo 3 factura
+    SQL = SQL & ", c4fvararidoc = " & DBSet(mvarC4Factura, "N") 'campo 4 factura
     
-    sql = sql & " WHERE codparam =" & Codigo & ";"
+    SQL = SQL & " WHERE codparam =" & Codigo & ";"
 
-    conn.Execute sql
+    conn.Execute SQL
 
     Modificar = 1
     Exit Function

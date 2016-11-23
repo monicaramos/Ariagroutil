@@ -1,7 +1,7 @@
 Attribute VB_Name = "ExpresionBusqueda"
 
-Public Function SeparaCampoBusqueda(Tipo As String, campo As String, cadena As String, ByRef DevSQL As String) As Byte
-Dim cad As String
+Public Function SeparaCampoBusqueda(tipo As String, campo As String, Cadena As String, ByRef DevSQL As String) As Byte
+Dim Cad As String
 Dim Aux As String
 Dim Ch As String
 Dim Fin As Boolean
@@ -10,95 +10,95 @@ Dim i, J As String
 On Error GoTo ErrSepara
 SeparaCampoBusqueda = 1
 DevSQL = ""
-cad = ""
-Select Case Tipo
+Cad = ""
+Select Case tipo
 Case "N"
     '----------------  NUMERICO  ---------------------
-    i = CararacteresCorrectos(cadena, "N")
+    i = CararacteresCorrectos(Cadena, "N")
     If i > 0 Then Exit Function  'Ha habido un error y salimos
     'Comprobamos si hay intervalo ':'
-    i = InStr(1, cadena, ":")
+    i = InStr(1, Cadena, ":")
     If i > 0 Then
         'Intervalo numerico
-        cad = Mid(cadena, 1, i - 1)
-        Aux = Mid(cadena, i + 1)
-        If Not IsNumeric(cad) Or Not IsNumeric(Aux) Then Exit Function  'No son numeros
+        Cad = Mid(Cadena, 1, i - 1)
+        Aux = Mid(Cadena, i + 1)
+        If Not IsNumeric(Cad) Or Not IsNumeric(Aux) Then Exit Function  'No son numeros
         'Intervalo correcto
         'Construimos la cadena
         
         '+-+-+- 23/05/2005 Canvi de Cèsar: per a que DevSQL tinga este aspecte: (taula.camp) >= 5 AND (taula.camp) <= 7 -+-+-+-+-
         'DevSQL = campo & " >= " & cad & " AND " & campo & " <= " & Aux
-        DevSQL = campo & " >= " & cad & ") AND (" & campo & " <= " & Aux
+        DevSQL = campo & " >= " & Cad & ") AND (" & campo & " <= " & Aux
         '+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
         
         'ELSE
         Else
             'Prueba
             'Comprobamos que no es el mayor
-            If cadena = ">>" Or cadena = "<<" Then
+            If Cadena = ">>" Or Cadena = "<<" Then
                 DevSQL = "1=1"
              Else
                     Fin = False
                     i = 1
-                    cad = ""
+                    Cad = ""
                     Aux = "NO ES NUMERO"
                     While Not Fin
-                        Ch = Mid(cadena, i, 1)
+                        Ch = Mid(Cadena, i, 1)
                         If Ch = ">" Or Ch = "<" Or Ch = "=" Then
-                            cad = cad & Ch
+                            Cad = Cad & Ch
                             Else
-                                Aux = Mid(cadena, i)
+                                Aux = Mid(Cadena, i)
                                 Fin = True
                         End If
                         i = i + 1
-                        If i > Len(cadena) Then Fin = True
+                        If i > Len(Cadena) Then Fin = True
                     Wend
                     'En aux debemos tener el numero
                     If Not IsNumeric(Aux) Then Exit Function
                     'Si que es numero. Entonces, si Cad="" entronces le ponemos =
-                    If cad = "" Then cad = " = "
-                    DevSQL = campo & " " & cad & " " & Aux
+                    If Cad = "" Then Cad = " = "
+                    DevSQL = campo & " " & Cad & " " & Aux
             End If
         End If
 Case "F"
      '---------------- FECHAS ------------------
-    i = CararacteresCorrectos(cadena, "F")
+    i = CararacteresCorrectos(Cadena, "F")
     If i = 1 Then Exit Function
     'Comprobamos si hay intervalo ':'
-    i = InStr(1, cadena, ":")
+    i = InStr(1, Cadena, ":")
     If i > 0 Then
         'Intervalo de fechas
-        cad = Mid(cadena, 1, i - 1)
-        Aux = Mid(cadena, i + 1)
-        If Not EsFechaOKString(cad) Or Not EsFechaOKString(Aux) Then Exit Function  'Fechas incorrectas
+        Cad = Mid(Cadena, 1, i - 1)
+        Aux = Mid(Cadena, i + 1)
+        If Not EsFechaOKString(Cad) Or Not EsFechaOKString(Aux) Then Exit Function  'Fechas incorrectas
         'Intervalo correcto
         'Construimos la cadena
-        cad = Format(cad, FormatoFecha)
+        Cad = Format(Cad, FormatoFecha)
         Aux = Format(Aux, FormatoFecha)
         'En my sql es la ' no el #
         'DevSQL = Campo & " >=#" & Cad & "# AND " & Campo & " <= #" & AUX & "#"
-        DevSQL = campo & " >='" & cad & "' AND " & campo & " <= '" & Aux & "'"
+        DevSQL = campo & " >='" & Cad & "' AND " & campo & " <= '" & Aux & "'"
         '----
         'ELSE
         Else
             'Comprobamos que no es el mayor
-            If cadena = ">>" Or cadena = "<<" Then
+            If Cadena = ">>" Or Cadena = "<<" Then
                   DevSQL = "1=1"
             Else
                 Fin = False
                 i = 1
-                cad = ""
+                Cad = ""
                 Aux = "NO ES FECHA"
                 While Not Fin
-                    Ch = Mid(cadena, i, 1)
+                    Ch = Mid(Cadena, i, 1)
                     If Ch = ">" Or Ch = "<" Or Ch = "=" Then
-                        cad = cad & Ch
+                        Cad = Cad & Ch
                         Else
-                            Aux = Mid(cadena, i)
+                            Aux = Mid(Cadena, i)
                             Fin = True
                     End If
                     i = i + 1
-                    If i > Len(cadena) Then Fin = True
+                    If i > Len(Cadena) Then Fin = True
                 Wend
                 'En aux debemos tener el numero
                 If Not EsFechaOKString(Aux) Then Exit Function
@@ -108,49 +108,49 @@ Case "F"
                 Else
                     Aux = "Date(" & Year(Aux) & "," & Month(Aux) & "," & Day(Aux) & ")"
                 End If
-                If cad = "" Then cad = " = "
-                DevSQL = campo & " " & cad & " " & Aux
+                If Cad = "" Then Cad = " = "
+                DevSQL = campo & " " & Cad & " " & Aux
             End If
         End If
     
 Case "FHF" 'monica
-    i = CararacteresCorrectos(cadena, "F")
+    i = CararacteresCorrectos(Cadena, "F")
     If i = 1 Then Exit Function
     'Comprobamos si hay intervalo ':'
-    i = InStr(1, cadena, ":")
+    i = InStr(1, Cadena, ":")
     If i > 0 Then
         'Intervalo de fechas
-        cad = Mid(cadena, 1, i - 1)
-        Aux = Mid(cadena, i + 1)
-        If Not EsFechaOKString(cad) Or Not EsFechaOKString(Aux) Then Exit Function  'Fechas incorrectas
+        Cad = Mid(Cadena, 1, i - 1)
+        Aux = Mid(Cadena, i + 1)
+        If Not EsFechaOKString(Cad) Or Not EsFechaOKString(Aux) Then Exit Function  'Fechas incorrectas
         'Intervalo correcto
         'Construimos la cadena
-        cad = Format(cad, FormatoFecha)
+        Cad = Format(Cad, FormatoFecha)
         Aux = Format(Aux, FormatoFecha)
         'En my sql es la ' no el #
         'DevSQL = Campo & " >=#" & Cad & "# AND " & Campo & " <= #" & AUX & "#"
-        DevSQL = "date(" & campo & ") >='" & cad & "' AND date(" & campo & ") <= '" & Aux & "'"
+        DevSQL = "date(" & campo & ") >='" & Cad & "' AND date(" & campo & ") <= '" & Aux & "'"
         '----
         'ELSE
         Else
             'Comprobamos que no es el mayor
-            If cadena = ">>" Or cadena = "<<" Then
+            If Cadena = ">>" Or Cadena = "<<" Then
                   DevSQL = "1=1"
             Else
                 Fin = False
                 i = 1
-                cad = ""
+                Cad = ""
                 Aux = "NO ES FECHA"
                 While Not Fin
-                    Ch = Mid(cadena, i, 1)
+                    Ch = Mid(Cadena, i, 1)
                     If Ch = ">" Or Ch = "<" Or Ch = "=" Then
-                        cad = cad & Ch
+                        Cad = Cad & Ch
                         Else
-                            Aux = Mid(cadena, i)
+                            Aux = Mid(Cadena, i)
                             Fin = True
                     End If
                     i = i + 1
-                    If i > Len(cadena) Then Fin = True
+                    If i > Len(Cadena) Then Fin = True
                 Wend
                 'En aux debemos tener el numero
                 If Not EsFechaOKString(Aux) Then Exit Function
@@ -160,67 +160,67 @@ Case "FHF" 'monica
                 Else
                     Aux = "Date(" & Year(Aux) & "," & Month(Aux) & "," & Day(Aux) & ")"
                 End If
-                If cad = "" Then cad = " = "
-                DevSQL = "date(" & campo & ") " & cad & " " & Aux
+                If Cad = "" Then Cad = " = "
+                DevSQL = "date(" & campo & ") " & Cad & " " & Aux
             End If
         End If
 
 Case "FHH" 'monica
-    i = CararacteresCorrectos(cadena, "F")
+    i = CararacteresCorrectos(Cadena, "F")
     If i = 1 Then Exit Function
-    If cadena = ">>" Or cadena = "<<" Then
+    If Cadena = ">>" Or Cadena = "<<" Then
         DevSQL = "1=1"
     Else
-        If EsHoraOK(cadena) Then
-            DevSQL = "time(" & campo & ") ='" & cadena & "'"
+        If EsHoraOK(Cadena) Then
+            DevSQL = "time(" & campo & ") ='" & Cadena & "'"
         End If
     End If
     
 Case "T"
     '---------------- TEXTO ------------------
-    i = CararacteresCorrectos(cadena, "T")
+    i = CararacteresCorrectos(Cadena, "T")
     If i = 1 Then Exit Function
     
     'Comprobamos que no es el mayor
-    If cadena = ">>" Or cadena = "<<" Then
+    If Cadena = ">>" Or Cadena = "<<" Then
         DevSQL = "1=1"
         Exit Function
     End If
     
     'Comprobamos si hay intervalo ':'
-    i = InStr(1, cadena, ":")
+    i = InStr(1, Cadena, ":")
     If i > 0 Then
         'Intervalo numerico
-        cad = Mid(cadena, 1, i - 1)
-        Aux = Mid(cadena, i + 1)
+        Cad = Mid(Cadena, 1, i - 1)
+        Aux = Mid(Cadena, i + 1)
 '        If Not IsNumeric(cad) Or Not IsNumeric(Aux) Then Exit Function  'No son numeros
         'Intervalo correcto
         'Construimos la cadena
-        DevSQL = campo & " >= '" & cad & "' AND " & campo & " <= '" & Aux & "'"
+        DevSQL = campo & " >= '" & Cad & "' AND " & campo & " <= '" & Aux & "'"
     Else
     
         'Comprobamos si es LIKE o NOT LIKE
-        cad = Mid(cadena, 1, 2)
-        If cad = "<>" Then
-            cadena = Mid(cadena, 3)
+        Cad = Mid(Cadena, 1, 2)
+        If Cad = "<>" Then
+            Cadena = Mid(Cadena, 3)
             If Left(campo, 1) <> "{" Then
                 'No es consulta seleccion para Report.
                 DevSQL = campo & " NOT LIKE '"
             Else
                 'Consulta de seleccion para Crystal Report
-                DevSQL = "NOT (" & campo & " LIKE """ & cadena & """)"
+                DevSQL = "NOT (" & campo & " LIKE """ & Cadena & """)"
             End If
         Else
             If Left(campo, 1) <> "{" Then
             'NO es para report
                 DevSQL = campo & " LIKE '"
             Else  'Es para report
-                i = InStr(1, cadena, "*")
+                i = InStr(1, Cadena, "*")
                 'Poner Consulta de seleccion para Crystal Report
                 If i > 0 Then
-                    DevSQL = campo & " LIKE """ & cadena & """"
+                    DevSQL = campo & " LIKE """ & Cadena & """"
                 Else
-                    DevSQL = campo & " = """ & cadena & """"
+                    DevSQL = campo & " = """ & Cadena & """"
                 End If
             End If
         End If
@@ -228,7 +228,7 @@ Case "T"
     
         'Cambiamos el * por % puesto que en ADO es el caraacter para like
         i = 1
-        Aux = cadena
+        Aux = Cadena
         If Not Left(campo, 1) = "{" Then
           'No es para report
            While i <> 0
@@ -290,23 +290,23 @@ Case "B"
     'Los booleanos. Valores buenos son
     'Verdadero , Falso, True, False, = , <>
     'Igual o distinto
-    i = InStr(1, cadena, "<>")
+    i = InStr(1, Cadena, "<>")
     If i = 0 Then
         'IGUAL A valor
-        cad = " = "
+        Cad = " = "
         Else
             'Distinto a valor
-        cad = " <> "
+        Cad = " <> "
     End If
     'Verdadero o falso
-    i = InStr(1, cadena, "V")
+    i = InStr(1, Cadena, "V")
     If i > 0 Then
             Aux = "True"
             Else
             Aux = "False"
     End If
     'Ponemos la cadena
-    DevSQL = campo & " " & cad & " " & Aux
+    DevSQL = campo & " " & Cad & " " & Aux
     
 Case Else
     'No hacemos nada
@@ -318,14 +318,14 @@ ErrSepara:
 End Function
 
 
-Private Function CararacteresCorrectos(vcad As String, Tipo As String) As Byte
+Private Function CararacteresCorrectos(vcad As String, tipo As String) As Byte
 Dim i As Integer
 Dim Ch As String
 Dim Error As Boolean
 
 CararacteresCorrectos = 1
 Error = False
-Select Case Tipo
+Select Case tipo
 Case "N"
     'Numero. Aceptamos numeros, >,< = :
     For i = 1 To Len(vcad)
@@ -352,6 +352,7 @@ Case "T"
             Case "<", ">"
             Case "Ñ", "ñ"
             Case "-" 'Añade Laura
+            Case "#", "@", "$" '[Monica]29/07/2016: no estaba incluida la arroba
             Case Else
                 Error = True
                 Exit For
@@ -403,7 +404,7 @@ End Function
 
 
 
-Public Function ContieneCaracterBusqueda(cadena As String) As Boolean
+Public Function ContieneCaracterBusqueda(Cadena As String) As Boolean
 'Comprueba si la cadena contiene algun caracter especial de busqueda
 ' >,>,>=,: , ....
 'si encuentra algun caracter de busqueda devuelve TRUE y sale
@@ -414,7 +415,7 @@ Dim i As Integer
     i = 1
     b = False
     Do
-        Ch = Mid(cadena, i, 1)
+        Ch = Mid(Cadena, i, 1)
         Select Case Ch
             Case "<", ">", ":", "="
                 b = True
@@ -425,7 +426,7 @@ Dim i As Integer
         End Select
     'Next i
         i = i + 1
-    Loop Until (b = True) Or (i > Len(cadena))
+    Loop Until (b = True) Or (i > Len(Cadena))
     ContieneCaracterBusqueda = b
 End Function
 

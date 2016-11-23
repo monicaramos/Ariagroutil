@@ -1,6 +1,6 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
-Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "comdlg32.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
+Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmIntTesorSeg 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Integración de Cobros en Tesorería"
@@ -311,8 +311,8 @@ Private HaDevueltoDatos As Boolean
 
 Private WithEvents frmC As frmCal 'calendario fechas
 Attribute frmC.VB_VarHelpID = -1
-Private WithEvents frmFpa As frmForpaConta 'formas de pago de la contabilidad
-Attribute frmFpa.VB_VarHelpID = -1
+Private WithEvents frmFPa As frmForpaConta 'formas de pago de la contabilidad
+Attribute frmFPa.VB_VarHelpID = -1
 Private WithEvents frmCtas As frmCtasConta 'cuentas contables de contabilidad
 Attribute frmCtas.VB_VarHelpID = -1
 
@@ -427,7 +427,7 @@ Private Sub frmCtas_DatoSeleccionado(CadenaSeleccion As String)
     txtNombre(indCodigo).Text = RecuperaValor(CadenaSeleccion, 2)
 End Sub
 
-Private Sub frmFPa_DatoSeleccionado(CadenaSeleccion As String)
+Private Sub frmFpa_DatoSeleccionado(CadenaSeleccion As String)
 'Form de Consulta de formas de pago de contabilidad
     txtCodigo(indCodigo).Text = RecuperaValor(CadenaSeleccion, 1)
     txtNombre(indCodigo).Text = RecuperaValor(CadenaSeleccion, 2)
@@ -513,7 +513,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -525,7 +525,11 @@ Dim cad As String, cadTipo As String 'tipo cliente
     
     Select Case Index
         Case 3 ' FORMA DE PAGO DE LA CONTABILIDAD
-            If txtCodigo(Index).Text <> "" Then txtNombre(Index).Text = DevuelveDesdeBDNew(cContaSeg, "sforpa", "nomforpa", "codforpa", txtCodigo(3).Text, "N")
+            If vParamAplic.ContabilidadNueva Then
+                If txtCodigo(Index).Text <> "" Then txtNombre(Index).Text = DevuelveDesdeBDNew(cContaSeg, "formapago", "nomforpa", "codforpa", txtCodigo(3).Text, "N")
+            Else
+                If txtCodigo(Index).Text <> "" Then txtNombre(Index).Text = DevuelveDesdeBDNew(cContaSeg, "sforpa", "nomforpa", "codforpa", txtCodigo(3).Text, "N")
+            End If
             If txtNombre(Index).Text = "" Then
                 MsgBox "Forma de Pago  no existe en la contabilidad. Reintroduzca.", vbExclamation
             End If
@@ -586,12 +590,12 @@ End Function
 
 Private Sub AbrirFrmForpaConta(indice As Integer)
     indCodigo = indice
-    Set frmFpa = New frmForpaConta
-    frmFpa.DatosADevolverBusqueda = "0|1|"
-    frmFpa.CodigoActual = txtCodigo(indCodigo)
-    frmFpa.Conexion = cContaSeg
-    frmFpa.Show vbModal
-    Set frmFpa = Nothing
+    Set frmFPa = New frmForpaConta
+    frmFPa.DatosADevolverBusqueda = "0|1|"
+    frmFPa.CodigoActual = txtCodigo(indCodigo)
+    frmFPa.Conexion = cContaSeg
+    frmFPa.Show vbModal
+    Set frmFPa = Nothing
 End Sub
  
 Private Sub AbrirFrmCuentas(indice As Integer)
@@ -726,7 +730,7 @@ End Function
 
 Private Function PasarCalculoAContab(cadwhere As String) As Boolean
 Dim SQL As String
-Dim rs As adodb.Recordset
+Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
 Dim NumLinea As Integer
@@ -739,7 +743,7 @@ Dim ImporteH As Currency
 Dim Diferencia As Currency
 Dim Obs As String
 Dim cadMen As String
-Dim cad As String
+Dim Cad As String
 Dim CtaDifer As String
 Dim Codmacta As String
 
@@ -768,24 +772,24 @@ Dim Codmacta As String
         Obs = "Contabilización de Cobro de Pólizas de fecha " & Format(txtCodigo(0).Text, "dd/mm/yyyy")
 
         SQL = "select * from segpoliza where " & cadwhere
-        Set rs = New adodb.Recordset
-        rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+        Set Rs = New ADODB.Recordset
+        Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
 
 
         b = True
         i = 1
-        While Not rs.EOF And b
+        While Not Rs.EOF And b
                 IncrementarProgres Me.Pb1, 1
                 Me.lblProgres(1).Caption = "Insertando registro en Tesorería...   (" & i & " de " & NumLinea & ")"
                 Me.Refresh
                 
                 i = i + 1
-                b = InsertarEnTesoreriaNew2(rs, txtCodigo(2).Text, txtCodigo(3).Text, txtCodigo(4).Text, cadMen)
+                b = InsertarEnTesoreriaNew2(Rs, txtCodigo(2).Text, txtCodigo(3).Text, txtCodigo(4).Text, cadMen)
                 cadMen = "Insertando en Tesoreria: "
                
-                rs.MoveNext
+                Rs.MoveNext
         Wend
-        rs.Close
+        Rs.Close
             
 ' de momento comentado para hacer pruebas
         If b Then

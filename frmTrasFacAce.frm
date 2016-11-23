@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmTrasFacAce 
    BorderStyle     =   3  'Fixed Dialog
@@ -318,7 +318,7 @@ Dim indCodigo As Integer 'indice para txtCodigo
 'Se inicializan para cada Informe (tabla de BD a la que hace referencia
 Dim Codigo As String 'Código para FormulaSelection de Crystal Report
 Dim TipCod As String
-Dim cad As String
+Dim Cad As String
 Dim cadTABLA As String
 
 Dim vContad As Long
@@ -335,12 +335,12 @@ Private Sub KEYpress(KeyAscii As Integer)
 End Sub
 
 Private Sub cmdAceptar_Click()
-Dim Sql As String
+Dim SQL As String
 Dim i As Byte
 Dim cadwhere As String
 Dim b As Boolean
 Dim NomFic As String
-Dim CADENA As String
+Dim Cadena As String
 Dim cadena1 As String
 Dim Acabar As Boolean
 
@@ -376,9 +376,9 @@ On Error GoTo eError
                     cadTABLA = "tmpinformes"
                     cadFormula = "{tmpinformes.codusu} = " & vSesion.Codigo
                     
-                    Sql = "select count(*) from tmpinformes where codusu = " & vSesion.Codigo
+                    SQL = "select count(*) from tmpinformes where codusu = " & vSesion.Codigo
                     
-                    If TotalRegistros(Sql) <> 0 Then
+                    If TotalRegistros(SQL) <> 0 Then
                         MsgBox "Hay errores en la Importación de Facturas de Aceite. Debe corregirlos previamente.", vbExclamation
                         cadTitulo = "Errores de Importación"
                         cadNombreRPT = "rErroresImpGas.rpt"
@@ -527,21 +527,21 @@ Dim NF As Integer
     RecuperaFichero = False
     NF = FreeFile
     Open App.path For Input As #NF ' & "\BV" & Format(CDate(txtcodigo(0).Text), "ddmmyy") & "." & Format(txtcodigo(1).Text, "000") For Input As #NF
-    Line Input #NF, cad
+    Line Input #NF, Cad
     Close #NF
-    If cad <> "" Then RecuperaFichero = True
+    If Cad <> "" Then RecuperaFichero = True
     
 End Function
 
 Private Function ProcesarFichero(nomFich As String) As Boolean
 Dim NF As Long
-Dim cad As String
+Dim Cad As String
 Dim i As Integer
 Dim longitud As Long
 Dim Rs As ADODB.Recordset
 Dim Rs1 As ADODB.Recordset
 Dim NumReg As Long
-Dim Sql As String
+Dim SQL As String
 Dim SQL1 As String
 Dim SQL11 As String
 Dim sql2 As String
@@ -591,15 +591,15 @@ Dim TipoIva As String
     
             ' PROCESO DEL FICHERO
             While Not EOF(NF) And b
-                Line Input #NF, cad
-                Me.Pb1.Value = Me.Pb1.Value + Len(cad)
+                Line Input #NF, Cad
+                Me.Pb1.Value = Me.Pb1.Value + Len(Cad)
                 
                 lblProgres(1).Caption = "Linea " & Linea
                 Me.Refresh
                 sql2 = ""
                 Sql3 = ""
-                If cad <> "" Then
-                    b = InsertarLinea(cad, sql2, Sql3)
+                If Cad <> "" Then
+                    b = InsertarLinea(Cad, sql2, Sql3)
                     If b Then
                         SQL1 = SQL1 & sql2
                         SQL11 = SQL11 & Sql3
@@ -614,20 +614,20 @@ Dim TipoIva As String
                 ' quitamos la ultima coma para hacer el insert
                 SQL1 = Mid(SQL1, 1, Len(SQL1) - 1)
                 
-                Sql = "insert into cabfact (codsecci,letraser,numfactu,fecfactu,ctaclien,observac,intconta,baseiva1,baseiva2,baseiva3,"
-                Sql = Sql & "impoiva1,impoiva2,impoiva3,imporec1,imporec2,imporec3,totalfac,tipoiva1,tipoiva2,tipoiva3,"
-                Sql = Sql & "porciva1,porciva2,porciva3,codforpa,porcrec1,porcrec2,porcrec3,retfaccl,trefaccl,cuereten) values "
-                Sql = Sql & SQL1
+                SQL = "insert into cabfact (codsecci,letraser,numfactu,fecfactu,ctaclien,observac,intconta,baseiva1,baseiva2,baseiva3,"
+                SQL = SQL & "impoiva1,impoiva2,impoiva3,imporec1,imporec2,imporec3,totalfac,tipoiva1,tipoiva2,tipoiva3,"
+                SQL = SQL & "porciva1,porciva2,porciva3,codforpa,porcrec1,porcrec2,porcrec3,retfaccl,trefaccl,cuereten) values "
+                SQL = SQL & SQL1
                 
-                conn.Execute Sql
+                conn.Execute SQL
                 
                 ' quitamos la ultima coma para hacer el insert
                 SQL11 = Mid(SQL11, 1, Len(SQL11) - 1)
                 
-                Sql = "insert into linfact (codsecci,letraser,numfactu,fecfactu,numlinea,codconce,ampliaci,importe,tipoiva) values "
-                Sql = Sql & SQL11
+                SQL = "insert into linfact (codsecci,letraser,numfactu,fecfactu,numlinea,codconce,ampliaci,importe,tipoiva) values "
+                SQL = SQL & SQL11
                 
-                conn.Execute Sql
+                conn.Execute SQL
             End If
         End If
         
@@ -654,11 +654,11 @@ End Function
                 
 Private Function ProcesarFichero2(nomFich As String) As Boolean
 Dim NF As Long
-Dim cad As String
+Dim Cad As String
 Dim i As Integer
 Dim longitud As Long
 Dim Rs As ADODB.Recordset
-Dim Sql As String
+Dim SQL As String
 Dim sql2 As String
 Dim Nifsocio As String
 Dim CtaSocio As String
@@ -669,11 +669,11 @@ Dim Linea As Integer
 Dim tipo As String
 Dim numfactu As String
 Dim fecfactu As String
-Dim socio As String
-Dim cuenta As String
+Dim Socio As String
+Dim Cuenta As String
 Dim FormatSocio As String
 Dim Base As String
-Dim iva As String
+Dim Iva As String
 Dim total As String
 Dim PorcIva As Currency
 Dim vIva As Currency
@@ -730,23 +730,23 @@ Dim TipoIva As String
             
             ' PROCESO DEL FICHERO
             While Not EOF(NF)
-                Line Input #NF, cad
-                Me.Pb1.Value = Me.Pb1.Value + Len(cad)
+                Line Input #NF, Cad
+                Me.Pb1.Value = Me.Pb1.Value + Len(Cad)
                 
                 Linea = Linea + 1
                 
-                If cad <> "" Then
+                If Cad <> "" Then
                     lblProgres(1).Caption = "Linea " & Linea
                     Me.Refresh
                     
-                    numfactu = Mid(cad, 4, 7)
-                    vFecfactu = Mid(cad, 12, 8)
+                    numfactu = Mid(Cad, 4, 7)
+                    vFecfactu = Mid(Cad, 12, 8)
                     fecfactu = CDate(Mid(vFecfactu, 1, 2) & "/" & Mid(vFecfactu, 3, 2) & "/" & Mid(vFecfactu, 5, 4))
                     
-                    If Mid(cad, 22, 1) = "0" Then
-                        vCodsocio = Mid(cad, 24, 3)
+                    If Mid(Cad, 22, 1) = "0" Then
+                        vCodsocio = Mid(Cad, 24, 3)
                     Else
-                        vCodsocio = Mid(cad, 23, 4)
+                        vCodsocio = Mid(Cad, 23, 4)
                     End If
                     Codsocio = CCur(vCodsocio)
 '                    If Codsocio >= 1000 Then Codsocio = Codsocio - 1000
@@ -756,11 +756,11 @@ Dim TipoIva As String
                     CadenaCeros = Repeat("0", vEmpresaFac.DigitosUltimoNivel - vEmpresaFac.DigitosNivelAnterior)
                     Codmacta = RaizCta & Format(Codsocio, CadenaCeros)
                     
-                    ampliacion = Mid(cad, 34, 15) & " " & Mid(cad, 83, 9) & " litros"
+                    ampliacion = Mid(Cad, 34, 15) & " " & Mid(Cad, 83, 9) & " litros"
                     
-                    Base = Mid(cad, 50, 10)
-                    iva = Mid(cad, 61, 10)
-                    total = Mid(cad, 72, 10)
+                    Base = Mid(Cad, 50, 10)
+                    Iva = Mid(Cad, 61, 10)
+                    total = Mid(Cad, 72, 10)
                     
                     'comprobamos que la cuenta contable del socio sea correcta
                     sql2 = "select codmacta from cuentas where codmacta = " & DBSet(Codmacta, "T")
@@ -772,28 +772,28 @@ Dim TipoIva As String
                         Codmacta = DBLet(Rs!Codmacta, "T")
                     Else
                         Mens = "Cuenta contable del socio inexistente "
-                        Sql = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
+                        SQL = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
                               vSesion.Codigo & "," & DBSet(Codmacta, "T") & "," & DBSet(Mens, "T") & ")"
                               
-                        conn.Execute Sql
+                        conn.Execute SQL
                     End If
                    
                     Set Rs = Nothing
                     
                     
                     ' comprobamos que la factura no exista ya en la tabla
-                    Sql = ""
-                    Sql = "select count(*) from cabfact where codsecci = " & DBSet(txtCodigo(1).Text, "N") & " and "
-                    Sql = Sql & " letraser = " & DBSet(letraser, "T") & " and numfactu = " & DBSet(numfactu, "N") & " and "
-                    Sql = Sql & " fecfactu = " & DBSet(fecfactu, "F")
+                    SQL = ""
+                    SQL = "select count(*) from cabfact where codsecci = " & DBSet(txtCodigo(1).Text, "N") & " and "
+                    SQL = SQL & " letraser = " & DBSet(letraser, "T") & " and numfactu = " & DBSet(numfactu, "N") & " and "
+                    SQL = SQL & " fecfactu = " & DBSet(fecfactu, "F")
                     
                     
-                    If TotalRegistros(Sql) <> 0 Then
+                    If TotalRegistros(SQL) <> 0 Then
                         Mens = "Ya existe esta factura "
-                        Sql = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
+                        SQL = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
                               vSesion.Codigo & "," & DBSet(letraser & " " & numfactu & " " & fecfactu & " " & Codmacta, "T") & "," & DBSet(Mens, "T") & ")"
                               
-                        conn.Execute Sql
+                        conn.Execute SQL
                     End If
                     
                     ' comprobamos que los valores se correspondan con el iva introducido
@@ -801,23 +801,23 @@ Dim TipoIva As String
                     PorcIva = DevuelveDesdeBDNewFac("tiposiva", "porceiva", "codigiva", TipoIva, "N")
                     IvaCalc = Round2(CCur(Base) * PorcIva / 100, 2)
                     
-                    If Round2((CCur(Base) + CCur(iva)), 2) <> Round2((CCur(Base) + IvaCalc), 2) Then
+                    If Round2((CCur(Base) + CCur(Iva)), 2) <> Round2((CCur(Base) + IvaCalc), 2) Then
                         Mens = "Iva distinto al introducido"
-                        Mens1 = Base & " + " & iva & " <> " & Base & " + " & IvaCalc
-                        Sql = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
+                        Mens1 = Base & " + " & Iva & " <> " & Base & " + " & IvaCalc
+                        SQL = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
                               vSesion.Codigo & "," & DBSet(Mens1, "T") & "," & DBSet(Mens, "T") & ")"
                               
-                        conn.Execute Sql
+                        conn.Execute SQL
                     End If
                     
                     ' comprobamos que los importes introducidos sean correctos
-                    If (CCur(Base) + CCur(iva)) <> CCur(total) Then
+                    If (CCur(Base) + CCur(Iva)) <> CCur(total) Then
                         Mens = "Total distinto a Base + Iva "
-                        Mens1 = DBSet(Base, "N") & " + " & DBSet(iva, "N") & " = " & DBSet(total, "N")
-                        Sql = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
+                        Mens1 = DBSet(Base, "N") & " + " & DBSet(Iva, "N") & " = " & DBSet(total, "N")
+                        SQL = "insert into tmpinformes (codusu, nombre1, nombre2) values (" & _
                               vSesion.Codigo & "," & DBSet(Mens1, "T") & "," & DBSet(Mens, "T") & ")"
                               
-                        conn.Execute Sql
+                        conn.Execute SQL
                     End If
                     
                 End If
@@ -847,9 +847,9 @@ eProcesarFichero2:
     End If
 End Function
             
-Private Function InsertarLinea(cad As String, ByRef Result As String, ByRef Result2 As String) As Boolean
+Private Function InsertarLinea(Cad As String, ByRef Result As String, ByRef Result2 As String) As Boolean
 Dim b As Boolean
-Dim Sql As String
+Dim SQL As String
 Dim sql2 As String
 Dim registro As String
 
@@ -857,15 +857,15 @@ Dim numfactu As String
 Dim fecfactu As String
 Dim Nifsocio As String
 Dim Base As String
-Dim iva As String
+Dim Iva As String
 Dim total As String
 Dim Codmacta As String
-Dim codartic As String
+Dim CodArtic As String
 Dim NomArtic As String
 Dim NomSocio As String
 Dim cantidad As String
 Dim PrecioVe As String
-Dim Implinea As String
+Dim ImpLinea As String
 Dim NumLinea As Long
 Dim vNumFac As Currency
 Dim PorcIva As String
@@ -897,14 +897,14 @@ Dim ampliacion As String
     PorcIva = ""
     PorcIva = DevuelveDesdeBDNewFac("tiposiva", "porceiva", "codigiva", TipoIva, "N")
     
-    numfactu = Mid(cad, 4, 7)
-    vFecfactu = Mid(cad, 12, 8)
+    numfactu = Mid(Cad, 4, 7)
+    vFecfactu = Mid(Cad, 12, 8)
     fecfactu = CDate(Mid(vFecfactu, 1, 2) & "/" & Mid(vFecfactu, 3, 2) & "/" & Mid(vFecfactu, 5, 4))
     
-    If Mid(cad, 22, 1) = "0" Then
-        vCodsocio = Mid(cad, 24, 3)
+    If Mid(Cad, 22, 1) = "0" Then
+        vCodsocio = Mid(Cad, 24, 3)
     Else
-        vCodsocio = Mid(cad, 23, 4)
+        vCodsocio = Mid(Cad, 23, 4)
     End If
     Codsocio = CCur(vCodsocio)
 '    If Codsocio >= 1000 Then Codsocio = Codsocio - 1000
@@ -914,63 +914,63 @@ Dim ampliacion As String
     CadenaCeros = Repeat("0", vEmpresaFac.DigitosUltimoNivel - vEmpresaFac.DigitosNivelAnterior)
     Codmacta = RaizCta & Format(Codsocio, CadenaCeros)
     
-    ampliacion = Mid(cad, 34, 15) & " " & Mid(cad, 83, 9) & " litros"
+    ampliacion = Mid(Cad, 34, 15) & " " & Mid(Cad, 83, 9) & " litros"
     
-    Base = Mid(cad, 50, 10)
-    iva = Mid(cad, 61, 10)
-    total = Mid(cad, 72, 10)
+    Base = Mid(Cad, 50, 10)
+    Iva = Mid(Cad, 61, 10)
+    total = Mid(Cad, 72, 10)
     
 '   +++++CABFACT+++++
 '   (codsecci,letraser,numfactu,fecfactu,ctaclien,observac,intconta,baseiva1,baseiva2,baseiva3,
 '   impoiva1,impoiva2,impoiva3,impoiva3,imporec1,imporec2,imporec3,totalfac,tipoiva1,tipoiva2,tipoiva3,
 '   porciva1,porciva2,porciva3,codforpa,porcrec1,porcrec2,porcrec3,retfaccl,trefaccl,cuereten)
-    Sql = DBSet(txtCodigo(1).Text, "N") & ","
-    Sql = Sql & DBSet(letraser, "T") & ","
-    Sql = Sql & DBSet(numfactu, "N") & ","
-    Sql = Sql & DBSet(fecfactu, "F") & ","
-    Sql = Sql & DBSet(Codmacta, "T") & ","
-    Sql = Sql & ValorNulo & "," 'observaciones
-    Sql = Sql & "0," ' intconta
-    Sql = Sql & DBSet(ImporteSinFormato(Base), "N") & "," ' baseiva1
-    Sql = Sql & ValorNulo & "," ' baseiva2
-    Sql = Sql & ValorNulo & "," ' baseiva3
-    Sql = Sql & DBSet(ImporteSinFormato(iva), "N") & "," 'impoiva1
-    Sql = Sql & ValorNulo & "," ' impoiva2
-    Sql = Sql & ValorNulo & "," ' impoiva3
-    Sql = Sql & ValorNulo & "," ' imporec1
-    Sql = Sql & ValorNulo & "," ' imporec2
-    Sql = Sql & ValorNulo & "," ' imporec3
-    Sql = Sql & DBSet(ImporteSinFormato(total), "N") & "," 'totalfac
-    Sql = Sql & DBSet(TipoIva, "N") & "," ' tipoiva1
-    Sql = Sql & ValorNulo & "," 'tipoiva2
-    Sql = Sql & ValorNulo & "," 'tipoiva3
-    Sql = Sql & DBSet(ImporteSinFormato(PorcIva), "N") & "," 'porceiva1
-    Sql = Sql & ValorNulo & "," 'porceiva2
-    Sql = Sql & ValorNulo & "," 'porceiva3
-    Sql = Sql & DBSet(txtCodigo(2).Text, "N") & "," ' forma de pago
-    Sql = Sql & ValorNulo & "," ' porcrec1
-    Sql = Sql & ValorNulo & "," ' porcrec2
-    Sql = Sql & ValorNulo & "," ' porcrec3
-    Sql = Sql & ValorNulo & "," ' retfaccl
-    Sql = Sql & ValorNulo & "," ' trefaccl
-    Sql = Sql & ValorNulo  ' cuereten
+    SQL = DBSet(txtCodigo(1).Text, "N") & ","
+    SQL = SQL & DBSet(letraser, "T") & ","
+    SQL = SQL & DBSet(numfactu, "N") & ","
+    SQL = SQL & DBSet(fecfactu, "F") & ","
+    SQL = SQL & DBSet(Codmacta, "T") & ","
+    SQL = SQL & ValorNulo & "," 'observaciones
+    SQL = SQL & "0," ' intconta
+    SQL = SQL & DBSet(ImporteSinFormato(Base), "N") & "," ' baseiva1
+    SQL = SQL & ValorNulo & "," ' baseiva2
+    SQL = SQL & ValorNulo & "," ' baseiva3
+    SQL = SQL & DBSet(ImporteSinFormato(Iva), "N") & "," 'impoiva1
+    SQL = SQL & ValorNulo & "," ' impoiva2
+    SQL = SQL & ValorNulo & "," ' impoiva3
+    SQL = SQL & ValorNulo & "," ' imporec1
+    SQL = SQL & ValorNulo & "," ' imporec2
+    SQL = SQL & ValorNulo & "," ' imporec3
+    SQL = SQL & DBSet(ImporteSinFormato(total), "N") & "," 'totalfac
+    SQL = SQL & DBSet(TipoIva, "N") & "," ' tipoiva1
+    SQL = SQL & ValorNulo & "," 'tipoiva2
+    SQL = SQL & ValorNulo & "," 'tipoiva3
+    SQL = SQL & DBSet(ImporteSinFormato(PorcIva), "N") & "," 'porceiva1
+    SQL = SQL & ValorNulo & "," 'porceiva2
+    SQL = SQL & ValorNulo & "," 'porceiva3
+    SQL = SQL & DBSet(txtCodigo(2).Text, "N") & "," ' forma de pago
+    SQL = SQL & ValorNulo & "," ' porcrec1
+    SQL = SQL & ValorNulo & "," ' porcrec2
+    SQL = SQL & ValorNulo & "," ' porcrec3
+    SQL = SQL & ValorNulo & "," ' retfaccl
+    SQL = SQL & ValorNulo & "," ' trefaccl
+    SQL = SQL & ValorNulo  ' cuereten
    
-    Result = "(" & Sql & "),"
+    Result = "(" & SQL & "),"
      
     
 '   +++++LINFACT+++++
 '(codsecci,letraser,numfactu,fecfactu,numlinea,codconce,ampliaci,importe,tipoiva)
-    Sql = DBSet(txtCodigo(1).Text, "N") & ","
-    Sql = Sql & DBSet(letraser, "T") & ","
-    Sql = Sql & DBSet(numfactu, "N") & ","
-    Sql = Sql & DBSet(fecfactu, "F") & ","
-    Sql = Sql & "1,"
-    Sql = Sql & DBSet(txtCodigo(0), "N") & ","
-    Sql = Sql & DBSet(ampliacion, "T") & ","
-    Sql = Sql & DBSet(ImporteSinFormato(Base), "N") & ","
-    Sql = Sql & DBSet(TipoIva, "N")
+    SQL = DBSet(txtCodigo(1).Text, "N") & ","
+    SQL = SQL & DBSet(letraser, "T") & ","
+    SQL = SQL & DBSet(numfactu, "N") & ","
+    SQL = SQL & DBSet(fecfactu, "F") & ","
+    SQL = SQL & "1,"
+    SQL = SQL & DBSet(txtCodigo(0), "N") & ","
+    SQL = SQL & DBSet(ampliacion, "T") & ","
+    SQL = SQL & DBSet(ImporteSinFormato(Base), "N") & ","
+    SQL = SQL & DBSet(TipoIva, "N")
     
-    Result2 = "(" & Sql & "),"
+    Result2 = "(" & SQL & "),"
     InsertarLinea = True
     Exit Function
     
@@ -995,10 +995,10 @@ Private Sub LlamarImprimir()
 End Sub
 
 Private Sub InicializarTabla()
-Dim Sql As String
-    Sql = "delete from tmpinformes where codusu = " & vSesion.Codigo
+Dim SQL As String
+    SQL = "delete from tmpinformes where codusu = " & vSesion.Codigo
     
-    conn.Execute Sql
+    conn.Execute SQL
 End Sub
 
 Private Sub frmCon_DatoSeleccionado(CadenaSeleccion As String)
@@ -1069,7 +1069,7 @@ Dim Orden2 As String
 Dim FFin As Date
 Dim Conta1 As String
 Dim Conta2 As String
-Dim Sql As String
+Dim SQL As String
 
    b = True
 
@@ -1106,9 +1106,13 @@ Dim Sql As String
         If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, CByte(BdConta)) Then
             Set vEmpresaFac = New CempresaFac
             If vEmpresaFac.LeerNiveles Then
-                Sql = ""
-                Sql = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", txtCodigo(2).Text, "N")
-                If Sql = "" Then
+                SQL = ""
+                If vParamAplic.ContabilidadNueva Then
+                    SQL = DevuelveDesdeBDNewFac("formapago", "nomforpa", "codforpa", txtCodigo(2).Text, "N")
+                Else
+                    SQL = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", txtCodigo(2).Text, "N")
+                End If
+                If SQL = "" Then
                     MsgBox "No existe la Forma de Pago. Reintroduzca.", vbExclamation
                     b = False
                     PonerFoco txtCodigo(2)
@@ -1155,7 +1159,7 @@ End Sub
 
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 Dim Conta1 As String
 Dim Conta2 As String
 
@@ -1209,7 +1213,11 @@ Dim Conta2 As String
             If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, CByte(BdConta)) Then
                 Set vEmpresaFac = New CempresaFac
                 If vEmpresaFac.LeerNiveles Then
-                    txtNombre(Index).Text = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", txtCodigo(Index).Text, "N")
+                    If vParamAplic.ContabilidadNueva Then
+                        txtNombre(Index).Text = DevuelveDesdeBDNewFac("formapago", "nomforpa", "codforpa", txtCodigo(Index).Text, "N")
+                    Else
+                        txtNombre(Index).Text = DevuelveDesdeBDNewFac("sforpa", "nomforpa", "codforpa", txtCodigo(Index).Text, "N")
+                    End If
                     If txtNombre(Index).Text = "" Then
                         MsgBox "No existe la Forma de Pago. Reintroduzca.", vbExclamation
                         PonerFoco txtCodigo(Index)

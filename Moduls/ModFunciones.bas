@@ -1064,7 +1064,7 @@ Public Function ObtenerBusqueda(ByRef formulario As Form, Optional CHECK As Stri
     Dim mTag As CTag
     Dim Aux As String
     Dim Cad As String
-    Dim Sql As String
+    Dim SQL As String
     Dim tabla As String
     Dim RC As Byte
 
@@ -1073,7 +1073,7 @@ Public Function ObtenerBusqueda(ByRef formulario As Form, Optional CHECK As Stri
     'Exit Function
     Set mTag = New CTag
     ObtenerBusqueda = ""
-    Sql = ""
+    SQL = ""
 
     'Recorremos los text en busca de ">>" o "<<"
     For Each Control In formulario.Controls
@@ -1098,22 +1098,22 @@ Public Function ObtenerBusqueda(ByRef formulario As Form, Optional CHECK As Stri
                                 Cad = Cad & mTag.columna & ")"
                         End Select
                         
-                        Sql = "Select " & Cad & " from " & mTag.tabla
-                        If cadwhere <> "" Then Sql = Sql & " WHERE " & cadwhere
-                        Sql = ObtenerMaximoMinimo(Sql, vBD)
+                        SQL = "Select " & Cad & " from " & mTag.tabla
+                        If cadwhere <> "" Then SQL = SQL & " WHERE " & cadwhere
+                        SQL = ObtenerMaximoMinimo(SQL, vBD)
                         Select Case mTag.TipoDato
                         Case "N"
-                            Sql = mTag.tabla & "." & mTag.columna & " = " & TransformaComasPuntos(Sql)
+                            SQL = mTag.tabla & "." & mTag.columna & " = " & TransformaComasPuntos(SQL)
                         Case "F"
-                            Sql = mTag.tabla & "." & mTag.columna & " = '" & Format(Sql, "yyyy-mm-dd") & "'"
+                            SQL = mTag.tabla & "." & mTag.columna & " = '" & Format(SQL, "yyyy-mm-dd") & "'"
                         Case "FHF"
-                            Sql = "date(" & mTag.tabla & "." & mTag.columna & ") = '" & Format(Sql, "yyyy-mm-dd") & "'"
+                            SQL = "date(" & mTag.tabla & "." & mTag.columna & ") = '" & Format(SQL, "yyyy-mm-dd") & "'"
                         Case "FHH"
-                            Sql = "time(" & mTag.tabla & "." & mTag.columna & ") = '" & Format(Sql, "hh:mm:ss") & "'"
+                            SQL = "time(" & mTag.tabla & "." & mTag.columna & ") = '" & Format(SQL, "hh:mm:ss") & "'"
                         Case Else
-                            Sql = mTag.tabla & "." & mTag.columna & " = '" & Sql & "'"
+                            SQL = mTag.tabla & "." & mTag.columna & " = '" & SQL & "'"
                         End Select
-                        Sql = "(" & Sql & ")"
+                        SQL = "(" & SQL & ")"
                     End If
                 End If
             End If
@@ -1139,8 +1139,8 @@ Public Function ObtenerBusqueda(ByRef formulario As Form, Optional CHECK As Stri
                         End If
                         RC = SeparaCampoBusqueda(mTag.TipoDato, tabla & mTag.columna, Aux, Cad)
                         If RC = 0 Then
-                            If Sql <> "" Then Sql = Sql & " AND "
-                            Sql = Sql & "(" & Cad & ")"
+                            If SQL <> "" Then SQL = SQL & " AND "
+                            SQL = SQL & "(" & Cad & ")"
                         End If
                     End If
                 Else
@@ -1162,8 +1162,8 @@ Public Function ObtenerBusqueda(ByRef formulario As Form, Optional CHECK As Stri
                             Cad = ValorParaSQL(Control.List(Control.ListIndex), mTag)
                         End If
                         Cad = mTag.tabla & "." & mTag.columna & " = " & Cad
-                        If Sql <> "" Then Sql = Sql & " AND "
-                        Sql = Sql & "(" & Cad & ")"
+                        If SQL <> "" Then SQL = SQL & " AND "
+                        SQL = SQL & "(" & Cad & ")"
                     End If
                 End If
             End If
@@ -1186,15 +1186,15 @@ Public Function ObtenerBusqueda(ByRef formulario As Form, Optional CHECK As Stri
 '                    If Control.Value = 1 Then
                         Cad = Control.Value
                         Cad = mTag.tabla & "." & mTag.columna & " = " & Cad
-                        If Sql <> "" Then Sql = Sql & " AND "
-                        Sql = Sql & "(" & Cad & ")"
+                        If SQL <> "" Then SQL = SQL & " AND "
+                        SQL = SQL & "(" & Cad & ")"
                     End If
                 End If
             End If
             '===================
         End If
     Next Control
-    ObtenerBusqueda = Sql
+    ObtenerBusqueda = SQL
 Exit Function
 EObtenerBusqueda:
     ObtenerBusqueda = ""
@@ -1209,7 +1209,7 @@ Public Function ObtenerBusqueda2(ByRef formulario As Form, Optional CHECK As Str
     Dim mTag As CTag
     Dim Aux As String
     Dim Cad As String
-    Dim Sql As String
+    Dim SQL As String
     Dim tabla As String
     Dim RC As Byte
 
@@ -1218,7 +1218,7 @@ Public Function ObtenerBusqueda2(ByRef formulario As Form, Optional CHECK As Str
     'Exit Function
     Set mTag = New CTag
     ObtenerBusqueda2 = ""
-    Sql = ""
+    SQL = ""
 
     'Recorremos los text en busca de ">>" o "<<"
     For Each Control In formulario.Controls
@@ -1233,17 +1233,17 @@ Public Function ObtenerBusqueda2(ByRef formulario As Form, Optional CHECK As Str
                         Else
                             Cad = " MIN(" & mTag.columna & ")"
                         End If
-                        Sql = "Select " & Cad & " from " & mTag.tabla
-                        Sql = ObtenerMaximoMinimo(Sql)
+                        SQL = "Select " & Cad & " from " & mTag.tabla
+                        SQL = ObtenerMaximoMinimo(SQL)
                         Select Case mTag.TipoDato
                         Case "N"
-                            Sql = mTag.tabla & "." & mTag.columna & " = " & TransformaComasPuntos(Sql)
+                            SQL = mTag.tabla & "." & mTag.columna & " = " & TransformaComasPuntos(SQL)
                         Case "F"
-                            Sql = mTag.tabla & "." & mTag.columna & " = '" & Format(Sql, "yyyy-mm-dd") & "'"
+                            SQL = mTag.tabla & "." & mTag.columna & " = '" & Format(SQL, "yyyy-mm-dd") & "'"
                         Case Else
-                            Sql = mTag.tabla & "." & mTag.columna & " = '" & Sql & "'"
+                            SQL = mTag.tabla & "." & mTag.columna & " = '" & SQL & "'"
                         End Select
-                        Sql = "(" & Sql & ")"
+                        SQL = "(" & SQL & ")"
                     End If
                 End If
             End If
@@ -1267,8 +1267,8 @@ Public Function ObtenerBusqueda2(ByRef formulario As Form, Optional CHECK As Str
                         End If
                         RC = SeparaCampoBusqueda(mTag.TipoDato, tabla & mTag.columna, Aux, Cad)
                         If RC = 0 Then
-                            If Sql <> "" Then Sql = Sql & " AND "
-                            Sql = Sql & "(" & Cad & ")"
+                            If SQL <> "" Then SQL = SQL & " AND "
+                            SQL = SQL & "(" & Cad & ")"
                         End If
                     End If
                 End If
@@ -1288,8 +1288,8 @@ Public Function ObtenerBusqueda2(ByRef formulario As Form, Optional CHECK As Str
                         If Control.ListIndex > -1 Then
                             Cad = Control.ItemData(Control.ListIndex)
                             Cad = mTag.tabla & "." & mTag.columna & " = " & Cad
-                            If Sql <> "" Then Sql = Sql & " AND "
-                            Sql = Sql & "(" & Cad & ")"
+                            If SQL <> "" Then SQL = SQL & " AND "
+                            SQL = SQL & "(" & Cad & ")"
                         End If
                     End If
                 End If
@@ -1314,15 +1314,15 @@ Public Function ObtenerBusqueda2(ByRef formulario As Form, Optional CHECK As Str
 '                    If Control.Value = 1 Then
                         Cad = Control.Value
                         Cad = mTag.tabla & "." & mTag.columna & " = " & Cad
-                        If Sql <> "" Then Sql = Sql & " AND "
-                        Sql = Sql & "(" & Cad & ")"
+                        If SQL <> "" Then SQL = SQL & " AND "
+                        SQL = SQL & "(" & Cad & ")"
                     End If
                 End If
             End If
             '===================
         End If
     Next Control
-    ObtenerBusqueda2 = Sql
+    ObtenerBusqueda2 = SQL
 Exit Function
 EObtenerBusqueda:
     ObtenerBusqueda2 = ""
@@ -2083,7 +2083,7 @@ End Function
 
 Public Function DesBloqueaRegistroForm(ByRef TextBoxConTag As TextBox) As Boolean
 Dim mTag As CTag
-Dim Sql As String
+Dim SQL As String
 
 'Solo me interesa la tabla
 On Error Resume Next
@@ -2091,7 +2091,7 @@ On Error Resume Next
     mTag.Cargar TextBoxConTag
     If mTag.Cargado Then
 '        SQL = "DELETE from zBloqueos where codusu=" & vUsu.Codigo & " and tabla='" & mTag.tabla & "'"
-        conn.Execute Sql
+        conn.Execute SQL
         If Err.Number <> 0 Then
             Err.Clear
         End If
@@ -2272,12 +2272,12 @@ End Function
 
 
 Public Function DesBloqueoManual(cadTABLA As String) As Boolean
-Dim Sql As String
+Dim SQL As String
 'Solo me interesa la tabla
 On Error Resume Next
 
-        Sql = "DELETE FROM zbloqueos WHERE codusu=" & vSesion.Codigo & " and tabla='" & cadTABLA & "'"
-        conn.Execute Sql
+        SQL = "DELETE FROM zbloqueos WHERE codusu=" & vSesion.Codigo & " and tabla='" & cadTABLA & "'"
+        conn.Execute SQL
         If Err.Number <> 0 Then
             Err.Clear
         End If
@@ -2337,12 +2337,12 @@ End Function
 
 
 Public Function BorrarTablaIntermedia() As Boolean
-Dim Sql As String
+Dim SQL As String
     
     On Error GoTo eBorrarTablaIntermedia
     
-    Sql = "delete from tmpinformes where codusu = " & vSesion.Codigo
-    conn.Execute Sql
+    SQL = "delete from tmpinformes where codusu = " & vSesion.Codigo
+    conn.Execute SQL
     
     BorrarTablaIntermedia = True
     Exit Function
@@ -2438,12 +2438,25 @@ End Function
 
 
 Public Function EsSeccionMaterna(Seccion As String) As Boolean
-Dim Sql As String
+Dim SQL As String
 
-    Sql = "select esmaterna from seccion where codsecci = " & Seccion
+    SQL = "select esmaterna from seccion where codsecci = " & Seccion
     
-    EsSeccionMaterna = (DevuelveValor(Sql) = 1)
+    EsSeccionMaterna = (DevuelveValor(SQL) = 1)
     
 End Function
 
+
+'Si es "" devuelve "" , si no, devuelve el campo formateado
+Public Function MiFormat(Valor As String, Formato As String) As String
+    If Trim(Valor) = "" Then
+       MiFormat = ""
+    Else
+        If Formato = "" Then
+            MiFormat = Valor
+        Else
+            MiFormat = Format(Valor, Formato)
+        End If
+    End If
+End Function
 

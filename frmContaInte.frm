@@ -1,6 +1,6 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
-Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "comdlg32.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
+Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmContaInte 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Integración Contable de Intereses"
@@ -296,8 +296,8 @@ Private WithEvents frmC As frmCal 'calendario fechas
 Attribute frmC.VB_VarHelpID = -1
 Private WithEvents frmCtas As frmCtasConta 'cuentas de contabilidad
 Attribute frmCtas.VB_VarHelpID = -1
-Private WithEvents frmFpa As frmForpaConta 'formas de pago de la contabilidad
-Attribute frmFpa.VB_VarHelpID = -1
+Private WithEvents frmFPa As frmForpaConta 'formas de pago de la contabilidad
+Attribute frmFPa.VB_VarHelpID = -1
 
 'GENERALES PARA PASARLE A CRYSTAL REPORT
 Private cadFormula As String 'Cadena con la FormulaSelection para Crystal Report
@@ -417,7 +417,7 @@ Private Sub frmCtas_DatoSeleccionado(CadenaSeleccion As String)
     txtNombre(indCodigo).Text = RecuperaValor(CadenaSeleccion, 2)
 End Sub
 
-Private Sub frmFPa_DatoSeleccionado(CadenaSeleccion As String)
+Private Sub frmFpa_DatoSeleccionado(CadenaSeleccion As String)
 'Form de Consulta de formas de pago de contabilidad
     txtCodigo(indCodigo).Text = RecuperaValor(CadenaSeleccion, 1)
     txtCodigo(indCodigo).Text = Format(txtCodigo(indCodigo).Text, "000")
@@ -520,7 +520,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -532,7 +532,11 @@ Dim cad As String, cadTipo As String 'tipo cliente
     
     Select Case Index
         Case 3 ' FORMA DE PAGO DE LA CONTABILIDAD
-            If txtCodigo(Index).Text <> "" Then txtNombre(Index).Text = DevuelveDesdeBDNew(cConta, "sforpa", "nomforpa", "codforpa", txtCodigo(3).Text, "N")
+            If vParamAplic.ContabilidadNueva Then
+                If txtCodigo(Index).Text <> "" Then txtNombre(Index).Text = DevuelveDesdeBDNew(cConta, "formapago", "nomforpa", "codforpa", txtCodigo(3).Text, "N")
+            Else
+                If txtCodigo(Index).Text <> "" Then txtNombre(Index).Text = DevuelveDesdeBDNew(cConta, "sforpa", "nomforpa", "codforpa", txtCodigo(3).Text, "N")
+            End If
             If txtNombre(Index).Text = "" Then
                 MsgBox "Forma de Pago  no existe en la contabilidad. Reintroduzca.", vbExclamation
             End If
@@ -606,12 +610,12 @@ End Sub
 
 Private Sub AbrirFrmForpaConta(indice As Integer)
     indCodigo = indice
-    Set frmFpa = New frmForpaConta
-    frmFpa.DatosADevolverBusqueda = "0|1|"
-    frmFpa.CodigoActual = txtCodigo(indCodigo)
-    frmFpa.Conexion = cConta
-    frmFpa.Show vbModal
-    Set frmFpa = Nothing
+    Set frmFPa = New frmForpaConta
+    frmFPa.DatosADevolverBusqueda = "0|1|"
+    frmFPa.CodigoActual = txtCodigo(indCodigo)
+    frmFPa.Conexion = cConta
+    frmFPa.Show vbModal
+    Set frmFPa = Nothing
 End Sub
  
 
@@ -766,7 +770,7 @@ End Function
 
 Private Function PasarCalculoAContab(cadwhere As String) As Boolean
 Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
 Dim NumLinea As Integer
@@ -780,7 +784,7 @@ Dim ImporteH As Currency
 Dim Diferencia As Currency
 Dim Obs As String
 Dim cadMen As String
-Dim cad As String
+Dim Cad As String
 Dim CtaDifer As String
 Dim Codmacta As String
 
@@ -823,9 +827,9 @@ Dim Codmacta As String
                   " FROM movim " & _
                   " WHERE " & cadwhere
             
-            Set RS = New ADODB.Recordset
+            Set Rs = New ADODB.Recordset
             
-            RS.Open SQL, conn, adOpenDynamic, adLockOptimistic, adCmdText
+            Rs.Open SQL, conn, adOpenDynamic, adLockOptimistic, adCmdText
             
             i = 0
             ImporteD = 0
@@ -836,36 +840,36 @@ Dim Codmacta As String
             ampliacionh = Trim(DevuelveDesdeBDNew(cConta, "conceptos", "nomconce", "codconce", vParamAplic.ConceHaber, "N")) & " " & ampliacion
             
             
-            If Not RS.EOF Then RS.MoveFirst
-            While Not RS.EOF And b
+            If Not Rs.EOF Then Rs.MoveFirst
+            While Not Rs.EOF And b
                 Codmacta = ""
-                Codmacta = DevuelveDesdeBDNew(cPTours, "avnic", "codmacta", "codavnic", RS.Fields(0).Value, "N", , "anoejerc", Year(CDate(txtCodigo(0).Text)), "N")
+                Codmacta = DevuelveDesdeBDNew(cPTours, "avnic", "codmacta", "codavnic", Rs.Fields(0).Value, "N", , "anoejerc", Year(CDate(txtCodigo(0).Text)), "N")
                 
-                numdocum = "Av-" & Format(DBLet(RS!codavnic, "N"), "000000")
+                numdocum = "Av-" & Format(DBLet(Rs!codavnic, "N"), "000000")
                 ' ******************IMPORTE BRUTO
                 i = i + 1
                 
-                cad = "1," & DBSet(txtCodigo(0).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
-                cad = cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaGasto, "T") & "," & DBSet(numdocum, "T") & ","
+                Cad = "1," & DBSet(txtCodigo(0).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+                Cad = Cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaGasto, "T") & "," & DBSet(numdocum, "T") & ","
                 
                 ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
-                If RS.Fields(2).Value > 0 Then
+                If Rs.Fields(2).Value > 0 Then
                     ' importe al debe en positivo
-                    cad = cad & DBSet(vParamAplic.ConceDebe, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(RS.Fields(2).Value, "N") & ","
-                    cad = cad & ValorNulo & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
+                    Cad = Cad & DBSet(vParamAplic.ConceDebe, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(Rs.Fields(2).Value, "N") & ","
+                    Cad = Cad & ValorNulo & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
                 
-                    ImporteD = ImporteD + CCur(RS.Fields(2).Value)
+                    ImporteD = ImporteD + CCur(Rs.Fields(2).Value)
                 Else
                     ' importe al haber en positivo, cambiamos el signo
-                    cad = cad & DBSet(vParamAplic.ConceHaber, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & ","
-                    cad = cad & DBSet((RS.Fields(2).Value * -1), "N") & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
+                    Cad = Cad & DBSet(vParamAplic.ConceHaber, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & ","
+                    Cad = Cad & DBSet((Rs.Fields(2).Value * -1), "N") & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
                 
-                    ImporteH = ImporteH + (CCur(RS.Fields(2).Value) * (-1))
+                    ImporteH = ImporteH + (CCur(Rs.Fields(2).Value) * (-1))
                 End If
                 
-                cad = "(" & cad & ")"
+                Cad = "(" & Cad & ")"
                 
-                b = InsertarLinAsientoDia(cad, cadMen, cConta)
+                b = InsertarLinAsientoDia(Cad, cadMen, cConta)
                 cadMen = "Insertando Lin. Asiento: " & i
             
                 IncrementarProgres Me.Pb1, 1
@@ -875,27 +879,27 @@ Dim Codmacta As String
                 ' ******************RETENCION
                 i = i + 1
                 
-                cad = "1," & DBSet(txtCodigo(0).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
-                cad = cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaReten, "T") & "," & DBSet(numdocum, "T") & ","
+                Cad = "1," & DBSet(txtCodigo(0).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+                Cad = Cad & DBSet(i, "N") & "," & DBSet(vParamAplic.CtaReten, "T") & "," & DBSet(numdocum, "T") & ","
                 
                 ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
-                If RS.Fields(3).Value > 0 Then
+                If Rs.Fields(3).Value > 0 Then
                     ' importe al haber en positivo
-                    cad = cad & DBSet(vParamAplic.ConceHaber, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & ","
-                    cad = cad & DBSet(RS.Fields(3).Value, "N") & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
+                    Cad = Cad & DBSet(vParamAplic.ConceHaber, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & ","
+                    Cad = Cad & DBSet(Rs.Fields(3).Value, "N") & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
                 
-                    ImporteH = ImporteH + CCur(RS.Fields(3).Value)
+                    ImporteH = ImporteH + CCur(Rs.Fields(3).Value)
                 Else
                     ' importe al debe en positivo, cambiamos el signo
-                    cad = cad & DBSet(vParamAplic.ConceDebe, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet((RS.Fields(3).Value * -1), "N") & ","
-                    cad = cad & ValorNulo & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
+                    Cad = Cad & DBSet(vParamAplic.ConceDebe, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet((Rs.Fields(3).Value * -1), "N") & ","
+                    Cad = Cad & ValorNulo & "," & ValorNulo & "," & DBSet(Codmacta, "T") & "," & ValorNulo & ",0"
                 
-                    ImporteH = ImporteH + (CCur(RS.Fields(3).Value) * (-1))
+                    ImporteH = ImporteH + (CCur(Rs.Fields(3).Value) * (-1))
                 End If
                 
-                cad = "(" & cad & ")"
+                Cad = "(" & Cad & ")"
                 
-                b = InsertarLinAsientoDia(cad, cadMen, cConta)
+                b = InsertarLinAsientoDia(Cad, cadMen, cConta)
                 cadMen = "Insertando Lin. Asiento: " & i
             
                 IncrementarProgres Me.Pb1, 1
@@ -905,30 +909,30 @@ Dim Codmacta As String
                 ' ******************IMPORTE NETO
                 i = i + 1
                 
-                cad = "1," & DBSet(txtCodigo(0).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
-                cad = cad & DBSet(i, "N") & "," & DBSet(Codmacta, "T") & "," & DBSet(numdocum, "T") & ","
+                Cad = "1," & DBSet(txtCodigo(0).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+                Cad = Cad & DBSet(i, "N") & "," & DBSet(Codmacta, "T") & "," & DBSet(numdocum, "T") & ","
                 
                 ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
-                If RS.Fields(1).Value > 0 Then
+                If Rs.Fields(1).Value > 0 Then
                     ' importe al haber en positivo
-                    cad = cad & DBSet(vParamAplic.ConceHaber, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & ","
-                    cad = cad & DBSet(RS.Fields(1).Value, "N") & "," & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                    Cad = Cad & DBSet(vParamAplic.ConceHaber, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & ","
+                    Cad = Cad & DBSet(Rs.Fields(1).Value, "N") & "," & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
                 
-                    ImporteH = ImporteH + CCur(RS.Fields(1).Value)
+                    ImporteH = ImporteH + CCur(Rs.Fields(1).Value)
                 Else
                     ' importe al debe en positivo, cambiamos el signo
-                    cad = cad & DBSet(vParamAplic.ConceDebe, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet((RS.Fields(1).Value * -1), "N") & ","
-                    cad = cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                    Cad = Cad & DBSet(vParamAplic.ConceDebe, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet((Rs.Fields(1).Value * -1), "N") & ","
+                    Cad = Cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
                 
-                    ImporteH = ImporteH + (CCur(RS.Fields(1).Value) * (-1))
+                    ImporteH = ImporteH + (CCur(Rs.Fields(1).Value) * (-1))
                 End If
                 
-                cad = "(" & cad & ")"
+                Cad = "(" & Cad & ")"
                 
-                b = InsertarLinAsientoDia(cad, cadMen, cConta)
+                b = InsertarLinAsientoDia(Cad, cadMen, cConta)
                 cadMen = "Insertando Lin. Asiento: " & i
             
-                b = InsertarEnTesoreriaNew(txtCodigo(0).Text, txtCodigo(1).Text, RS.Fields(0).Value, Year(CDate(txtCodigo(0).Text)), txtCodigo(4).Text, txtCodigo(2).Text, txtCodigo(3).Text, cadMen)
+                b = InsertarEnTesoreriaNew(txtCodigo(0).Text, txtCodigo(1).Text, Rs.Fields(0).Value, Year(CDate(txtCodigo(0).Text)), txtCodigo(4).Text, txtCodigo(2).Text, txtCodigo(3).Text, cadMen)
                 cadMen = "Insertando en Tesoreria: "
                
             
@@ -937,9 +941,9 @@ Dim Codmacta As String
                 Me.Refresh
                 
             
-                RS.MoveNext
+                Rs.MoveNext
             Wend
-            RS.Close
+            Rs.Close
             
             If b Then
                 'Poner intconta=1 en ariagroutil.movim
