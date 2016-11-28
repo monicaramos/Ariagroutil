@@ -1050,8 +1050,13 @@ Dim Cad As String
     'que ya existan
     '-----------------------------------------------------------------------
     Me.lblProgres(1).Caption = "Comprobando Nº Facturas en contabilidad ..."
-    SQL = "anofaccl>=" & Year(txtCodigo(2).Text) & " AND anofaccl<= " & Year(txtCodigo(3).Text)
-    b = ComprobarNumFacturasFac(SQL)
+    If vParamAplic.ContabilidadNueva Then
+        SQL = "anofactu>=" & Year(txtCodigo(2).Text) & " AND anofactu<= " & Year(txtCodigo(3).Text)
+        b = ComprobarNumFacturasFacContaNueva(SQL)
+    Else
+        SQL = "anofaccl>=" & Year(txtCodigo(2).Text) & " AND anofaccl<= " & Year(txtCodigo(3).Text)
+        b = ComprobarNumFacturasFac(SQL)
+    End If
     IncrementarProgres Me.Pb1, 20
     Me.Refresh
     If Not b Then

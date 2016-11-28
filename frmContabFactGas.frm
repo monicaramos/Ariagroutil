@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmContabFactGas 
    BorderStyle     =   3  'Fixed Dialog
@@ -172,7 +172,7 @@ Dim cadMen As String
 Dim i As Byte
 Dim SQL As String
 Dim tipo As Byte
-Dim nRegs As Long
+Dim Nregs As Long
 Dim NumError As Long
     InicializarVbles
     
@@ -345,7 +345,7 @@ Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -419,7 +419,7 @@ End Function
 
 Private Function DatosOk() As Boolean
 Dim b As Boolean
-Dim cad As String
+Dim Cad As String
 
     DatosOk = False
 
@@ -529,8 +529,13 @@ Dim CCoste As String
     'que ya existan
     '-----------------------------------------------------------------------
     Me.lblProgres(1).Caption = "Comprobando Nº Facturas en contabilidad ..."
-    SQL = "anofaccl>=" & Year(txtCodigo(7).Text) & " AND anofaccl<= " & Year(txtCodigo(7).Text)
-    b = ComprobarNumFacturas(cContaGas, SQL)
+    If vParamAplic.ContabilidadNueva Then
+        SQL = "anofactu>=" & Year(txtCodigo(7).Text) & " AND anofactu<= " & Year(txtCodigo(7).Text)
+        b = ComprobarNumFacturasContaNueva(cContaGas, SQL)
+    Else
+        SQL = "anofaccl>=" & Year(txtCodigo(7).Text) & " AND anofaccl<= " & Year(txtCodigo(7).Text)
+        b = ComprobarNumFacturas(cContaGas, SQL)
+    End If
     IncrementarProgres Me.Pb1, 20
     Me.Refresh
     If Not b Then
@@ -642,17 +647,17 @@ End Sub
 
 Private Function PasarFacturasAContab(cadTABLA As String, CCoste As String) As Boolean
 Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
-Dim NumFactu As Integer
+Dim numfactu As Integer
 Dim codigo1 As String
 Dim Mc As CContadorContab
 Dim NumLinea As Currency
 Dim Obs As String
 Dim cadMen As String
 Dim TotalFacturas As Currency
-Dim cad As String
+Dim Cad As String
 Dim ampliacion As String
 Dim ampliaciond As String
 Dim ampliacionh As String
@@ -672,24 +677,24 @@ Dim ampliacionh As String
     SQL = SQL & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
     
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
-    If Not RS.EOF Then
-        NumFactu = RS.Fields(0)
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    If Not Rs.EOF Then
+        numfactu = Rs.Fields(0)
     Else
-        NumFactu = 0
+        numfactu = 0
     End If
-    RS.Close
-    Set RS = Nothing
+    Rs.Close
+    Set Rs = Nothing
 
-    If NumFactu > 0 Then
-     CargarProgresNew Me.Pb1, NumFactu
+    If numfactu > 0 Then
+     CargarProgresNew Me.Pb1, numfactu
         
      SQL = "SELECT * "
      SQL = SQL & " FROM tmpfactu "
             
-     Set RS = New ADODB.Recordset
-     RS.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
+     Set Rs = New ADODB.Recordset
+     Rs.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
      i = 1
         
      Set Mc = New CContadorContab
@@ -709,22 +714,22 @@ Dim ampliacionh As String
             TotalFacturas = 0
             
             'contabilizar cada una de las facturas seleccionadas
-            While Not RS.EOF And b
-                SQL = cadTABLA & "." & codigo1 & "=" & DBSet(Trim(RS.Fields(0)), "T") & " and numfactu=" & DBLet(RS!NumFactu, "N")
-                SQL = SQL & " and fecfactu=" & DBSet(RS!fecfactu, "F")
+            While Not Rs.EOF And b
+                SQL = cadTABLA & "." & codigo1 & "=" & DBSet(Trim(Rs.Fields(0)), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
+                SQL = SQL & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
                 
                 NumLinea = NumLinea + 1
                 
-                b = PasarFacturaGas(SQL, RS!fecfactu, CStr(Mc.Contador), CStr(NumLinea), CCoste, TotalFacturas)
+                b = PasarFacturaGas(SQL, Rs!fecfactu, CStr(Mc.Contador), CStr(NumLinea), CCoste, TotalFacturas)
                 
                 IncrementarProgresNew Me.Pb1, 1
-                Me.lblProgres(1).Caption = "Insertando Facturas en Contabilidad...   (" & i & " de " & NumFactu & ")"
+                Me.lblProgres(1).Caption = "Insertando Facturas en Contabilidad...   (" & i & " de " & numfactu & ")"
                 Me.Refresh
                 i = i + 1
-                RS.MoveNext
+                Rs.MoveNext
             Wend
-            RS.Close
-            Set RS = Nothing
+            Rs.Close
+            Set Rs = Nothing
             
             'insertamos la contrapartida
             
@@ -734,24 +739,24 @@ Dim ampliacionh As String
             
             NumLinea = NumLinea + 1
             
-            cad = vParamAplic.NumDiarioGas & "," & DBSet(txtCodigo(7).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
+            Cad = vParamAplic.NumDiarioGas & "," & DBSet(txtCodigo(7).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
                                                                                             '++monica:05/11/2008 antes valor nulo en el numero de documento
-            cad = cad & DBSet(NumLinea, "N") & "," & DBSet(vParamAplic.CtaContraGas, "T") & ",'" & Format(txtCodigo(7).Text, "ddmmyyyy") & "',"
+            Cad = Cad & DBSet(NumLinea, "N") & "," & DBSet(vParamAplic.CtaContraGas, "T") & ",'" & Format(txtCodigo(7).Text, "ddmmyyyy") & "',"
             
             ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
             If TotalFacturas < 0 Then
                 ' importe al haber en positivo, cambiamos el signo
-                cad = cad & DBSet(vParamAplic.ConceHaberGas, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(TotalFacturas * (-1), "N") & ","
-                cad = cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                Cad = Cad & DBSet(vParamAplic.ConceHaberGas, "N") & "," & DBSet(ampliacionh, "T") & "," & ValorNulo & "," & DBSet(TotalFacturas * (-1), "N") & ","
+                Cad = Cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
             Else
                 ' importe al debe en positivo
-                cad = cad & DBSet(vParamAplic.ConceDebeGas, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(TotalFacturas, "N") & "," & ValorNulo & ","
-                cad = cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
+                Cad = Cad & DBSet(vParamAplic.ConceDebeGas, "N") & "," & DBSet(ampliaciond, "T") & "," & DBSet(TotalFacturas, "N") & "," & ValorNulo & ","
+                Cad = Cad & ValorNulo & "," & ValorNulo & "," & ValorNulo & ",0"
             End If
             
-            cad = "(" & cad & ")"
+            Cad = "(" & Cad & ")"
             
-            b = InsertarLinAsientoDia(cad, cadMen, cContaGas)
+            b = InsertarLinAsientoDia(Cad, cadMen, cContaGas)
             cadMen = "Insertando Lin. Asiento: " & NumLinea
         End If
         
@@ -779,8 +784,8 @@ Private Function ComprobarFechasConta(ind As Integer) As Boolean
 'comprobar que el periodo de fechas a contabilizar esta dentro del
 'periodo de fechas del ejercicio de la contabilidad
 Dim FechaIni As String, FechaFin As String
-Dim cad As String
-Dim RS As ADODB.Recordset
+Dim Cad As String
+Dim Rs As ADODB.Recordset
     
 On Error GoTo EComprobar
 
@@ -788,28 +793,28 @@ On Error GoTo EComprobar
     
     If txtCodigo(ind).Text <> "" Then
         FechaIni = "Select fechaini,fechafin From parametros"
-        Set RS = New ADODB.Recordset
-        RS.Open FechaIni, ConnContaGas, adOpenForwardOnly, adLockPessimistic, adCmdText
+        Set Rs = New ADODB.Recordset
+        Rs.Open FechaIni, ConnContaGas, adOpenForwardOnly, adLockPessimistic, adCmdText
     
-        If Not RS.EOF Then
-            FechaIni = DBLet(RS!FechaIni, "F")
-            FechaFin = DateAdd("yyyy", 1, CDate(DBLet(RS!FechaFin, "F"))) ' + 365
+        If Not Rs.EOF Then
+            FechaIni = DBLet(Rs!FechaIni, "F")
+            FechaFin = DateAdd("yyyy", 1, CDate(DBLet(Rs!FechaFin, "F"))) ' + 365
             'nos guardamos los valores
             Orden1 = FechaIni
             Orden2 = FechaFin
         
             If Not EntreFechas(FechaIni, txtCodigo(ind).Text, FechaFin) Then
-                 cad = "El período de contabilización debe estar dentro del ejercicio:" & vbCrLf & vbCrLf
-                 cad = cad & "    Desde: " & FechaIni & vbCrLf
-                 cad = cad & "    Hasta: " & FechaFin
-                 MsgBox cad, vbExclamation
+                 Cad = "El período de contabilización debe estar dentro del ejercicio:" & vbCrLf & vbCrLf
+                 Cad = Cad & "    Desde: " & FechaIni & vbCrLf
+                 Cad = Cad & "    Hasta: " & FechaFin
+                 MsgBox Cad, vbExclamation
                  txtCodigo(ind).Text = ""
             Else
                 ComprobarFechasConta = True
             End If
         End If
-        RS.Close
-        Set RS = Nothing
+        Rs.Close
+        Set Rs = Nothing
     Else
         ComprobarFechasConta = True
     End If
