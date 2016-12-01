@@ -2983,7 +2983,7 @@ Dim Nulo3 As String
     If vParamAplic.ContabilidadNueva Then
         Cad = Format(Diario, "00") & ", " & DBSet(Fecha, "F") & "," & Format(Asiento, "000000") & ","
         Cad = Cad & DBSet(Obs, "T")
-        Cad = Cad & "," & DBSet(Now, "FH") & "," & DBSet(vSesion.Login, "T") & ",'ARIAGROUTIL'"
+        Cad = Cad & "," & DBSet(Now, "FH") & "," & DBSet(vSesion.Login, "T") & ",'ARIAGRO UTILIDADES'"
         Cad = "(" & Cad & ")"
 
         'Insertar en la contabilidad
