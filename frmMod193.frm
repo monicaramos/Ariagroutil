@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmMod193 
    BorderStyle     =   3  'Fixed Dialog
@@ -414,22 +414,22 @@ End Sub
 Private Sub cmdAceptar_Click()
 Dim i As Byte
 Dim SQL As String
-Dim nRegs As Long
-Dim cadWhere As String
+Dim Nregs As Long
+Dim cadwhere As String
 
     If Not DatosOk Then Exit Sub
     
     SQL = "SELECT  count(*) "
     SQL = SQL & " from avnic where "
-    cadWhere = "anoejerc = " & DBSet(txtCodigo(0).Text, "N")
-    If txtCodigo(5).Text <> "" Then cadWhere = cadWhere & " and avnic.codavnic >= " & DBSet(txtCodigo(5).Text, "N")
-    If txtCodigo(6).Text <> "" Then cadWhere = cadWhere & " and avnic.codavnic <= " & DBSet(txtCodigo(6).Text, "N")
-    SQL = SQL & cadWhere
+    cadwhere = "anoejerc = " & DBSet(txtCodigo(0).Text, "N")
+    If txtCodigo(5).Text <> "" Then cadwhere = cadwhere & " and avnic.codavnic >= " & DBSet(txtCodigo(5).Text, "N")
+    If txtCodigo(6).Text <> "" Then cadwhere = cadwhere & " and avnic.codavnic <= " & DBSet(txtCodigo(6).Text, "N")
+    SQL = SQL & cadwhere
     
-    nRegs = TotalRegistros(SQL)
+    Nregs = TotalRegistros(SQL)
 
-    If nRegs <> 0 Then
-        If GeneraFichero(cadWhere) Then
+    If Nregs <> 0 Then
+        If GeneraFichero(cadwhere) Then
             If CopiarFichero Then
                 MsgBox "Proceso realizado correctamente", vbExclamation
                 cmdCancel_Click
@@ -541,7 +541,7 @@ End Sub
 
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cad As String, cadTipo As String 'tipo cliente
+Dim Cad As String, cadTipo As String 'tipo cliente
 
     'Quitar espacios en blanco por los lados
     txtCodigo(Index).Text = Trim(txtCodigo(Index).Text)
@@ -570,13 +570,13 @@ Private Sub FrameCobrosVisible(visible As Boolean, ByRef h As Integer, ByRef w A
     Me.FrameCobros.visible = visible
 End Sub
 
-Private Function GeneraFichero(cadWhere As String) As Boolean
+Private Function GeneraFichero(cadwhere As String) As Boolean
 Dim NFich1 As Integer
-Dim RS As ADODB.Recordset
-Dim cad As String
+Dim Rs As ADODB.Recordset
+Dim Cad As String
 Dim SQL As String
 Dim v_Hayreg As Integer
-Dim nRegs As Long
+Dim Nregs As Long
 Dim b As Boolean
 Dim Mens As String
 
@@ -594,7 +594,7 @@ Dim t_impret As Currency
     GeneraFichero = False
 
     Mens = "Cargando la tabla temporal."
-    b = CrearTMPavnicsNew(cadWhere, Mens)
+    b = CrearTMPavnicsNew(cadwhere, Mens)
     
     If b Then
         Mens = "Calculando totales."
@@ -603,55 +603,55 @@ Dim t_impret As Currency
     
     If b Then
         Me.lblProgres(1).Caption = "Cargando fichero..."
-        nRegs = TotalRegistros("select count(*) from tmptempo")
+        Nregs = TotalRegistros("select count(*) from tmptempo")
         
         Pb1.visible = True
-        Pb1.Max = nRegs
+        Pb1.Max = Nregs
         Pb1.Value = 0
             
         
         NFich1 = FreeFile
         Open App.path & "\fichero.txt" For Output As #NFich1
     
-        cad = "1193"
-        cad = cad & txtCodigo(0).Text ' anoejerc
-        cad = cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9)
-        cad = cad & RellenaABlancos(vEmpresa.nomEmpre, True, 40)
+        Cad = "1193"
+        Cad = Cad & txtCodigo(0).Text ' anoejerc
+        Cad = Cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9)
+        Cad = Cad & RellenaABlancos(vEmpresa.nomEmpre, True, 40)
         
         If Option1(0).Value Then 'tipo de documento
-            cad = cad & "D"
+            Cad = Cad & "D"
         Else
-            cad = cad & "T"
+            Cad = Cad & "T"
         End If
-        cad = cad & Format(CCur(txtCodigo(2).Text), "000000000") ' telefono
+        Cad = Cad & Format(CCur(txtCodigo(2).Text), "000000000") ' telefono
         '[Monica]25/01/2012: cambiado antes el nompresi era de 39, ahora de 40
-        cad = cad & RellenaABlancos(vEmpresa.PerEmpresa, True, 40) ' nompresi
+        Cad = Cad & RellenaABlancos(vEmpresa.PerEmpresa, True, 40) ' nompresi
         
-        cad = cad & Format(txtCodigo(1).Text, "000") 'numero
+        Cad = Cad & Format(txtCodigo(1).Text, "000") 'numero
         
-        cad = cad & Format(ComprobarCero(txtCodigo(3).Text), "0000000000") 'justificante
+        Cad = Cad & Format(ComprobarCero(txtCodigo(3).Text), "0000000000") 'justificante
         
         'tipo de declaracion
         If Option2(0).Value Then
-            cad = cad & "  " & Repeat("0", 13)
+            Cad = Cad & "  " & Repeat("0", 13)
         End If
         If Option2(1).Value Then
-            cad = cad & "C " & Repeat("0", 13)
+            Cad = Cad & "C " & Repeat("0", 13)
         End If
         If Option2(2).Value Then
-            cad = cad & " S" & Format(CCur(txtCodigo(1).Text), "000") & Format(CCur(txtCodigo(7).Text), "0000000000")
+            Cad = Cad & " S" & Format(CCur(txtCodigo(1).Text), "000") & Format(CCur(txtCodigo(7).Text), "0000000000")
         End If
             
-        cad = cad & Format(TotalReg, "000000000")
-        cad = cad & Format(Round2(impbase * 100, 0), "000000000000000")
-        cad = cad & Format(Round2(ImpReten * 100, 0), "000000000000000")
-        cad = cad & Format(Round2(ImpReten * 100, 0), "000000000000000")
+        Cad = Cad & Format(TotalReg, "000000000")
+        Cad = Cad & Format(Round2(impbase * 100, 0), "000000000000000")
+        Cad = Cad & Format(Round2(ImpReten * 100, 0), "000000000000000")
+        Cad = Cad & Format(Round2(ImpReten * 100, 0), "000000000000000")
         
         '[Monica]25/01/2012: ahora son blancos
-        cad = cad & Space(30) ' 30 blancos
-        cad = cad & Repeat("0", 15) ' gastos
-        cad = cad & " " ' naturaleza del declarante
-        cad = cad & Space(265)
+        Cad = Cad & Space(30) ' 30 blancos
+        Cad = Cad & Repeat("0", 15) ' gastos
+        Cad = Cad & " " ' naturaleza del declarante
+        Cad = Cad & Space(265)
         
 'antes de 25/01/2012
 '        cad = cad & Repeat("0", 15)
@@ -662,75 +662,82 @@ Dim t_impret As Currency
 '        cad = cad & Space(13)
 '        cad = cad & "             "
         
-        Print #NFich1, cad
+        Print #NFich1, Cad
     
     
-        Set RS = New ADODB.Recordset
+        Set Rs = New ADODB.Recordset
         
         'partimos de la tabla de historico de facturas
         SQL = "SELECT * from tmptempo order by nifperso " ' codavnic, tipocodi"
-        RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+        Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
         
         b = True
         v_Hayreg = 0
-        While Not RS.EOF And b
+        While Not Rs.EOF And b
             v_Hayreg = 1
             
             Pb1.Value = Pb1.Value + 1
             
             
-            cad = "2193"
-            cad = cad & txtCodigo(0).Text
-            cad = cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9)
+            Cad = "2193"
+            Cad = Cad & txtCodigo(0).Text 'p.5
+            Cad = Cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 9) 'p.9
             
-            If Trim(DBLet(RS!nifrepre, "T")) <> "" And Not IsNull(RS!nifrepre) Then
-                cad = cad & Space(9)
-                cad = cad & RellenaABlancos(DBLet(RS!nifrepre, "T"), True, 9)
+            If Trim(DBLet(Rs!nifrepre, "T")) <> "" And Not IsNull(Rs!nifrepre) Then 'p.18
+                Cad = Cad & Space(9) 'p.27
+                Cad = Cad & RellenaABlancos(DBLet(Rs!nifrepre, "T"), True, 9)
             Else
-                cad = cad & RellenaABlancos(DBLet(RS!nifperso, "T"), True, 9)
-                cad = cad & Space(9)
+                Cad = Cad & RellenaABlancos(DBLet(Rs!nifperso, "T"), True, 9) 'p.18
+                Cad = Cad & Space(9) 'p.27
             End If
                 
-            cad = cad & RellenaABlancos(DBLet(RS!nombrper, "T"), True, 40)
-            cad = cad & " "
-            cad = cad & Mid(RellenaABlancos(DBLet(RS!codPobla, "T"), True, 6), 1, 2)
-            cad = cad & "1"
-            cad = cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 12)
-            cad = cad & "B"
-            cad = cad & "06"
-            cad = cad & "1"
-            cad = cad & "O"
-            cad = cad & Space(20)
-            cad = cad & " "
-            cad = cad & "0000" '[Monica]25/01/2012: antes esto:"0" & Mid(txtCodigo(0).Text, 2, 3)
-            cad = cad & "1"
-            cad = cad & Format(Round2(DBLet(RS!ImporPer, "N") * 100, 0), "0000000000000")
-            cad = cad & Space(3) '[Monica]25/01/2012: antes esto:"000"
-            cad = cad & Repeat("0", 13)
-            cad = cad & Format(Round2(DBLet(RS!ImporPer, "N") * 100, 0), "0000000000000")
-            cad = cad & Format(Round2(vParamAplic.Porcrete * 100, 0), "0000")
-            cad = cad & Format(Round2(DBLet(RS!ImporRet, "N") * 100, 0), "0000000000000")
-            cad = cad & Space(13) '[Monica]25/01/2012: antes esto: Repeat("0", 13)
+            Cad = Cad & RellenaABlancos(DBLet(Rs!nombrper, "T"), True, 40) 'p.36
+            Cad = Cad & " " 'p.76
+            Cad = Cad & Mid(RellenaABlancos(DBLet(Rs!codPobla, "T"), True, 6), 1, 2) 'p.77
+            Cad = Cad & "1" 'p.79
+            Cad = Cad & RellenaABlancos(vEmpresa.CifEmpresa, True, 12) 'p.80
+            Cad = Cad & "B" 'p.92
+            Cad = Cad & "06" 'p.93
+            Cad = Cad & "1" 'p.95
+            Cad = Cad & "O" 'p.96
+            Cad = Cad & Space(20) 'p.97
+            Cad = Cad & " " 'p.117
+            Cad = Cad & "0000" 'p.118 '[Monica]25/01/2012: antes esto:"0" & Mid(txtCodigo(0).Text, 2, 3)
+            Cad = Cad & "1" 'p.122
+            Cad = Cad & Format(Round2(DBLet(Rs!ImporPer, "N") * 100, 0), "0000000000000") 'p.123
+            Cad = Cad & Space(3) '[Monica]25/01/2012: antes esto:"000" 'p.136
+            Cad = Cad & Repeat("0", 13)  'p.139
+            Cad = Cad & Format(Round2(DBLet(Rs!ImporPer, "N") * 100, 0), "0000000000000") 'p.152
+            Cad = Cad & Format(Round2(vParamAplic.Porcrete * 100, 0), "0000") 'p.165
+            Cad = Cad & Format(Round2(DBLet(Rs!ImporRet, "N") * 100, 0), "0000000000000") 'p.169
+            '[Monica]20/01/2017:
+            Cad = Cad & Repeat("0", 11) 'p.182 penalizaciones
+            Cad = Cad & Space(15) '[Monica]25/01/2012: antes esto: Repeat("0", 13) 'p.193
             
             '++monica:24/01/2008 añadido por un tema de Alzira
-            cad = cad & Space(14)
-            cad = cad & Repeat("0", 40)
-            cad = cad & Space(2)
+            '[Monica]20/01/2017: camio en el modelo 193
+            Cad = Cad & " "  'p.208
+            Cad = Cad & Repeat("0", 8) 'p.209
+            Cad = Cad & Repeat("0", 8) 'p.217
+            Cad = Cad & Repeat("0", 12) 'p.225 importe compensaciones
+            Cad = Cad & Repeat("0", 12) 'p.237 imprte garantias
+            Cad = Cad & Space(252) 'p.249-500 relleno a blancos
+            
             '++
             
             '[Monica]25/01/2012: ahora la longitud del registro es hasta la 500 (antes 250)
-            cad = cad & Space(250)
+'            Cad = Cad & Space(250)
             'fin
             
-            Print #NFich1, cad
+            Print #NFich1, Cad
                 
-            RS.MoveNext
+            Rs.MoveNext
         Wend
     End If
     
 EGen:
     Close (NFich1)
-    Set RS = Nothing
+    Set Rs = Nothing
     If Err.Number <> 0 Or Not b Then
         MuestraError Err.Number, Err.Description & vbCrLf & Mens
     Else
@@ -742,7 +749,7 @@ End Function
 
 Public Function CopiarFichero() As Boolean
 Dim nomFich As String
-Dim CADENA As String
+Dim Cadena As String
 On Error GoTo ecopiarfichero
 
     CopiarFichero = True
@@ -794,12 +801,12 @@ Private Function DatosOk() As Boolean
     
 End Function
 
-Private Function InsertarEnFichero1(NFich1 As Integer, LetraSer As String, numfactu As Long, vsocio As String, ByRef Mens As String) As Boolean
+Private Function InsertarEnFichero1(NFich1 As Integer, letraser As String, numfactu As Long, vsocio As String, ByRef Mens As String) As Boolean
 Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim vBase As Currency
 Dim vIva As Currency
-Dim cad As String
+Dim Cad As String
 
 
     On Error GoTo eInsertarEnFichero1
@@ -809,24 +816,24 @@ Dim cad As String
     SQL = "select schfacr.baseimp1, schfacr.baseimp2, schfacr.baseimp3, schfacr.impoiva1, "
     SQL = SQL & " schfacr.impoiva2, schfacr.impoiva3, schfacr.totalfac, schfacr.fecfactu "
     SQL = SQL & " from schfacr "
-    SQL = SQL & " where letraser = " & DBSet(LetraSer, "T") & " and numfactu = " & DBSet(numfactu, "N")
+    SQL = SQL & " where letraser = " & DBSet(letraser, "T") & " and numfactu = " & DBSet(numfactu, "N")
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
     
-    If Not RS.EOF Then
-        vBase = DBLet(RS.Fields(0).Value, "N") + DBLet(RS.Fields(1).Value, "N") + DBLet(RS.Fields(2).Value, "N")
-        vIva = DBLet(RS.Fields(3).Value, "N") + DBLet(RS.Fields(4).Value, "N") + DBLet(RS.Fields(5).Value, "N")
+    If Not Rs.EOF Then
+        vBase = DBLet(Rs.Fields(0).Value, "N") + DBLet(Rs.Fields(1).Value, "N") + DBLet(Rs.Fields(2).Value, "N")
+        vIva = DBLet(Rs.Fields(3).Value, "N") + DBLet(Rs.Fields(4).Value, "N") + DBLet(Rs.Fields(5).Value, "N")
         
         ' cargamos el fichero fichero1
-        cad = LetraSer & "|"
-        cad = cad & Format(numfactu, "0000000") & "|"
-        cad = cad & Format(DBLet(RS.Fields(7).Value, "F"), FormatoFecha) & "|"
-        cad = cad & vsocio & "|"
-        cad = cad & Format(vBase, "##,###,##0.00") & "|"
-        cad = cad & Format(vIva, "##,###,##0.00") & "|"
-        cad = cad & Format(DBLet(RS.Fields(6).Value, "N"), "##,###,##0.00") & "|"
-        Print #NFich1, cad
+        Cad = letraser & "|"
+        Cad = Cad & Format(numfactu, "0000000") & "|"
+        Cad = Cad & Format(DBLet(Rs.Fields(7).Value, "F"), FormatoFecha) & "|"
+        Cad = Cad & vsocio & "|"
+        Cad = Cad & Format(vBase, "##,###,##0.00") & "|"
+        Cad = Cad & Format(vIva, "##,###,##0.00") & "|"
+        Cad = Cad & Format(DBLet(Rs.Fields(6).Value, "N"), "##,###,##0.00") & "|"
+        Print #NFich1, Cad
     End If
     InsertarEnFichero1 = True
 eInsertarEnFichero1:
@@ -856,8 +863,8 @@ Private Sub AbrirFrmAvnics(indice As Integer)
     Set frmavn = Nothing
 End Sub
 
-Private Function CrearTMPavnics(cadWhere As String, ByRef Mens As String) As Boolean
-Dim RS As ADODB.Recordset
+Private Function CrearTMPavnics(cadwhere As String, ByRef Mens As String) As Boolean
+Dim Rs As ADODB.Recordset
 Dim SQL As String
 Dim ImporPer As Currency
 Dim ImporRet As Currency
@@ -891,99 +898,99 @@ Dim Existe As String
     conn.Execute SQL
     
     SQL = "select nombrper, nifperso, nifrepre, codposta, imporper, imporret, codavnic, "
-    SQL = SQL & "nifpers1, nombper1, codposta from avnic where " & cadWhere
+    SQL = SQL & "nifpers1, nombper1, codposta from avnic where " & cadwhere
     
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
-    While Not RS.EOF
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    While Not Rs.EOF
 '        If Trim(DBLet(RS!nifrepre, "T")) <> "" Then
-        Debug.Print RS!nifrepre & "-" & RS!nifperso & "-" & RS!nifpers1
-        If Not IsNull(RS!nifrepre) And Trim(DBLet(RS!nifrepre, "T")) <> "" Then
+        Debug.Print Rs!nifrepre & "-" & Rs!nifperso & "-" & Rs!nifpers1
+        If Not IsNull(Rs!nifrepre) And Trim(DBLet(Rs!nifrepre, "T")) <> "" Then
             '++monica: añadida la condicion de no añadir nifs duplicados
             Existe = ""
-            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifrepre", "nifrepre", RS.Fields(2).Value, "T")
+            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifrepre", "nifrepre", Rs.Fields(2).Value, "T")
         
             If Existe = "" Then
                 SQL = "insert into tmptempo ( nombrper, nifperso, nifrepre, codpobla, imporper,"
                 SQL = SQL & " imporret, codavnic, nifpers1, nombper1, codpobl1, tipocodi) values ("
-                SQL = SQL & DBSet(RS.Fields(0).Value, "T") & "," 'nombrper
+                SQL = SQL & DBSet(Rs.Fields(0).Value, "T") & "," 'nombrper
                 SQL = SQL & ValorNulo & "," 'nifperso
-                SQL = SQL & DBSet(RS.Fields(2).Value, "T") & "," 'nifrepre
-                SQL = SQL & DBSet(RS.Fields(3).Value, "T") & "," 'codpobla
-                SQL = SQL & DBSet(RS.Fields(4).Value, "N") & "," 'imporper
-                SQL = SQL & DBSet(RS.Fields(5).Value, "N") & "," 'imporret
-                SQL = SQL & DBSet(RS.Fields(6).Value, "N") & "," 'codavnic
+                SQL = SQL & DBSet(Rs.Fields(2).Value, "T") & "," 'nifrepre
+                SQL = SQL & DBSet(Rs.Fields(3).Value, "T") & "," 'codpobla
+                SQL = SQL & DBSet(Rs.Fields(4).Value, "N") & "," 'imporper
+                SQL = SQL & DBSet(Rs.Fields(5).Value, "N") & "," 'imporret
+                SQL = SQL & DBSet(Rs.Fields(6).Value, "N") & "," 'codavnic
                 SQL = SQL & ValorNulo & "," 'nifpers1
                 SQL = SQL & ValorNulo & "," 'nombper1
                 SQL = SQL & ValorNulo & "," 'codpobl1
                 SQL = SQL & "0)"
             Else
-                SQL = "update tmptempo set imporper = imporper + " & DBSet(RS.Fields(4).Value, "N")
-                SQL = SQL & ", imporret = imporret + " & DBSet(RS.Fields(5).Value, "N")
-                SQL = SQL & " where nifrepre = " & DBSet(RS.Fields(2).Value, "T")
+                SQL = "update tmptempo set imporper = imporper + " & DBSet(Rs.Fields(4).Value, "N")
+                SQL = SQL & ", imporret = imporret + " & DBSet(Rs.Fields(5).Value, "N")
+                SQL = SQL & " where nifrepre = " & DBSet(Rs.Fields(2).Value, "T")
             End If
             
             conn.Execute SQL
 '       ElseIf Trim(DBLet(RS!nifpers1, "T")) = "" Then
-       ElseIf (IsNull(RS!nifpers1) Or Trim(DBLet(RS!nifpers1, "T")) = "") Then
+       ElseIf (IsNull(Rs!nifpers1) Or Trim(DBLet(Rs!nifpers1, "T")) = "") Then
             '++monica: añadida la condicion de no añadir nifs duplicados
             Existe = ""
-            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", RS.Fields(1).Value, "T")
+            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", Rs.Fields(1).Value, "T")
         
             If Existe = "" Then
                 SQL = "insert into tmptempo ( nombrper, nifperso, nifrepre, codpobla, imporper,"
                 SQL = SQL & " imporret, codavnic, nifpers1, nombper1, codpobl1, tipocodi) values ("
-                SQL = SQL & DBSet(RS.Fields(0).Value, "T") & "," 'nombrper
-                SQL = SQL & DBSet(RS.Fields(1).Value, "T") & "," 'nifperso
+                SQL = SQL & DBSet(Rs.Fields(0).Value, "T") & "," 'nombrper
+                SQL = SQL & DBSet(Rs.Fields(1).Value, "T") & "," 'nifperso
                 SQL = SQL & ValorNulo & "," 'nifrepre
-                SQL = SQL & DBSet(RS.Fields(3).Value, "T") & "," 'codpobla
-                SQL = SQL & DBSet(RS.Fields(4).Value, "N") & "," 'imporper
-                SQL = SQL & DBSet(RS.Fields(5).Value, "N") & "," 'imporret
-                SQL = SQL & DBSet(RS.Fields(6).Value, "N") & "," 'codavnic
+                SQL = SQL & DBSet(Rs.Fields(3).Value, "T") & "," 'codpobla
+                SQL = SQL & DBSet(Rs.Fields(4).Value, "N") & "," 'imporper
+                SQL = SQL & DBSet(Rs.Fields(5).Value, "N") & "," 'imporret
+                SQL = SQL & DBSet(Rs.Fields(6).Value, "N") & "," 'codavnic
                 SQL = SQL & ValorNulo & "," 'nifpers1
                 SQL = SQL & ValorNulo & "," 'nombper1
                 SQL = SQL & ValorNulo & "," 'codpobl1
                 SQL = SQL & "1)"
             Else
-                SQL = "update tmptempo set imporper = imporper + " & DBSet(RS.Fields(4).Value, "N")
-                SQL = SQL & ", imporret = imporret + " & DBSet(RS.Fields(5).Value, "N")
-                SQL = SQL & " where nifperso = " & DBSet(RS.Fields(1).Value, "T")
+                SQL = "update tmptempo set imporper = imporper + " & DBSet(Rs.Fields(4).Value, "N")
+                SQL = SQL & ", imporret = imporret + " & DBSet(Rs.Fields(5).Value, "N")
+                SQL = SQL & " where nifperso = " & DBSet(Rs.Fields(1).Value, "T")
             End If
             
             conn.Execute SQL
        Else
-            ImporPer = Round2(DBLet(RS!ImporPer, "N") * 0.5, 2)
-            ImporRet = Round2(DBLet(RS!ImporRet, "N") * 0.5, 2)
+            ImporPer = Round2(DBLet(Rs!ImporPer, "N") * 0.5, 2)
+            ImporRet = Round2(DBLet(Rs!ImporRet, "N") * 0.5, 2)
             
             '++monica: añadida la condicion de no añadir nifs duplicados
             Existe = ""
-            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifpers1", "nifpers1", RS.Fields(7).Value, "T", , "nifperso", RS.Fields(1).Value, "T")
+            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifpers1", "nifpers1", Rs.Fields(7).Value, "T", , "nifperso", Rs.Fields(1).Value, "T")
         
             If Existe = "" Then
                 SQL = "insert into tmptempo ( nombrper, nifperso, nifrepre, codpobla, imporper,"
                 SQL = SQL & " imporret, codavnic, nifpers1, nombper1, codpobl1, tipocodi) values ("
-                SQL = SQL & DBSet(RS.Fields(0).Value, "T") & "," 'nombrper
-                SQL = SQL & DBSet(RS.Fields(1).Value, "T") & "," 'nifperso
+                SQL = SQL & DBSet(Rs.Fields(0).Value, "T") & "," 'nombrper
+                SQL = SQL & DBSet(Rs.Fields(1).Value, "T") & "," 'nifperso
                 SQL = SQL & ValorNulo & "," 'nifrepre
-                SQL = SQL & DBSet(RS.Fields(3).Value, "T") & "," 'codpobla
+                SQL = SQL & DBSet(Rs.Fields(3).Value, "T") & "," 'codpobla
                 SQL = SQL & DBSet(ImporPer, "N") & "," 'imporper
                 SQL = SQL & DBSet(ImporRet, "N") & "," 'imporret
-                SQL = SQL & DBSet(RS.Fields(6).Value, "N") & "," 'codavnic
-                SQL = SQL & DBSet(RS.Fields(7).Value, "T") & "," 'nifpers1
-                SQL = SQL & DBSet(RS.Fields(8).Value, "T") & "," 'nombper1
-                SQL = SQL & DBSet(RS.Fields(9).Value, "T") & "," 'codpobl1
+                SQL = SQL & DBSet(Rs.Fields(6).Value, "N") & "," 'codavnic
+                SQL = SQL & DBSet(Rs.Fields(7).Value, "T") & "," 'nifpers1
+                SQL = SQL & DBSet(Rs.Fields(8).Value, "T") & "," 'nombper1
+                SQL = SQL & DBSet(Rs.Fields(9).Value, "T") & "," 'codpobl1
                 SQL = SQL & "2)"
             Else
                 SQL = "update tmptempo set imporper = imporper + " & DBSet(ImporPer, "N")
                 SQL = SQL & ", imporret = imporret + " & DBSet(ImporRet, "N")
-                SQL = SQL & " where nifpers1 = " & DBSet(RS.Fields(7).Value, "T")
-                SQL = SQL & " and nifperso = " & DBSet(RS.Fields(1).Value, "T")
+                SQL = SQL & " where nifpers1 = " & DBSet(Rs.Fields(7).Value, "T")
+                SQL = SQL & " and nifperso = " & DBSet(Rs.Fields(1).Value, "T")
             End If
             
             conn.Execute SQL
        End If
-       RS.MoveNext
+       Rs.MoveNext
     Wend
 
     CrearTMPavnics = True
@@ -998,8 +1005,8 @@ ECrear:
 End Function
 
 
-Private Function CrearTMPavnicsNew(cadWhere As String, ByRef Mens As String) As Boolean
-Dim RS As ADODB.Recordset
+Private Function CrearTMPavnicsNew(cadwhere As String, ByRef Mens As String) As Boolean
+Dim Rs As ADODB.Recordset
 Dim SQL As String
 Dim ImporPer As Currency
 Dim ImporRet As Currency
@@ -1028,107 +1035,107 @@ Dim Existe As String
     conn.Execute SQL
     
     SQL = "select nombrper, nifperso, nifrepre, codposta, imporper, imporret, codavnic, "
-    SQL = SQL & "nifpers1, nombper1, codposta from avnic where " & cadWhere
+    SQL = SQL & "nifpers1, nombper1, codposta from avnic where " & cadwhere
     
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
-    While Not RS.EOF
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    While Not Rs.EOF
 '        If Trim(DBLet(RS!nifrepre, "T")) <> "" Then
-        If Not IsNull(RS!nifrepre) And Trim(DBLet(RS!nifrepre, "T")) <> "" Then
+        If Not IsNull(Rs!nifrepre) And Trim(DBLet(Rs!nifrepre, "T")) <> "" Then
             '++monica: añadida la condicion de no añadir nifs duplicados
             Existe = ""
-            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", RS.Fields(1).Value, "T", , "nifrepre", RS.Fields(2).Value, "T")
+            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", Rs.Fields(1).Value, "T", , "nifrepre", Rs.Fields(2).Value, "T")
         
             If Existe = "" Then
                 SQL = "insert into tmptempo ( nombrper, nifperso, codpobla, imporper,"
                 SQL = SQL & " imporret) values ("
-                SQL = SQL & DBSet(RS.Fields(0).Value, "T") & "," 'nombrper
-                SQL = SQL & DBSet(RS.Fields(1).Value, "T") & "," 'nifperso
-                SQL = SQL & DBSet(RS.Fields(2).Value, "T") & "," 'nifrepre
-                SQL = SQL & DBSet(RS.Fields(3).Value, "T") & "," 'codpobla
-                SQL = SQL & DBSet(RS.Fields(4).Value, "N") & "," 'imporper
-                SQL = SQL & DBSet(RS.Fields(5).Value, "N") & ")" 'imporret
+                SQL = SQL & DBSet(Rs.Fields(0).Value, "T") & "," 'nombrper
+                SQL = SQL & DBSet(Rs.Fields(1).Value, "T") & "," 'nifperso
+                SQL = SQL & DBSet(Rs.Fields(2).Value, "T") & "," 'nifrepre
+                SQL = SQL & DBSet(Rs.Fields(3).Value, "T") & "," 'codpobla
+                SQL = SQL & DBSet(Rs.Fields(4).Value, "N") & "," 'imporper
+                SQL = SQL & DBSet(Rs.Fields(5).Value, "N") & ")" 'imporret
             Else
-                SQL = "update tmptempo set imporper = imporper + " & DBSet(RS.Fields(4).Value, "N")
-                SQL = SQL & ", imporret = imporret + " & DBSet(RS.Fields(5).Value, "N")
-                SQL = SQL & " where nifperso = " & DBSet(RS.Fields(1).Value, "T")
-                SQL = SQL & " and nifrepre = " & DBSet(RS.Fields(2).Value, "T")
+                SQL = "update tmptempo set imporper = imporper + " & DBSet(Rs.Fields(4).Value, "N")
+                SQL = SQL & ", imporret = imporret + " & DBSet(Rs.Fields(5).Value, "N")
+                SQL = SQL & " where nifperso = " & DBSet(Rs.Fields(1).Value, "T")
+                SQL = SQL & " and nifrepre = " & DBSet(Rs.Fields(2).Value, "T")
             End If
             
             conn.Execute SQL
 '       ElseIf Trim(DBLet(RS!nifpers1, "T")) = "" Then
-       ElseIf (IsNull(RS!nifpers1) Or Trim(DBLet(RS!nifpers1, "T")) = "") Then
+       ElseIf (IsNull(Rs!nifpers1) Or Trim(DBLet(Rs!nifpers1, "T")) = "") Then
             '++monica: añadida la condicion de no añadir nifs duplicados
             Existe = ""
-            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", RS.Fields(1).Value, "T")
+            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", Rs.Fields(1).Value, "T")
         
             If Existe = "" Then
                 SQL = "insert into tmptempo ( nombrper, nifperso, nifrepre, codpobla, imporper,"
                 SQL = SQL & " imporret) values ("
-                SQL = SQL & DBSet(RS.Fields(0).Value, "T") & "," 'nombrper
-                SQL = SQL & DBSet(RS.Fields(1).Value, "T") & "," 'nifperso
+                SQL = SQL & DBSet(Rs.Fields(0).Value, "T") & "," 'nombrper
+                SQL = SQL & DBSet(Rs.Fields(1).Value, "T") & "," 'nifperso
                 SQL = SQL & ValorNulo & "," 'nifrepre
-                SQL = SQL & DBSet(RS.Fields(3).Value, "T") & "," 'codpobla
-                SQL = SQL & DBSet(RS.Fields(4).Value, "N") & "," 'imporper
-                SQL = SQL & DBSet(RS.Fields(5).Value, "N") & ")" 'imporret
+                SQL = SQL & DBSet(Rs.Fields(3).Value, "T") & "," 'codpobla
+                SQL = SQL & DBSet(Rs.Fields(4).Value, "N") & "," 'imporper
+                SQL = SQL & DBSet(Rs.Fields(5).Value, "N") & ")" 'imporret
             Else
-                SQL = "update tmptempo set imporper = imporper + " & DBSet(RS.Fields(4).Value, "N")
-                SQL = SQL & ", imporret = imporret + " & DBSet(RS.Fields(5).Value, "N")
-                SQL = SQL & " where nifperso = " & DBSet(RS.Fields(1).Value, "T")
+                SQL = "update tmptempo set imporper = imporper + " & DBSet(Rs.Fields(4).Value, "N")
+                SQL = SQL & ", imporret = imporret + " & DBSet(Rs.Fields(5).Value, "N")
+                SQL = SQL & " where nifperso = " & DBSet(Rs.Fields(1).Value, "T")
             End If
             
             conn.Execute SQL
        Else
-            ImporPer = Round2(DBLet(RS!ImporPer, "N") * 0.5, 2)
-            ImporRet = Round2(DBLet(RS!ImporRet, "N") * 0.5, 2)
+            ImporPer = Round2(DBLet(Rs!ImporPer, "N") * 0.5, 2)
+            ImporRet = Round2(DBLet(Rs!ImporRet, "N") * 0.5, 2)
         
-        Debug.Print RS!nifrepre & "-" & RS!nifperso & "-" & RS!nifpers1
+        Debug.Print Rs!nifrepre & "-" & Rs!nifperso & "-" & Rs!nifpers1
             
             '++monica: añadida la condicion de no añadir nifs duplicados
             Existe = ""
-            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", RS.Fields(1).Value, "T")
+            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", Rs.Fields(1).Value, "T")
         
             If Existe = "" Then
                 SQL = "insert into tmptempo ( nombrper, nifperso, nifrepre, codpobla, imporper,"
                 SQL = SQL & " imporret) values ("
-                SQL = SQL & DBSet(RS.Fields(0).Value, "T") & "," 'nombrper
-                SQL = SQL & DBSet(RS.Fields(1).Value, "T") & "," 'nifperso
+                SQL = SQL & DBSet(Rs.Fields(0).Value, "T") & "," 'nombrper
+                SQL = SQL & DBSet(Rs.Fields(1).Value, "T") & "," 'nifperso
                 SQL = SQL & ValorNulo & "," 'nifrepre
-                SQL = SQL & DBSet(RS.Fields(3).Value, "T") & "," 'codpobla
+                SQL = SQL & DBSet(Rs.Fields(3).Value, "T") & "," 'codpobla
                 SQL = SQL & DBSet(ImporPer, "N") & "," 'imporper
                 SQL = SQL & DBSet(ImporRet, "N") & ")" 'imporret
             Else
                 SQL = "update tmptempo set imporper = imporper + " & DBSet(ImporPer, "N")
                 SQL = SQL & ", imporret = imporret + " & DBSet(ImporRet, "N")
-                SQL = SQL & " where nifperso = " & DBSet(RS.Fields(1).Value, "T")
+                SQL = SQL & " where nifperso = " & DBSet(Rs.Fields(1).Value, "T")
             End If
             
             conn.Execute SQL
             
             Existe = ""
-            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", RS.Fields(7).Value, "T")
+            Existe = DevuelveDesdeBDNew(cPTours, "tmptempo", "nifperso", "nifperso", Rs.Fields(7).Value, "T")
        
             If Existe = "" Then
                 SQL = "insert into tmptempo ( nombrper, nifperso, nifrepre, codpobla, imporper,"
                 SQL = SQL & " imporret) values ("
-                SQL = SQL & DBSet(RS.Fields(8).Value, "T") & "," 'nombrper
-                SQL = SQL & DBSet(RS.Fields(7).Value, "T") & "," 'nifpers1
+                SQL = SQL & DBSet(Rs.Fields(8).Value, "T") & "," 'nombrper
+                SQL = SQL & DBSet(Rs.Fields(7).Value, "T") & "," 'nifpers1
                 SQL = SQL & ValorNulo & "," 'nifrepre
-                SQL = SQL & DBSet(RS.Fields(3).Value, "T") & "," 'codpobla
+                SQL = SQL & DBSet(Rs.Fields(3).Value, "T") & "," 'codpobla
                 SQL = SQL & DBSet(ImporPer, "N") & "," 'imporper
                 SQL = SQL & DBSet(ImporRet, "N") & ")" 'imporret
             Else
                 SQL = "update tmptempo set imporper = imporper + " & DBSet(ImporPer, "N")
                 SQL = SQL & ", imporret = imporret + " & DBSet(ImporRet, "N")
-                SQL = SQL & " where nifperso = " & DBSet(RS.Fields(7).Value, "T")
+                SQL = SQL & " where nifperso = " & DBSet(Rs.Fields(7).Value, "T")
             End If
             
             conn.Execute SQL
        
        
        End If
-       RS.MoveNext
+       Rs.MoveNext
     Wend
 
     CrearTMPavnicsNew = True
@@ -1146,7 +1153,7 @@ End Function
 
 Private Function CalcularTotales(ByRef impbase As Currency, ByRef ImpReten As Currency, ByRef TotalReg As Currency, ByRef Mens As String) As Boolean
 Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim v_import As String
 Dim v_impret As String
 
@@ -1163,25 +1170,25 @@ Dim v_impret As String
     
     SQL = "select * from tmptempo"
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
-    While Not RS.EOF
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    While Not Rs.EOF
         TotalReg = TotalReg + 1
-        impbase = impbase + DBLet(RS!ImporPer, "N")
-        ImpReten = ImpReten + DBLet(RS!ImporRet, "N")
+        impbase = impbase + DBLet(Rs!ImporPer, "N")
+        ImpReten = ImpReten + DBLet(Rs!ImporRet, "N")
         
-        If DBLet(RS!tipocodi, "N") = 2 Then
+        If DBLet(Rs!tipocodi, "N") = 2 Then
             TotalReg = TotalReg + 1
             v_import = ""
             v_impret = "imporret"
-            v_import = DevuelveDesdeBDNew(cPTours, "avnic", "imporper", "codavnic", RS!codavnic, "N", v_impret, "anoejerc", txtCodigo(0).Text, "N")
+            v_import = DevuelveDesdeBDNew(cPTours, "avnic", "imporper", "codavnic", Rs!codavnic, "N", v_impret, "anoejerc", txtCodigo(0).Text, "N")
             
-            impbase = impbase + CCur(v_import) - DBLet(RS!ImporPer, "N")
-            ImpReten = ImpReten + CCur(v_impret) - DBLet(RS!ImporRet, "N")
+            impbase = impbase + CCur(v_import) - DBLet(Rs!ImporPer, "N")
+            ImpReten = ImpReten + CCur(v_impret) - DBLet(Rs!ImporRet, "N")
         End If
-        RS.MoveNext
+        Rs.MoveNext
     Wend
-    Set RS = Nothing
+    Set Rs = Nothing
     CalcularTotales = True
     Exit Function
     
@@ -1193,7 +1200,7 @@ End Function
 
 Private Function CalcularTotalesNew(ByRef impbase As Currency, ByRef ImpReten As Currency, ByRef TotalReg As Currency, ByRef Mens As String) As Boolean
 Dim SQL As String
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim v_import As String
 Dim v_impret As String
 
@@ -1210,16 +1217,16 @@ Dim v_impret As String
     
     SQL = "select * from tmptempo"
     
-    Set RS = New ADODB.Recordset
-    RS.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
-    While Not RS.EOF
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    While Not Rs.EOF
         TotalReg = TotalReg + 1
-        impbase = impbase + DBLet(RS!ImporPer, "N")
-        ImpReten = ImpReten + DBLet(RS!ImporRet, "N")
+        impbase = impbase + DBLet(Rs!ImporPer, "N")
+        ImpReten = ImpReten + DBLet(Rs!ImporRet, "N")
         
-        RS.MoveNext
+        Rs.MoveNext
     Wend
-    Set RS = Nothing
+    Set Rs = Nothing
     CalcularTotalesNew = True
     Exit Function
     
