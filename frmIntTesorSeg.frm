@@ -341,13 +341,13 @@ Private Sub KEYpress(KeyAscii As Integer)
 End Sub
 
 Private Sub cmdAceptar_Click()
-Dim SQL As String
+Dim Sql As String
 Dim i As Byte
 Dim cadwhere As String
 
     If Not DatosOk Then Exit Sub
              
-    SQL = "SELECT count(*)" & _
+    Sql = "SELECT count(*)" & _
           " FROM segpoliza " & _
           "WHERE "
           
@@ -356,9 +356,9 @@ Dim cadwhere As String
     If txtCodigo(0).Text <> "" Then cadwhere = cadwhere & " and fechaenv >= " & DBSet(txtCodigo(0).Text, "F")
     If txtCodigo(1).Text <> "" Then cadwhere = cadwhere & " and fechaenv <= " & DBSet(txtCodigo(1).Text, "F")
              
-    SQL = SQL & cadwhere
+    Sql = Sql & cadwhere
              
-    If RegistrosAListar(SQL) = 0 Then
+    If RegistrosAListar(Sql) = 0 Then
         MsgBox "No existen datos a contabilizar entre esas fechas.", vbExclamation
         Exit Sub
     End If
@@ -610,17 +610,17 @@ End Sub
 
 Private Sub ContabilizarCobros(cadwhere As String)
 'Contabiliza Facturas de Clientes o de Proveedores
-Dim SQL As String
+Dim Sql As String
 Dim b As Boolean
 Dim tmpErrores As Boolean 'Indica si se creo correctamente la tabla de errores
 Dim CCoste As String
 Dim cadTABLA As String
 
-    SQL = "CONTES" 'contabilizar tesoreria
+    Sql = "CONTES" 'contabilizar tesoreria
 
     'Bloquear para que nadie mas pueda contabilizar
-    DesBloqueoManual (SQL)
-    If Not BloqueoManual(SQL, "1") Then
+    DesBloqueoManual (Sql)
+    If Not BloqueoManual(Sql, "1") Then
         MsgBox "No se pueden Contabilizar Cobros. Hay otro usuario contabilizándolo.", vbExclamation
         Screen.MousePointer = vbDefault
         Exit Sub
@@ -729,11 +729,11 @@ Dim FFin As Date
 End Function
 
 Private Function PasarCalculoAContab(cadwhere As String) As Boolean
-Dim SQL As String
+Dim Sql As String
 Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
-Dim NumLinea As Integer
+Dim numlinea As Integer
 Dim numdocum As String
 Dim ampliacion As String
 Dim ampliaciond As String
@@ -752,35 +752,35 @@ Dim Codmacta As String
     PasarCalculoAContab = False
     
     'Total de lineas de asiento a Insertar en la contabilidad
-    SQL = "SELECT count(*)" & _
+    Sql = "SELECT count(*)" & _
           " FROM segpoliza " & _
           "WHERE " & cadwhere
              
-    NumLinea = TotalRegistros(SQL)
+    numlinea = TotalRegistros(Sql)
     
-    If NumLinea = 0 Then Exit Function
+    If numlinea = 0 Then Exit Function
     
     
-    If NumLinea > 0 Then
-        NumLinea = NumLinea
+    If numlinea > 0 Then
+        numlinea = numlinea
         
-        CargarProgres Me.Pb1, NumLinea
+        CargarProgres Me.Pb1, numlinea
         
-        ConnConta.BeginTrans
+        ConnContaSeg.BeginTrans
         conn.BeginTrans
         
         Obs = "Contabilización de Cobro de Pólizas de fecha " & Format(txtCodigo(0).Text, "dd/mm/yyyy")
 
-        SQL = "select * from segpoliza where " & cadwhere
+        Sql = "select * from segpoliza where " & cadwhere
         Set Rs = New ADODB.Recordset
-        Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+        Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
 
 
         b = True
         i = 1
         While Not Rs.EOF And b
                 IncrementarProgres Me.Pb1, 1
-                Me.lblProgres(1).Caption = "Insertando registro en Tesorería...   (" & i & " de " & NumLinea & ")"
+                Me.lblProgres(1).Caption = "Insertando registro en Tesorería...   (" & i & " de " & numlinea & ")"
                 Me.Refresh
                 
                 i = i + 1
@@ -806,7 +806,7 @@ EPasarCal:
         MuestraError Err.Number, "Integrando Asiento a Contabilidad", Err.Description
     End If
     If b Then
-        ConnConta.CommitTrans
+        ConnContaSeg.CommitTrans
         conn.CommitTrans
         PasarCalculoAContab = True
     Else
@@ -819,14 +819,14 @@ End Function
 
 Private Function ActualizarCobros(cadwhere As String, caderr As String) As Boolean
 'Poner el movimiento como contabilizada
-Dim SQL As String
+Dim Sql As String
 
     On Error GoTo EActualizar
     
-    SQL = "UPDATE segpoliza SET inttesor=1 "
-    SQL = SQL & " WHERE " & cadwhere
+    Sql = "UPDATE segpoliza SET inttesor=1 "
+    Sql = Sql & " WHERE " & cadwhere
 
-    conn.Execute SQL
+    conn.Execute Sql
     
 EActualizar:
     If Err.Number <> 0 Then

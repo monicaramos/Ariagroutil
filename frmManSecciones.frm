@@ -169,7 +169,7 @@ Begin VB.Form frmManSecciones
       Height          =   290
       Index           =   3
       Left            =   4815
-      MaxLength       =   1
+      MaxLength       =   3
       TabIndex        =   3
       Tag             =   "Letra|T|N|||seccion|letraser|||"
       Text            =   "L"
@@ -727,7 +727,7 @@ Private Sub BotonModificar()
     txtAux(7).Text = DataGrid1.Columns(6).Text
     ' ********************************************************
     '[Monica]26/05/2016: nuevo campo de materna
-    Me.chkAux(1).Value = Me.adodc1.Recordset!esmaterna
+    Me.chkAux(1).Value = Me.adodc1.Recordset!EsMaterna
 
     LLamaLineas anc, 4 'modo 4
    

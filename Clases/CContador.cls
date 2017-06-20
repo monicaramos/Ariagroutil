@@ -36,7 +36,7 @@ Option Explicit
 
 Private mContador As Long
 
-Private RS As ADODB.Recordset
+Private Rs As ADODB.Recordset
 Private Sql As String
 Private Mens As String
 
@@ -52,15 +52,13 @@ Public Property Get Contador() As Long
 End Property
 
 
-
-
 '///////////////////////////////////////////////////////////
 '//
 '//  Devuelve el contador que corresponda.
 '//  Si es llamado desde dentro de un begin-trans
 '//  entonces NO ejecuta las sentencias commit
-Public Function ConseguirContador(Tipo As String, DentroBeginTrans As Boolean, Optional ByRef db As BaseDatos) As Boolean
-Dim Ok As Boolean
+Public Function ConseguirContador(tipo As String, DentroBeginTrans As Boolean, Optional ByRef db As BaseDatos) As Boolean
+Dim OK As Boolean
 Dim c1 As Currency
 Dim c2 As Currency
 
@@ -68,39 +66,39 @@ Dim c2 As Currency
 
     'Abrimos bloqueando
     Sql = "Select contador, letraser from stipom "
-    Sql = Sql & " WHERE codtipom = '" & DBLet(Tipo, "T") & "' FOR UPDATE"
+    Sql = Sql & " WHERE codtipom = '" & DBLet(tipo, "T") & "' FOR UPDATE"
 
     ConseguirContador = False
-    Ok = False
+    OK = False
 
     If IsNull(db) Then
-        Set RS = New ADODB.Recordset
-        RS.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+        Set Rs = New ADODB.Recordset
+        Rs.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
     Else
-        Set RS = db.cursor(Sql)
+        Set Rs = db.cursor(Sql)
     End If
     
-    If Not RS.EOF Then
-        c1 = RS!Contador + 1
+    If Not Rs.EOF Then
+        c1 = Rs!Contador + 1
         mContador = c1
-        Ok = True
+        OK = True
     Else
         MsgBox "No existe contador para ese tipo de movimiento.", vbExclamation
-        Ok = False
+        OK = False
     End If
     
-    RS.Close
-    Set RS = Nothing
+    Rs.Close
+    Set Rs = Nothing
 
     If IsNull(db) Then
-        If Not Ok Then
+        If Not OK Then
             If Not DentroBeginTrans Then conn.Execute "commit"
             Exit Function
         End If
 
         'Actualizamos el contador
         Sql = "UPDATE stipom set contador = " & DBLet(c1, "N")
-        Sql = Sql & " WHERE codtipom = '" & DBLet(Tipo, "T") & "'"
+        Sql = Sql & " WHERE codtipom = '" & DBLet(tipo, "T") & "'"
         conn.Execute Sql
     
         'Desbloqueamos
@@ -110,18 +108,18 @@ Dim c2 As Currency
 
     Else
     
-        If Not Ok Then
-            If Not DentroBeginTrans Then db.ejecutar "commit"
+        If Not OK Then
+            If Not DentroBeginTrans Then db.Ejecutar "commit"
             Exit Function
         End If
 
         'Actualizamos el contador
         Sql = "UPDATE stipom set contador = " & DBLet(c1, "N")
-        Sql = Sql & " WHERE codtipom = '" & DBLet(Tipo, "T") & "'"
-        db.ejecutar Sql
+        Sql = Sql & " WHERE codtipom = '" & DBLet(tipo, "T") & "'"
+        db.Ejecutar Sql
     
         'Desbloqueamos
-        If Not DentroBeginTrans Then db.ejecutar "commit"
+        If Not DentroBeginTrans Then db.Ejecutar "commit"
         ConseguirContador = True
         Exit Function
     
@@ -248,53 +246,53 @@ End Function
 '//////////////////////////////////////////////////////////////////7
 '//
 '//     Si es el ultimo numero de la serie devuelve el anterior
-Public Function DevolverContador(Tipo As String, Contador As Long, Optional db As BaseDatos) As Boolean
-Dim Ok As Boolean
+Public Function DevolverContador(tipo As String, Contador As Long, Optional db As BaseDatos) As Boolean
+Dim OK As Boolean
 Dim c1 As Long
 Dim c2 As Long
     On Error GoTo Err1
     'Abrimos bloqueando
-    Sql = "Select * from stipom WHERE codtipom = '" & Tipo & "' FOR UPDATE"
+    Sql = "Select * from stipom WHERE codtipom = '" & tipo & "' FOR UPDATE"
     'Esto esba asi antes, sin comentar
     'Conn.Execute "Set autocommit = 0"
     DevolverContador = False
-    Ok = False
+    OK = False
     If IsNull(db) Then
-        Set RS = New ADODB.Recordset
-        RS.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+        Set Rs = New ADODB.Recordset
+        Rs.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
     Else
-        Set RS = db.cursor(Sql)
+        Set Rs = db.cursor(Sql)
     End If
-    If Not RS.EOF Then
-        c1 = RS!Contador
-        Ok = True
+    If Not Rs.EOF Then
+        c1 = Rs!Contador
+        OK = True
     End If
     
-    RS.Close
+    Rs.Close
     
-    If Not Ok Then
+    If Not OK Then
         If IsNull(db) Then
             conn.Execute "commit"
         Else
-            db.ejecutar "commit"
+            db.Ejecutar "commit"
         End If
         Exit Function
     End If
 
-    Ok = False
+    OK = False
     'Contador = Contador + 1
-    Ok = (c1 = Contador)
+    OK = (c1 = Contador)
 
-    If Ok Then
+    If OK Then
         'Actualizamos el contador
         Sql = "UPDATE stipom set "
         c1 = c1 - 1
         Sql = Sql & " contador=" & c1
-        Sql = Sql & " WHERE codtipom = '" & DBLet(Tipo, "T") & "'"
+        Sql = Sql & " WHERE codtipom = '" & DBLet(tipo, "T") & "'"
         If IsNull(db) Then
             conn.Execute Sql
         Else
-            db.ejecutar Sql
+            db.Ejecutar Sql
         End If
     End If
 
@@ -302,7 +300,7 @@ Dim c2 As Long
     If IsNull(db) Then
         conn.Execute "commit"
     Else
-        db.ejecutar "commit"
+        db.Ejecutar "commit"
     End If
     DevolverContador = True
 Err1:
@@ -313,7 +311,7 @@ Err1:
     If IsNull(db) Then
         conn.Execute "Set autocommit = 1"
     Else
-        db.ejecutar "Set autocommit = 1"
+        db.Ejecutar "Set autocommit = 1"
     End If
 End Function
 

@@ -567,6 +567,8 @@ Dim PrimeraVez As Boolean
 
 Dim BdConta As Integer
 
+Dim cContaFra As cContabilizarFacturas
+
 Private Sub KEYpress(KeyAscii As Integer)
     If KeyAscii = 13 Then 'ENTER
         KeyAscii = 0
@@ -581,8 +583,8 @@ Dim nDesde As String, nHasta As String 'cadena Descripcion Desde/Hasta
 Dim cadTABLA As String, cOrden As String
 Dim cadMen As String
 Dim i As Byte
-Dim SQL As String
-Dim tipo As Byte
+Dim Sql As String
+Dim Tipo As Byte
 Dim Nregs As Long
 Dim NumError As Long
 Dim cWhere As String
@@ -706,16 +708,16 @@ Private Sub frmFpa_DatoSeleccionado(CadenaSeleccion As String)
 End Sub
 
 Private Sub frmMens_DatoSeleccionado(CadenaSeleccion As String)
-Dim SQL As String
+Dim Sql As String
 Dim sql2 As String
 
     If CadenaSeleccion <> "" Then
-        SQL = " cuentas.codmacta in (" & CadenaSeleccion & ")"
+        Sql = " cuentas.codmacta in (" & CadenaSeleccion & ")"
         sql2 = " cuentas.codmacta in [" & CadenaSeleccion & "]"
     Else
-        SQL = ""
+        Sql = ""
     End If
-    If Not AnyadirAFormula(cadSelect, SQL) Then Exit Sub
+    If Not AnyadirAFormula(cadSelect, Sql) Then Exit Sub
     If Not AnyadirAFormula(cadFormula, sql2) Then Exit Sub
 
 End Sub
@@ -1284,7 +1286,7 @@ Dim PorcIva As String
 End Function
 
 Private Sub GenerarFacturas(cadTABLA As String, cadwhere As String, NumError As Long, MensError As String)
-Dim SQL As String
+Dim Sql As String
 Dim b As Boolean
 Dim tmpErrores As Boolean 'Indica si se creo correctamente la tabla de errores
 Dim CCoste As String
@@ -1308,11 +1310,11 @@ Dim Existe As Boolean
     On Error GoTo EContab
 
 
-    SQL = "GENFAC" 'generar facturas de venta
+    Sql = "GENFAC" 'generar facturas de venta
 
     'Bloquear para que nadie mas pueda contabilizar
-    DesBloqueoManual (SQL)
-    If Not BloqueoManual(SQL, "1") Then
+    DesBloqueoManual (Sql)
+    If Not BloqueoManual(Sql, "1") Then
         MsgBox "No se pueden Generar Facturas. Hay otro usuario realizando el proceso.", vbExclamation
         Screen.MousePointer = vbDefault
         Exit Sub
@@ -1333,10 +1335,10 @@ Dim Existe As Boolean
     Me.lblProgres(0).Caption = "Comprobaciones: "
     CargarProgresNew Me.Pb1, CInt(NumF)
         
-    SQL = "select ctaclien from ariagroutil.tmpfactu order by ctaclien"
+    Sql = "select ctaclien from ariagroutil.tmpfactu order by ctaclien"
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockReadOnly, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockReadOnly, adCmdText
         
     While Not Rs.EOF
     
@@ -1350,12 +1352,12 @@ Dim Existe As Boolean
             
             Existe = False
             Do
-                SQL = "select count(*) from cabfact where codsecci = " & DBSet(txtCodigo(6).Text, "N")
-                SQL = SQL & " and letraser = " & DBSet(vSec.LetraSerie, "T")
-                SQL = SQL & " and numfactu = " & DBSet(NumFact, "N")
-                SQL = SQL & " and fecfactu = " & DBSet(txtCodigo(7).Text, "F")
+                Sql = "select count(*) from cabfact where codsecci = " & DBSet(txtCodigo(6).Text, "N")
+                Sql = Sql & " and letraser = " & DBSet(vSec.LetraSerie, "T")
+                Sql = Sql & " and numfactu = " & DBSet(NumFact, "N")
+                Sql = Sql & " and fecfactu = " & DBSet(txtCodigo(7).Text, "F")
                 
-                If TotalRegistros(SQL) > 0 Then
+                If TotalRegistros(Sql) > 0 Then
                     vSec.IncrementarContador txtCodigo(6).Text
                     
                     NumFact = NumFact + 1
@@ -1456,7 +1458,7 @@ End Sub
 
 
 Private Function PasarFacturasAContab(cadTABLA As String, FecVenci As String, Banpr As String, CCoste As String) As Boolean
-Dim SQL As String
+Dim Sql As String
 Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
@@ -1468,16 +1470,16 @@ Dim codigo1 As String
     PasarFacturasAContab = False
     
     'Total de Facturas a Insertar en la contabilidad
-    SQL = "SELECT count(*) "
-    SQL = SQL & " FROM " & cadTABLA & " INNER JOIN tmpfactu "
+    Sql = "SELECT count(*) "
+    Sql = Sql & " FROM " & cadTABLA & " INNER JOIN tmpfactu "
     codigo1 = "letraser"
-    SQL = SQL & " ON " & cadTABLA & "." & codigo1 & "=tmpfactu.numserie"
-    SQL = SQL & " AND " & cadTABLA & ".codsecci=tmpfactu.codsecci"
-    SQL = SQL & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
+    Sql = Sql & " ON " & cadTABLA & "." & codigo1 & "=tmpfactu.numserie"
+    Sql = Sql & " AND " & cadTABLA & ".codsecci=tmpfactu.codsecci"
+    Sql = Sql & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
     
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         numfactu = Rs.Fields(0)
     Else
@@ -1489,20 +1491,33 @@ Dim codigo1 As String
     If numfactu > 0 Then
         CargarProgres Me.Pb1, numfactu
         
-        SQL = "SELECT * "
-        SQL = SQL & " FROM tmpfactu "
+         Set cContaFra = New cContabilizarFacturas
+        
+        If Not cContaFra.EstablecerValoresInciales(ConnContaFac) Then
+            'NO ha establcedio los valores de la conta.  Le dejaremos seguir, avisando que
+            ' obviamente, no va a contabilizar las FRAS
+            Sql = "Si continua, las facturas se insertaran en el registro, pero no serán contabilizadas" & vbCrLf
+            Sql = Sql & "en este momento. Deberán ser contabilizadas desde el ARICONTA" & vbCrLf & vbCrLf
+            Sql = Sql & Space(50) & "¿Continuar?"
+            If MsgBox(Sql, vbQuestion + vbYesNoCancel) <> vbYes Then Exit Function
+        End If
+               
+        
+        
+        Sql = "SELECT * "
+        Sql = Sql & " FROM tmpfactu "
             
         Set Rs = New ADODB.Recordset
-        Rs.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
+        Rs.Open Sql, conn, adOpenStatic, adLockPessimistic, adCmdText
         i = 1
 
         b = True
         'contabilizar cada una de las facturas seleccionadas
         While Not Rs.EOF
-            SQL = cadTABLA & ".codsecci = " & DBSet(Rs.Fields(0), "N") & " and "
-            SQL = SQL & cadTABLA & "." & codigo1 & "=" & DBSet(Rs.Fields(1), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
-            SQL = SQL & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
-            If PasarFacturaFac(SQL, FecVenci, Banpr, CCoste) = False And b Then b = False
+            Sql = cadTABLA & ".codsecci = " & DBSet(Rs.Fields(0), "N") & " and "
+            Sql = Sql & cadTABLA & "." & codigo1 & "=" & DBSet(Rs.Fields(1), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
+            Sql = Sql & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
+            If PasarFacturaFac(Sql, FecVenci, Banpr, CCoste, cContaFra) = False And b Then b = False
             
             IncrementarProgres Me.Pb1, 1
             Me.lblProgres(1).Caption = "Insertando Facturas en Contabilidad...   (" & i & " de " & numfactu & ")"
@@ -1581,21 +1596,21 @@ Private Function CrearTMP(cadTABLA As String, cadwhere As String, Optional Factu
 'Crea una temporal donde inserta la clave primaria de las
 'facturas seleccionadas para facturar y trabaja siempre con ellas
 ' facturas indica si viene de facturas varias o de telefonia
-Dim SQL As String
+Dim Sql As String
     
     On Error GoTo ECrear
     
     CrearTMP = False
     
-    SQL = "CREATE TABLE ariagroutil.tmpfactu ( "
-    SQL = SQL & "ctaclien varchar(10) NOT NULL default '')"
-    conn.Execute SQL
+    Sql = "CREATE TABLE ariagroutil.tmpfactu ( "
+    Sql = Sql & "ctaclien varchar(10) NOT NULL default '')"
+    conn.Execute Sql
      
-    SQL = "SELECT codmacta "
-    SQL = SQL & " FROM " & cadTABLA
-    SQL = SQL & " WHERE " & cadwhere
-    SQL = " INSERT INTO ariagroutil.tmpfactu " & SQL
-    ConnContaFac.Execute SQL
+    Sql = "SELECT codmacta "
+    Sql = Sql & " FROM " & cadTABLA
+    Sql = Sql & " WHERE " & cadwhere
+    Sql = " INSERT INTO ariagroutil.tmpfactu " & Sql
+    ConnContaFac.Execute Sql
 
     CrearTMP = True
     
@@ -1603,8 +1618,8 @@ ECrear:
      If Err.Number <> 0 Then
         CrearTMP = False
         'Borrar la tabla temporal
-        SQL = " DROP TABLE IF EXISTS ariagroutil.tmpfactu;"
-        conn.Execute SQL
+        Sql = " DROP TABLE IF EXISTS ariagroutil.tmpfactu;"
+        conn.Execute Sql
     End If
 End Function
 

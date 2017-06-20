@@ -395,6 +395,7 @@ Dim Modo As Byte
 '-----------------------------------------------
 Dim PrimeraVez As Boolean
 Dim vTabla As String
+Dim vTabla2 As String
 
 
 Private Sub PonerModo(vModo)
@@ -616,8 +617,10 @@ Private Sub Form_Load()
       
     If vParamAplic.ContabilidadNueva Then
         vTabla = "formapago"
+        vTabla2 = "tipofpago"
     Else
         vTabla = "sforpa"
+        vTabla2 = "stipoformapago"
     End If
     txtAux(0).Tag = "Código de Forma de Pago|N|N|||" & vTabla & "|codforpa|000|S|"
     txtAux(1).Tag = "Descripción de la Forpa|T|N|||" & vTabla & "|nomforpa|||"
@@ -625,7 +628,7 @@ Private Sub Form_Load()
       
 '    PonerOpcionesMenu  'En funcion del usuario
     '****************** canviar la consulta *********************************+
-    CadenaConsulta = "Select codforpa, nomforpa, tipforpa, descformapago FROM " & vTabla & ", stipoformapago where " & vTabla & ".tipforpa = stipoformapago.tipoformapago "
+    CadenaConsulta = "Select codforpa, nomforpa, tipforpa, descformapago FROM " & vTabla & ", " & vTabla2 & " where " & vTabla & ".tipforpa = " & vTabla2 & ".tipoformapago "
     '************************************************************************
     
     CadB = ""
@@ -791,30 +794,30 @@ Dim miRsAux As ADODB.Recordset
         Select Case Conexion
             Case cConta
                 adodc1.ConnectionString = ConnConta 'BD de la Contabilidad avnics
-                miRsAux.Open "Select * from stipoformapago order by descformapago", ConnConta, adOpenForwardOnly, adLockOptimistic, adCmdText
+                miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnConta, adOpenForwardOnly, adLockOptimistic, adCmdText
             Case cContaSeg
                 adodc1.ConnectionString = ConnContaSeg 'BD de la Contabilidad seguros
-                miRsAux.Open "Select * from stipoformapago order by descformapago", ConnContaSeg, adOpenForwardOnly, adLockOptimistic, adCmdText
+                miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnContaSeg, adOpenForwardOnly, adLockOptimistic, adCmdText
             Case cContaTel
                 adodc1.ConnectionString = ConnContaTel 'BD de la Contabilidad telefonia
-                miRsAux.Open "Select * from stipoformapago order by descformapago", ConnContaTel, adOpenForwardOnly, adLockOptimistic, adCmdText
+                miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnContaTel, adOpenForwardOnly, adLockOptimistic, adCmdText
             Case cContaGas
                 adodc1.ConnectionString = ConnContaGas 'BD de la Contabilidad gasolinera
-                miRsAux.Open "Select * from stipoformapago order by descformapago", ConnContaGas, adOpenForwardOnly, adLockOptimistic, adCmdText
+                miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnContaGas, adOpenForwardOnly, adLockOptimistic, adCmdText
             Case cContaFacSoc
                 adodc1.ConnectionString = ConnContaFacSoc 'BD de la Contabilidad facturas socio
-                miRsAux.Open "Select * from stipoformapago order by descformapago", ConnContaFacSoc, adOpenForwardOnly, adLockOptimistic, adCmdText
+                miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnContaFacSoc, adOpenForwardOnly, adLockOptimistic, adCmdText
             Case cContaCV
                 adodc1.ConnectionString = ConnContaCV 'BD de la Contabilidad facturas coarval
-                miRsAux.Open "Select * from stipoformapago order by descformapago", ConnContaCV, adOpenForwardOnly, adLockOptimistic, adCmdText
+                miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnContaCV, adOpenForwardOnly, adLockOptimistic, adCmdText
             Case cContaCVV
                 adodc1.ConnectionString = ConnContaCVV 'BD de la Contabilidad facturas coarval
-                miRsAux.Open "Select * from stipoformapago order by descformapago", ConnContaCVV, adOpenForwardOnly, adLockOptimistic, adCmdText
+                miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnContaCVV, adOpenForwardOnly, adLockOptimistic, adCmdText
                 
         End Select
     Else
         adodc1.ConnectionString = ConnContaFac 'BD de la Contabilidad facturas varias
-        miRsAux.Open "Select * from stipoformapago order by descformapago", ConnContaFac, adOpenForwardOnly, adLockOptimistic, adCmdText
+        miRsAux.Open "Select * from " & vTabla2 & " order by descformapago", ConnContaFac, adOpenForwardOnly, adLockOptimistic, adCmdText
     End If
     
     

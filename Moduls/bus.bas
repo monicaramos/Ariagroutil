@@ -1029,7 +1029,7 @@ Public Sub MuestraError(numero As Long, Optional Cadena As String, Optional Desc
     MsgBox Cad, vbExclamation
 End Sub
 
-Public Function DBSet(vData As Variant, tipo As String, Optional EsNulo As String) As Variant
+Public Function DBSet(vData As Variant, Tipo As String, Optional EsNulo As String) As Variant
 'Establece el valor del dato correcto antes de Insertar en la BD
 Dim Cad As String
 
@@ -1038,8 +1038,8 @@ Dim Cad As String
             Exit Function
         End If
 
-        If tipo <> "" Then
-            Select Case tipo
+        If Tipo <> "" Then
+            Select Case Tipo
                 Case "T"    'Texto
                     If vData = "" Then
                         If EsNulo = "N" Then
@@ -1121,12 +1121,12 @@ End Function
 
 
 
-Public Function DBLet(vData As Variant, Optional tipo As String) As Variant
+Public Function DBLet(vData As Variant, Optional Tipo As String) As Variant
 'Para cuando recupera Datos de la BD
     If IsNull(vData) Then
         DBLet = ""
-        If tipo <> "" Then
-            Select Case tipo
+        If Tipo <> "" Then
+            Select Case Tipo
                 Case "T"    'Texto
                     DBLet = ""
                 Case "N"    'Numero
@@ -1263,7 +1263,7 @@ Dim Aux As String
 End Function
 
 
-Public Function DevuelveDesdeBD(kCampo As String, Ktabla As String, Kcodigo As String, ValorCodigo As String, Optional tipo As String, Optional ByRef otroCampo As String) As String
+Public Function DevuelveDesdeBD(kCampo As String, Ktabla As String, Kcodigo As String, ValorCodigo As String, Optional Tipo As String, Optional ByRef OtroCampo As String) As String
     Dim Rs As Recordset
     Dim Cad As String
     Dim Aux As String
@@ -1271,18 +1271,18 @@ Public Function DevuelveDesdeBD(kCampo As String, Ktabla As String, Kcodigo As S
     On Error GoTo EDevuelveDesdeBD
     DevuelveDesdeBD = ""
     Cad = "Select " & kCampo
-    If otroCampo <> "" Then Cad = Cad & ", " & otroCampo
+    If OtroCampo <> "" Then Cad = Cad & ", " & OtroCampo
     Cad = Cad & " FROM " & Ktabla
     Cad = Cad & " WHERE " & Kcodigo & " = "
-    If tipo = "" Then tipo = "N"
-    Select Case tipo
+    If Tipo = "" Then Tipo = "N"
+    Select Case Tipo
     Case "N"
         'No hacemos nada
         Cad = Cad & ValorCodigo
     Case "T", "F"
         Cad = Cad & "'" & ValorCodigo & "'"
     Case Else
-        MsgBox "Tipo : " & tipo & " no definido", vbExclamation
+        MsgBox "Tipo : " & Tipo & " no definido", vbExclamation
         Exit Function
     End Select
     
@@ -1293,7 +1293,7 @@ Public Function DevuelveDesdeBD(kCampo As String, Ktabla As String, Kcodigo As S
     Rs.Open Cad, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
     If Not Rs.EOF Then
         DevuelveDesdeBD = DBLet(Rs.Fields(0))
-        If otroCampo <> "" Then otroCampo = DBLet(Rs.Fields(1))
+        If OtroCampo <> "" Then OtroCampo = DBLet(Rs.Fields(1))
     End If
     Rs.Close
     Set Rs = Nothing
@@ -1392,7 +1392,7 @@ End Function
 'LAURA
 'Este metodo sustituye a DevuelveDesdeBD
 'Funciona para claves primarias formadas por 3 campos
-Public Function DevuelveDesdeBDNew(vBD As Byte, Ktabla As String, kCampo As String, Kcodigo1 As String, valorCodigo1 As String, Optional tipo1 As String, Optional ByRef otroCampo As String, Optional KCodigo2 As String, Optional ValorCodigo2 As String, Optional tipo2 As String, Optional KCodigo3 As String, Optional ValorCodigo3 As String, Optional tipo3 As String) As String
+Public Function DevuelveDesdeBDNew(vBD As Byte, Ktabla As String, kCampo As String, Kcodigo1 As String, valorCodigo1 As String, Optional tipo1 As String, Optional ByRef OtroCampo As String, Optional KCodigo2 As String, Optional ValorCodigo2 As String, Optional tipo2 As String, Optional KCodigo3 As String, Optional ValorCodigo3 As String, Optional tipo3 As String) As String
 'IN: vBD --> Base de Datos a la que se accede
 Dim Rs As Recordset
 Dim Cad As String
@@ -1402,7 +1402,7 @@ On Error GoTo EDevuelveDesdeBDnew
     DevuelveDesdeBDNew = ""
 '    If valorCodigo1 = "" And ValorCodigo2 = "" Then Exit Function
     Cad = "Select " & kCampo
-    If otroCampo <> "" Then Cad = Cad & ", " & otroCampo
+    If OtroCampo <> "" Then Cad = Cad & ", " & OtroCampo
     Cad = Cad & " FROM " & Ktabla
     If Kcodigo1 <> "" Then
         Cad = Cad & " WHERE " & Kcodigo1 & " = "
@@ -1490,7 +1490,7 @@ On Error GoTo EDevuelveDesdeBDnew
     
     If Not Rs.EOF Then
         DevuelveDesdeBDNew = DBLet(Rs.Fields(0))
-        If otroCampo <> "" Then otroCampo = DBLet(Rs.Fields(1))
+        If OtroCampo <> "" Then OtroCampo = DBLet(Rs.Fields(1))
     End If
     Rs.Close
     Set Rs = Nothing
@@ -1504,7 +1504,7 @@ End Function
 'LAURA
 'Este metodo sustituye a DevuelveDesdeBD
 'Funciona para claves primarias formadas por 3 campos
-Public Function DevuelveDesdeBDNewFac(Ktabla As String, kCampo As String, Kcodigo1 As String, valorCodigo1 As String, Optional tipo1 As String, Optional ByRef otroCampo As String, Optional KCodigo2 As String, Optional ValorCodigo2 As String, Optional tipo2 As String, Optional KCodigo3 As String, Optional ValorCodigo3 As String, Optional tipo3 As String) As String
+Public Function DevuelveDesdeBDNewFac(Ktabla As String, kCampo As String, Kcodigo1 As String, valorCodigo1 As String, Optional tipo1 As String, Optional ByRef OtroCampo As String, Optional KCodigo2 As String, Optional ValorCodigo2 As String, Optional tipo2 As String, Optional KCodigo3 As String, Optional ValorCodigo3 As String, Optional tipo3 As String) As String
 'IN: vBD --> Base de Datos a la que se accede
 Dim Rs As Recordset
 Dim Cad As String
@@ -1514,7 +1514,7 @@ On Error GoTo EDevuelveDesdeBDnewFac
     DevuelveDesdeBDNewFac = ""
 '    If valorCodigo1 = "" And ValorCodigo2 = "" Then Exit Function
     Cad = "Select " & kCampo
-    If otroCampo <> "" Then Cad = Cad & ", " & otroCampo
+    If OtroCampo <> "" Then Cad = Cad & ", " & OtroCampo
     Cad = Cad & " FROM " & Ktabla
     If Kcodigo1 <> "" Then
         Cad = Cad & " WHERE " & Kcodigo1 & " = "
@@ -1583,7 +1583,7 @@ On Error GoTo EDevuelveDesdeBDnewFac
     
     If Not Rs.EOF Then
         DevuelveDesdeBDNewFac = DBLet(Rs.Fields(0))
-        If otroCampo <> "" Then otroCampo = DBLet(Rs.Fields(1))
+        If OtroCampo <> "" Then OtroCampo = DBLet(Rs.Fields(1))
     End If
     Rs.Close
     Set Rs = Nothing
@@ -1597,7 +1597,7 @@ End Function
 
 
 'CESAR
-Public Function DevuelveDesdeBDnew2(kBD As Integer, kCampo As String, Ktabla As String, Kcodigo As String, ValorCodigo As String, Optional tipo As String, Optional num As Byte, Optional ByRef otroCampo As String) As String
+Public Function DevuelveDesdeBDnew2(kBD As Integer, kCampo As String, Ktabla As String, Kcodigo As String, ValorCodigo As String, Optional Tipo As String, Optional num As Byte, Optional ByRef OtroCampo As String) As String
 Dim Rs As Recordset
 Dim Cad As String
 Dim Aux As String
@@ -1610,7 +1610,7 @@ On Error GoTo EDevuelveDesdeBDnew2
 DevuelveDesdeBDnew2 = ""
 
 Cad = "Select " & kCampo
-If otroCampo <> "" Then Cad = Cad & ", " & otroCampo
+If OtroCampo <> "" Then Cad = Cad & ", " & OtroCampo
 Cad = Cad & " FROM " & Ktabla
 
 If Kcodigo <> "" Then Cad = Cad & " where "
@@ -1618,10 +1618,10 @@ If Kcodigo <> "" Then Cad = Cad & " where "
 For v_aux = 1 To num
     campo = RecuperaValor(Kcodigo, v_aux)
     Valor = RecuperaValor(ValorCodigo, v_aux)
-    tip = RecuperaValor(tipo, v_aux)
+    tip = RecuperaValor(Tipo, v_aux)
         
     Cad = Cad & campo & "="
-    If tip = "" Then tipo = "N"
+    If tip = "" Then Tipo = "N"
     
     Select Case tip
             Case "N"
@@ -1646,9 +1646,9 @@ End Select
 
 If Not Rs.EOF Then
     DevuelveDesdeBDnew2 = DBLet(Rs.Fields(0))
-    If otroCampo <> "" Then otroCampo = DBLet(Rs.Fields(1))
+    If OtroCampo <> "" Then OtroCampo = DBLet(Rs.Fields(1))
 Else
-     If otroCampo <> "" Then otroCampo = ""
+     If OtroCampo <> "" Then OtroCampo = ""
 End If
 Rs.Close
 Set Rs = Nothing
@@ -1843,7 +1843,7 @@ Public Function UsuariosConectados() As Boolean
 Dim i As Integer
 Dim Cad As String
 Dim metag As String
-Dim SQL As String
+Dim Sql As String
 Cad = OtrosPCsContraAplicacion
 UsuariosConectados = False
 If Cad <> "" Then
@@ -1851,12 +1851,12 @@ If Cad <> "" Then
     i = 1
     metag = "Los siguientes PC's están conectados a: " & vEmpresa.nomEmpre & " (" & vSesion.CadenaConexion & ")" & vbCrLf & vbCrLf
     Do
-        SQL = RecuperaValor(Cad, i)
-        If SQL <> "" Then
-            metag = metag & "    - " & SQL & vbCrLf
+        Sql = RecuperaValor(Cad, i)
+        If Sql <> "" Then
+            metag = metag & "    - " & Sql & vbCrLf
             i = i + 1
         End If
-    Loop Until SQL = ""
+    Loop Until Sql = ""
     MsgBox metag, vbExclamation
 End If
 End Function
@@ -1883,5 +1883,17 @@ EPrepararCarpetasEnvioMail:
     MuestraError Err.Number, "", "Preparar Carpetas temporal para envio eMail. Borrando tmp "
 End Function
 
+
+
+Public Function ejecutar(ByRef Sql As String, OcultarMsg As Boolean) As Boolean
+    On Error Resume Next
+    conn.Execute Sql
+    If Err.Number <> 0 Then
+        If Not OcultarMsg Then MuestraError Err.Number, Err.Description, Sql
+        ejecutar = False
+    Else
+        ejecutar = True
+    End If
+End Function
 
 

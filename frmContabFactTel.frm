@@ -551,6 +551,8 @@ Dim Orden1 As String 'Campo de Ordenacion (por codigo) para Cristal Report
 Dim Orden2 As String 'Campo de Ordenacion (por nombre) para Cristal Report
 
 Dim PrimeraVez As Boolean
+Dim cContaFra As cContabilizarFacturas
+
 
 Private Sub KEYpress(KeyAscii As Integer)
     If KeyAscii = 13 Then 'ENTER
@@ -566,8 +568,8 @@ Dim nDesde As String, nHasta As String 'cadena Descripcion Desde/Hasta
 Dim cadTABLA As String, cOrden As String
 Dim cadMen As String
 Dim i As Byte
-Dim SQL As String
-Dim tipo As Byte
+Dim Sql As String
+Dim Tipo As Byte
 Dim Nregs As Long
 Dim NumError As Long
 
@@ -989,16 +991,16 @@ End Function
 ' copiado del ariges
 Private Sub ContabilizarFacturas(cadTABLA As String, cadwhere As String)
 'Contabiliza Facturas de Clientes o de Proveedores
-Dim SQL As String
+Dim Sql As String
 Dim b As Boolean
 Dim tmpErrores As Boolean 'Indica si se creo correctamente la tabla de errores
 Dim CCoste As String
 
-    SQL = "TELCON" 'contabilizar facturas de venta
+    Sql = "TELCON" 'contabilizar facturas de venta
 
     'Bloquear para que nadie mas pueda contabilizar
-    DesBloqueoManual (SQL)
-    If Not BloqueoManual(SQL, "1") Then
+    DesBloqueoManual (Sql)
+    If Not BloqueoManual(Sql, "1") Then
         MsgBox "No se pueden Contabilizar Facturas. Hay otro usuario contabilizando.", vbExclamation
         Screen.MousePointer = vbDefault
         Exit Sub
@@ -1027,10 +1029,10 @@ Dim CCoste As String
     'comprobar si existen en Ariagroutil (telefonia) facturas anteriores al periodo solicitado
     'sin contabilizar
     If Me.txtCodigo(2).Text <> "" Then
-        SQL = "SELECT COUNT(*) FROM " & cadTABLA
-        SQL = SQL & " WHERE fecfactu <"
-        SQL = SQL & DBSet(txtCodigo(2), "F") & " AND intconta=0 "
-        If RegistrosAListar(SQL) > 0 Then
+        Sql = "SELECT COUNT(*) FROM " & cadTABLA
+        Sql = Sql & " WHERE fecfactu <"
+        Sql = Sql & DBSet(txtCodigo(2), "F") & " AND intconta=0 "
+        If RegistrosAListar(Sql) > 0 Then
             MsgBox "Hay Facturas anteriores sin contabilizar.", vbExclamation
             Exit Sub
         End If
@@ -1074,8 +1076,8 @@ Dim CCoste As String
     'que ya existan
     '-----------------------------------------------------------------------
     Me.lblProgres(1).Caption = "Comprobando Nº Facturas en contabilidad ..."
-    SQL = "anofaccl>=" & Year(txtCodigo(2).Text) & " AND anofaccl<= " & Year(txtCodigo(3).Text)
-    b = ComprobarNumFacturas(cContaTel, SQL)
+    Sql = "anofaccl>=" & Year(txtCodigo(2).Text) & " AND anofaccl<= " & Year(txtCodigo(3).Text)
+    b = ComprobarNumFacturas(cContaTel, Sql)
     IncrementarProgres Me.Pb1, 30
     Me.Refresh
     If Not b Then
@@ -1131,7 +1133,7 @@ End Sub
 
 
 Private Function PasarFacturasAContab(cadTABLA As String, FecVenci As String, Banpr As String, CCoste As String) As Boolean
-Dim SQL As String
+Dim Sql As String
 Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
@@ -1143,15 +1145,15 @@ Dim codigo1 As String
     PasarFacturasAContab = False
     
     'Total de Facturas a Insertar en la contabilidad
-    SQL = "SELECT count(*) "
-    SQL = SQL & " FROM " & cadTABLA & " INNER JOIN tmpfactu "
+    Sql = "SELECT count(*) "
+    Sql = Sql & " FROM " & cadTABLA & " INNER JOIN tmpfactu "
     codigo1 = "numserie"
-    SQL = SQL & " ON " & cadTABLA & "." & codigo1 & "=tmpfactu." & codigo1
-    SQL = SQL & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
+    Sql = Sql & " ON " & cadTABLA & "." & codigo1 & "=tmpfactu." & codigo1
+    Sql = Sql & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
     
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         numfactu = Rs.Fields(0)
     Else
@@ -1161,21 +1163,32 @@ Dim codigo1 As String
     Set Rs = Nothing
 
     If numfactu > 0 Then
+        Set cContaFra = New cContabilizarFacturas
+        
+        If Not cContaFra.EstablecerValoresInciales(ConnContaTel) Then
+            'NO ha establcedio los valores de la conta.  Le dejaremos seguir, avisando que
+            ' obviamente, no va a contabilizar las FRAS
+            Sql = "Si continua, las facturas se insertaran en el registro, pero no serán contabilizadas" & vbCrLf
+            Sql = Sql & "en este momento. Deberán ser contabilizadas desde el ARICONTA" & vbCrLf & vbCrLf
+            Sql = Sql & Space(50) & "¿Continuar?"
+            If MsgBox(Sql, vbQuestion + vbYesNoCancel) <> vbYes Then Exit Function
+        End If
+    
         CargarProgres Me.Pb1, numfactu
         
-        SQL = "SELECT * "
-        SQL = SQL & " FROM tmpfactu "
+        Sql = "SELECT * "
+        Sql = Sql & " FROM tmpfactu "
             
         Set Rs = New ADODB.Recordset
-        Rs.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
+        Rs.Open Sql, conn, adOpenStatic, adLockPessimistic, adCmdText
         i = 1
 
         b = True
         'contabilizar cada una de las facturas seleccionadas
         While Not Rs.EOF
-            SQL = cadTABLA & "." & codigo1 & "=" & DBSet(Rs.Fields(0), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
-            SQL = SQL & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
-            If PasarFactura(SQL, FecVenci, txtCodigo(8).Text, txtCodigo(6).Text, txtCodigo(9).Text, txtCodigo(10), CCoste) = False And b Then b = False
+            Sql = cadTABLA & "." & codigo1 & "=" & DBSet(Rs.Fields(0), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
+            Sql = Sql & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
+            If PasarFactura(Sql, FecVenci, txtCodigo(8).Text, txtCodigo(6).Text, txtCodigo(9).Text, txtCodigo(10), CCoste, cContaFra) = False And b Then b = False
             
             IncrementarProgres Me.Pb1, 1
             Me.lblProgres(1).Caption = "Insertando Facturas en Contabilidad...   (" & i & " de " & numfactu & ")"
@@ -1200,7 +1213,7 @@ End Function
 
 Public Function HayFacturasIncorrectas(cTabla As String, cWhere As String) As Boolean
 'Comprobar si hay registros a Mostrar antes de abrir el Informe
-Dim SQL As String
+Dim Sql As String
 Dim Rs As ADODB.Recordset
 Dim PorIva As Currency
 
@@ -1219,25 +1232,25 @@ Dim cad1 As String
     HayFacturasIncorrectas = True
     
     PorIva = 0
-    SQL = DevuelveDesdeBDNew(cContaTel, "tiposiva", "porceiva", "codigiva", txtCodigo(10).Text, "N")
-    If SQL <> "" Then PorIva = CCur(SQL)
+    Sql = DevuelveDesdeBDNew(cContaTel, "tiposiva", "porceiva", "codigiva", txtCodigo(10).Text, "N")
+    If Sql <> "" Then PorIva = CCur(Sql)
 
     If cWhere <> "" Then
         cWhere = QuitarCaracterACadena(cWhere, "{")
         cWhere = QuitarCaracterACadena(cWhere, "}")
         cWhere = QuitarCaracterACadena(cWhere, "_1")
-        SQL = SQL & " WHERE " & cWhere
+        Sql = Sql & " WHERE " & cWhere
     End If
     
-    SQL = " SELECT numserie,numfactu,fecfactu,codmacta, year(fecfactu) as anofaccl,"
-    SQL = SQL & "baseimpo,cuotaiva,totalfac "
-    SQL = SQL & " FROM telmovil "
-    SQL = SQL & " WHERE " & cWhere
-    SQL = SQL & " order by numserie, numfactu, fecfactu"
+    Sql = " SELECT numserie,numfactu,fecfactu,codmacta, year(fecfactu) as anofaccl,"
+    Sql = Sql & "baseimpo,cuotaiva,totalfac "
+    Sql = Sql & " FROM telmovil "
+    Sql = Sql & " WHERE " & cWhere
+    Sql = Sql & " order by numserie, numfactu, fecfactu"
     
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     
     Cad = ""
     

@@ -156,6 +156,8 @@ Dim PrimeraVez As Boolean
 
 Dim BdConta As Integer
 
+Dim cContaFra As cContabilizarFacturas
+
 Private Sub KEYpress(KeyAscii As Integer)
     If KeyAscii = 13 Then 'ENTER
         KeyAscii = 0
@@ -170,8 +172,8 @@ Dim nDesde As String, nHasta As String 'cadena Descripcion Desde/Hasta
 Dim cadTABLA As String, cOrden As String
 Dim cadMen As String
 Dim i As Byte
-Dim SQL As String
-Dim tipo As Byte
+Dim Sql As String
+Dim Tipo As Byte
 Dim Nregs As Long
 Dim NumError As Long
     InicializarVbles
@@ -436,16 +438,16 @@ End Function
 ' copiado del ariges
 Private Sub ContabilizarFacturas(cadTABLA As String, cadwhere As String)
 'Contabiliza Facturas de Clientes o de Proveedores
-Dim SQL As String
+Dim Sql As String
 Dim b As Boolean
 Dim tmpErrores As Boolean 'Indica si se creo correctamente la tabla de errores
 Dim CCoste As String
 
-    SQL = "GASCON" 'contabilizar facturas de venta
+    Sql = "GASCON" 'contabilizar facturas de venta
 
     'Bloquear para que nadie mas pueda contabilizar
-    DesBloqueoManual (SQL)
-    If Not BloqueoManual(SQL, "1") Then
+    DesBloqueoManual (Sql)
+    If Not BloqueoManual(Sql, "1") Then
         MsgBox "No se pueden Contabilizar Facturas de Gasolinera. Hay otro usuario contabilizando.", vbExclamation
         Screen.MousePointer = vbDefault
         Exit Sub
@@ -481,10 +483,10 @@ Dim CCoste As String
     'comprobar si existen en Ariagroutil facturas anteriores al periodo solicitado
     'sin contabilizar
     If Me.txtCodigo(7).Text <> "" Then
-        SQL = "SELECT COUNT(*) FROM " & cadTABLA
-        SQL = SQL & " WHERE fecfactu <"
-        SQL = SQL & DBSet(txtCodigo(7), "F") & " AND intconta=0 "
-        If RegistrosAListar(SQL) > 0 Then
+        Sql = "SELECT COUNT(*) FROM " & cadTABLA
+        Sql = Sql & " WHERE fecfactu <"
+        Sql = Sql & DBSet(txtCodigo(7), "F") & " AND intconta=0 "
+        If RegistrosAListar(Sql) > 0 Then
             MsgBox "Hay Facturas anteriores sin contabilizar.", vbExclamation
             Exit Sub
         End If
@@ -530,11 +532,11 @@ Dim CCoste As String
     '-----------------------------------------------------------------------
     Me.lblProgres(1).Caption = "Comprobando Nº Facturas en contabilidad ..."
     If vParamAplic.ContabilidadNueva Then
-        SQL = "anofactu>=" & Year(txtCodigo(7).Text) & " AND anofactu<= " & Year(txtCodigo(7).Text)
-        b = ComprobarNumFacturasContaNueva(cContaGas, SQL)
+        Sql = "anofactu>=" & Year(txtCodigo(7).Text) & " AND anofactu<= " & Year(txtCodigo(7).Text)
+        b = ComprobarNumFacturasContaNueva(cContaGas, Sql)
     Else
-        SQL = "anofaccl>=" & Year(txtCodigo(7).Text) & " AND anofaccl<= " & Year(txtCodigo(7).Text)
-        b = ComprobarNumFacturas(cContaGas, SQL)
+        Sql = "anofaccl>=" & Year(txtCodigo(7).Text) & " AND anofaccl<= " & Year(txtCodigo(7).Text)
+        b = ComprobarNumFacturas(cContaGas, Sql)
     End If
     IncrementarProgres Me.Pb1, 20
     Me.Refresh
@@ -646,14 +648,14 @@ End Sub
 
 
 Private Function PasarFacturasAContab(cadTABLA As String, CCoste As String) As Boolean
-Dim SQL As String
+Dim Sql As String
 Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
 Dim numfactu As Integer
 Dim codigo1 As String
 Dim Mc As CContadorContab
-Dim NumLinea As Currency
+Dim numlinea As Currency
 Dim Obs As String
 Dim cadMen As String
 Dim TotalFacturas As Currency
@@ -670,15 +672,15 @@ Dim ampliacionh As String
     conn.BeginTrans
      
     'Total de Facturas a Insertar en la contabilidad
-    SQL = "SELECT count(*) "
-    SQL = SQL & " FROM " & cadTABLA & " INNER JOIN tmpfactu "
+    Sql = "SELECT count(*) "
+    Sql = Sql & " FROM " & cadTABLA & " INNER JOIN tmpfactu "
     codigo1 = "letraser"
-    SQL = SQL & " ON " & cadTABLA & "." & codigo1 & "=tmpfactu.numserie"
-    SQL = SQL & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
+    Sql = Sql & " ON " & cadTABLA & "." & codigo1 & "=tmpfactu.numserie"
+    Sql = Sql & " AND " & cadTABLA & ".numfactu=tmpfactu.numfactu AND " & cadTABLA & ".fecfactu=tmpfactu.fecfactu "
     
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         numfactu = Rs.Fields(0)
     Else
@@ -690,11 +692,11 @@ Dim ampliacionh As String
     If numfactu > 0 Then
      CargarProgresNew Me.Pb1, numfactu
         
-     SQL = "SELECT * "
-     SQL = SQL & " FROM tmpfactu "
+     Sql = "SELECT * "
+     Sql = Sql & " FROM tmpfactu "
             
      Set Rs = New ADODB.Recordset
-     Rs.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
+     Rs.Open Sql, conn, adOpenStatic, adLockPessimistic, adCmdText
      i = 1
         
      Set Mc = New CContadorContab
@@ -709,18 +711,34 @@ Dim ampliacionh As String
         b = InsertarCabAsientoDia(vParamAplic.NumDiarioGas, Mc.Contador, txtCodigo(7).Text, Obs, cadMen, cContaGas)
         cadMen = "Insertando Cab. Asiento: " & cadMen
 
+
+        Set cContaFra = New cContabilizarFacturas
+        
+        If Not cContaFra.EstablecerValoresInciales(ConnContaGas) Then
+            'NO ha establcedio los valores de la conta.  Le dejaremos seguir, avisando que
+            ' obviamente, no va a contabilizar las FRAS
+            Sql = "Si continua, las facturas se insertaran en el registro, pero no serán contabilizadas" & vbCrLf
+            Sql = Sql & "en este momento. Deberán ser contabilizadas desde el ARICONTA" & vbCrLf & vbCrLf
+            Sql = Sql & Space(50) & "¿Continuar?"
+            If MsgBox(Sql, vbQuestion + vbYesNoCancel) <> vbYes Then Exit Function
+        End If
+        
+
+
+
+
         If b Then
-            NumLinea = 0
+            numlinea = 0
             TotalFacturas = 0
             
             'contabilizar cada una de las facturas seleccionadas
             While Not Rs.EOF And b
-                SQL = cadTABLA & "." & codigo1 & "=" & DBSet(Trim(Rs.Fields(0)), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
-                SQL = SQL & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
+                Sql = cadTABLA & "." & codigo1 & "=" & DBSet(Trim(Rs.Fields(0)), "T") & " and numfactu=" & DBLet(Rs!numfactu, "N")
+                Sql = Sql & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
                 
-                NumLinea = NumLinea + 1
+                numlinea = numlinea + 1
                 
-                b = PasarFacturaGas(SQL, Rs!fecfactu, CStr(Mc.Contador), CStr(NumLinea), CCoste, TotalFacturas)
+                b = PasarFacturaGas(Sql, Rs!fecfactu, CStr(Mc.Contador), CStr(numlinea), CCoste, TotalFacturas, cContaFra)
                 
                 IncrementarProgresNew Me.Pb1, 1
                 Me.lblProgres(1).Caption = "Insertando Facturas en Contabilidad...   (" & i & " de " & numfactu & ")"
@@ -737,11 +755,11 @@ Dim ampliacionh As String
             ampliaciond = Trim(DevuelveDesdeBDNew(cContaGas, "conceptos", "nomconce", "codconce", vParamAplic.ConceDebeGas, "N")) & " " & ampliacion
             ampliacionh = Trim(DevuelveDesdeBDNew(cContaGas, "conceptos", "nomconce", "codconce", vParamAplic.ConceHaberGas, "N")) & " " & ampliacion
             
-            NumLinea = NumLinea + 1
+            numlinea = numlinea + 1
             
             Cad = vParamAplic.NumDiarioGas & "," & DBSet(txtCodigo(7).Text, "F") & "," & DBSet(Mc.Contador, "N") & ","
                                                                                             '++monica:05/11/2008 antes valor nulo en el numero de documento
-            Cad = Cad & DBSet(NumLinea, "N") & "," & DBSet(vParamAplic.CtaContraGas, "T") & ",'" & Format(txtCodigo(7).Text, "ddmmyyyy") & "',"
+            Cad = Cad & DBSet(numlinea, "N") & "," & DBSet(vParamAplic.CtaContraGas, "T") & ",'" & Format(txtCodigo(7).Text, "ddmmyyyy") & "',"
             
             ' COMPROBAMOS EL SIGNO DEL IMPORTE PQ NO PERMITIMOS INTRODUCIR APUNTES CON IMPORTES NEGATIVOS
             If TotalFacturas < 0 Then
@@ -757,7 +775,7 @@ Dim ampliacionh As String
             Cad = "(" & Cad & ")"
             
             b = InsertarLinAsientoDia(Cad, cadMen, cContaGas)
-            cadMen = "Insertando Lin. Asiento: " & NumLinea
+            cadMen = "Insertando Lin. Asiento: " & numlinea
         End If
         
      End If

@@ -501,6 +501,8 @@ Dim TipCod As String
 
 Dim PrimeraVez As Boolean
 
+Dim cContaFra As cContabilizarFacturas
+
 Private Sub KEYpress(KeyAscii As Integer)
     If KeyAscii = 13 Then 'ENTER
         KeyAscii = 0
@@ -510,7 +512,7 @@ Private Sub KEYpress(KeyAscii As Integer)
 End Sub
 
 Private Sub cmdAceptar_Click()
-Dim SQL As String
+Dim Sql As String
 Dim i As Byte
 Dim cadwhere As String
 Dim cDesde As String
@@ -848,17 +850,17 @@ End Sub
 
 Private Sub ContabilizarIntereses(cadwhere As String)
 'Contabiliza Facturas de Clientes o de Proveedores
-Dim SQL As String
+Dim Sql As String
 Dim b As Boolean
 Dim tmpErrores As Boolean 'Indica si se creo correctamente la tabla de errores
 Dim CCoste As String
 Dim cadTABLA As String
 
-    SQL = "CONINT" 'contabilizar CALCULO DE INTERESES
+    Sql = "CONINT" 'contabilizar CALCULO DE INTERESES
 
     'Bloquear para que nadie mas pueda contabilizar
-    DesBloqueoManual (SQL)
-    If Not BloqueoManual(SQL, "1") Then
+    DesBloqueoManual (Sql)
+    If Not BloqueoManual(Sql, "1") Then
         MsgBox "No se pueden Contabilizar Cálculo de Intereses. Hay otro usuario contabilizándolo.", vbExclamation
         Screen.MousePointer = vbDefault
         Exit Sub
@@ -955,7 +957,7 @@ Dim b As Boolean
 Dim Orden1 As String
 Dim Orden2 As String
 Dim FFin As Date
-Dim Cta As String
+Dim cta As String
 
    b = True
 
@@ -1000,9 +1002,9 @@ Dim Cta As String
              b = False
              PonerFoco txtCodigo(4)
         Else
-             Cta = ""
-             Cta = DevuelveDesdeBDNew(cContaFacSoc, "cuentas", "codmacta", "codmacta", txtCodigo(4).Text, "T")
-             If Cta = "" Then
+             cta = ""
+             cta = DevuelveDesdeBDNew(cContaFacSoc, "cuentas", "codmacta", "codmacta", txtCodigo(4).Text, "T")
+             If cta = "" Then
                  MsgBox "La cuenta contable de Banco no existe. Reintroduzca.", vbExclamation
                  b = False
                  PonerFoco txtCodigo(4)
@@ -1014,11 +1016,11 @@ Dim Cta As String
 End Function
 
 Private Function PasarCalculoAContab(cadwhere As String) As Boolean
-Dim SQL As String
+Dim Sql As String
 Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
-Dim NumLinea As Integer
+Dim numlinea As Integer
 Dim Mc As CContadorContab
 Dim numdocum As String
 Dim ampliacion As String
@@ -1038,20 +1040,20 @@ Dim Codmacta As String
     PasarCalculoAContab = False
     
     'Total de lineas de asiento a Insertar en la contabilidad
-    SQL = "SELECT count(*)" & _
+    Sql = "SELECT count(*)" & _
           " FROM movim " & _
           "WHERE " & cadwhere
              
-    NumLinea = TotalRegistros(SQL)
+    numlinea = TotalRegistros(Sql)
     
-    If NumLinea = 0 Then Exit Function
+    If numlinea = 0 Then Exit Function
     
-    NumLinea = NumLinea * 3
+    numlinea = numlinea * 3
     
-    If NumLinea > 0 Then
-        NumLinea = NumLinea + 1
+    If numlinea > 0 Then
+        numlinea = numlinea + 1
         
-        CargarProgres Me.Pb1, NumLinea
+        CargarProgres Me.Pb1, numlinea
         
         ConnConta.BeginTrans
         conn.BeginTrans
@@ -1068,13 +1070,13 @@ Dim Codmacta As String
         cadMen = "Insertando Cab. Asiento: " & cadMen
         
         If b Then
-            SQL = "SELECT codavnic, timporte, timport1, timport2 " & _
+            Sql = "SELECT codavnic, timporte, timport1, timport2 " & _
                   " FROM movim " & _
                   " WHERE " & cadwhere
             
             Set Rs = New ADODB.Recordset
             
-            Rs.Open SQL, conn, adOpenDynamic, adLockOptimistic, adCmdText
+            Rs.Open Sql, conn, adOpenDynamic, adLockOptimistic, adCmdText
             
             i = 0
             ImporteD = 0
@@ -1118,7 +1120,7 @@ Dim Codmacta As String
                 cadMen = "Insertando Lin. Asiento: " & i
             
                 IncrementarProgres Me.Pb1, 1
-                Me.lblProgres(1).Caption = "Insertando línea de Asiento en Contabilidad...   (" & i & " de " & NumLinea & ")"
+                Me.lblProgres(1).Caption = "Insertando línea de Asiento en Contabilidad...   (" & i & " de " & numlinea & ")"
                 Me.Refresh
                 
                 ' ******************RETENCION
@@ -1148,7 +1150,7 @@ Dim Codmacta As String
                 cadMen = "Insertando Lin. Asiento: " & i
             
                 IncrementarProgres Me.Pb1, 1
-                Me.lblProgres(1).Caption = "Insertando línea de Asiento en Contabilidad...   (" & i & " de " & NumLinea & ")"
+                Me.lblProgres(1).Caption = "Insertando línea de Asiento en Contabilidad...   (" & i & " de " & numlinea & ")"
                 Me.Refresh
                 
                 ' ******************IMPORTE NETO
@@ -1182,7 +1184,7 @@ Dim Codmacta As String
                
             
                 IncrementarProgres Me.Pb1, 1
-                Me.lblProgres(1).Caption = "Insertando línea de Asiento en Contabilidad...   (" & i & " de " & NumLinea & ")"
+                Me.lblProgres(1).Caption = "Insertando línea de Asiento en Contabilidad...   (" & i & " de " & numlinea & ")"
                 Me.Refresh
                 
             
@@ -1219,16 +1221,16 @@ End Function
 ' copiado del ariges
 Private Sub ContabilizarFacturas(cadTABLA As String, cadwhere As String)
 'Contabiliza Facturas de Clientes o de Proveedores
-Dim SQL As String
+Dim Sql As String
 Dim b As Boolean
 Dim tmpErrores As Boolean 'Indica si se creo correctamente la tabla de errores
 Dim CCoste As String
 
-    SQL = "CONSOC" 'contabilizar facturas de socios
+    Sql = "CONSOC" 'contabilizar facturas de socios
 
     'Bloquear para que nadie mas pueda contabilizar
-    DesBloqueoManual (SQL)
-    If Not BloqueoManual(SQL, "1") Then
+    DesBloqueoManual (Sql)
+    If Not BloqueoManual(Sql, "1") Then
         MsgBox "No se pueden Contabilizar Facturas Socios. Hay otro usuario contabilizando.", vbExclamation
         Screen.MousePointer = vbDefault
         Exit Sub
@@ -1257,10 +1259,10 @@ Dim CCoste As String
     'comprobar si existen en Ariagroutil (facturas socios) facturas anteriores al periodo solicitado
     'sin contabilizar
     If Me.txtCodigo(6).Text <> "" Then
-        SQL = "SELECT COUNT(*) FROM " & cadTABLA
-        SQL = SQL & " WHERE fecfactu <"
-        SQL = SQL & DBSet(txtCodigo(5), "F") & " AND intconta=0 "
-        If RegistrosAListar(SQL) > 0 Then
+        Sql = "SELECT COUNT(*) FROM " & cadTABLA
+        Sql = Sql & " WHERE fecfactu <"
+        Sql = Sql & DBSet(txtCodigo(5), "F") & " AND intconta=0 "
+        If RegistrosAListar(Sql) > 0 Then
             MsgBox "Hay Facturas anteriores sin contabilizar.", vbExclamation
             Exit Sub
         End If
@@ -1405,7 +1407,7 @@ End Sub
 
 
 Private Function PasarFacturasAContab(cadTABLA As String, CCoste As String) As Boolean
-Dim SQL As String
+Dim Sql As String
 Dim Rs As ADODB.Recordset
 Dim b As Boolean
 Dim i As Integer
@@ -1417,13 +1419,13 @@ Dim codigo1 As String
     PasarFacturasAContab = False
 
     '---- Obtener el total de Facturas a Insertar en la contabilidad
-    SQL = "SELECT count(*) "
-    SQL = SQL & " FROM " & cadTABLA & " INNER JOIN tmpFactu "
-    SQL = SQL & " ON " & cadTABLA & ".codmacta = tmpFactu.codmacta "
-    SQL = SQL & " AND " & cadTABLA & ".numfactu=tmpFactu.numfactu AND " & cadTABLA & ".fecfactu=tmpFactu.fecfactu "
+    Sql = "SELECT count(*) "
+    Sql = Sql & " FROM " & cadTABLA & " INNER JOIN tmpFactu "
+    Sql = Sql & " ON " & cadTABLA & ".codmacta = tmpFactu.codmacta "
+    Sql = Sql & " AND " & cadTABLA & ".numfactu=tmpFactu.numfactu AND " & cadTABLA & ".fecfactu=tmpFactu.fecfactu "
 
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         numfactu = Rs.Fields(0)
     Else
@@ -1444,27 +1446,39 @@ Dim codigo1 As String
     If numfactu > 0 Then
         CargarProgres Me.Pb1, numfactu
 
+        Set cContaFra = New cContabilizarFacturas
+        
+        If Not cContaFra.EstablecerValoresInciales(ConnContaFacSoc) Then
+            'NO ha establcedio los valores de la conta.  Le dejaremos seguir, avisando que
+            ' obviamente, no va a contabilizar las FRAS
+            Sql = "Si continua, las facturas se insertaran en el registro, pero no serán contabilizadas" & vbCrLf
+            Sql = Sql & "en este momento. Deberán ser contabilizadas desde el ARICONTA" & vbCrLf & vbCrLf
+            Sql = Sql & Space(50) & "¿Continuar?"
+            If MsgBox(Sql, vbQuestion + vbYesNoCancel) <> vbYes Then Exit Function
+        End If
+        
+        
         'seleccinar todas las facturas que hemos insertado en la temporal (las que vamos a contabilizar)
-        SQL = "SELECT * "
-        SQL = SQL & " FROM tmpFactu "
+        Sql = "SELECT * "
+        Sql = Sql & " FROM tmpFactu "
 
         Set Rs = New ADODB.Recordset
-        Rs.Open SQL, conn, adOpenStatic, adLockPessimistic, adCmdText
+        Rs.Open Sql, conn, adOpenStatic, adLockPessimistic, adCmdText
         i = 1
 
         b = True
         'pasar a contabilidad cada una de las facturas seleccionadas
         While Not Rs.EOF
-            SQL = cadTABLA & ".codmacta= " & DBSet(Rs!Codmacta, "T") & " and numfactu=" & DBSet(Rs!numfactu, "N")
-            SQL = SQL & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
-            If PasarFacturaSoc(SQL, txtCodigo(1).Text, txtCodigo(4).Text, txtCodigo(3).Text) = False And b Then b = False
+            Sql = cadTABLA & ".codmacta= " & DBSet(Rs!Codmacta, "T") & " and numfactu=" & DBSet(Rs!numfactu, "N")
+            Sql = Sql & " and fecfactu=" & DBSet(Rs!fecfactu, "F")
+            If PasarFacturaSoc(Sql, txtCodigo(1).Text, txtCodigo(4).Text, txtCodigo(3).Text, cContaFra) = False And b Then b = False
 
             '---- Laura 26/10/2006
             'Al pasar cada factura al hacer el commit desbloqueamos los registros
             'que teniamos bloqueados y los volvemos a bloquear
             'Laura: 11/10/2006 bloquear los registros q vamos a contabilizar
-            SQL = cadTABLA & " INNER JOIN tmpFactu ON " & cadTABLA & ".codmacta=tmpFactu.codmacta AND " & cadTABLA & ".numfactu=tmpFactu.numfactu AND " & cadTABLA & ".fecfactu=tmpFactu.fecfactu "
-            If Not BloqueaRegistro(SQL, cadTABLA & ".codmacta=tmpFactu.codmacta AND " & cadTABLA & ".numfactu=tmpFactu.numfactu AND " & cadTABLA & ".fecfactu=tmpFactu.fecfactu") Then
+            Sql = cadTABLA & " INNER JOIN tmpFactu ON " & cadTABLA & ".codmacta=tmpFactu.codmacta AND " & cadTABLA & ".numfactu=tmpFactu.numfactu AND " & cadTABLA & ".fecfactu=tmpFactu.fecfactu "
+            If Not BloqueaRegistro(Sql, cadTABLA & ".codmacta=tmpFactu.codmacta AND " & cadTABLA & ".numfactu=tmpFactu.numfactu AND " & cadTABLA & ".fecfactu=tmpFactu.fecfactu") Then
 '                MsgBox "No se pueden Contabilizar Facturas. Hay registros bloqueados.", vbExclamation
 '                Screen.MousePointer = vbDefault
 '                Exit Sub

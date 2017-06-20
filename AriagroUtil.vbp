@@ -140,6 +140,7 @@ Form=frmCancelAvnic.frm
 Form=frmAyudaMod123.frm
 Module=ModFormularios; Moduls\ModFormularios.bas
 Form=frmIdentifica.frm
+Class=cContabilizarFacturas; Clases\cContabilizarFacturas.cls
 IconForm="MDIppal"
 Startup="Sub Main"
 HelpFile=""

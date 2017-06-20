@@ -1,11 +1,11 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Begin VB.MDIForm MDIppal 
    BackColor       =   &H8000000C&
    Caption         =   "AriagroUtil"
    ClientHeight    =   7860
    ClientLeft      =   225
-   ClientTop       =   1125
+   ClientTop       =   1170
    ClientWidth     =   11160
    Icon            =   "MDIppal.frx":0000
    LinkTopic       =   "MDIForm1"
@@ -447,7 +447,7 @@ Private Sub MDIForm_Activate()
 End Sub
 
 Private Sub MDIForm_Load()
-Dim cad As String
+Dim Cad As String
 Dim i As Integer
     PrimeraVez = True
     CargarImagen
@@ -456,7 +456,7 @@ Dim i As Integer
     If vEmpresa Is Nothing Then
         Caption = "ARIAGROUTIL" & " ver. " & App.Major & "." & App.Minor & "." & App.Revision & "   -  " & " FALTA CONFIGURAR"
     Else
-        Caption = "ARIAGROUTIL" & " ver. " & App.Major & "." & App.Minor & "." & App.Revision & "   -  Empresa: " & vEmpresa.nomEmpre & cad & _
+        Caption = "ARIAGROUTIL" & " ver. " & App.Major & "." & App.Minor & "." & App.Revision & "   -  Empresa: " & vEmpresa.nomEmpre & Cad & _
                   "   -  Usuario: " & vSesion.Nombre
     End If
 
@@ -549,7 +549,99 @@ Dim i As Integer
     
     BloqueoDeMenus
    
+   '[Monica]16/06/2017:
+    If vParamAplic.ContabilidadNueva And (vSesion.Nivel = 0 Or vSesion.Nivel = 1) Then FrasPendientesContabilizar
+   
 End Sub
+
+Public Sub FrasPendientesContabilizar()
+Dim SQL As String
+Dim sql2 As String
+Dim SqlBd As String
+Dim SqlInsert As String
+Dim RsBd As ADODB.Recordset
+Dim BBDD As String
+Dim BdConta As Integer
+
+Dim vSeccion As CSeccion
+Dim frmMens As frmMensaje
+
+    On Error GoTo eFrasPendientesContabilizar
+
+    
+    SQL = "delete from tmpinformes where codusu = " & vSesion.Codigo
+    conn.Execute SQL
+
+    SqlInsert = "insert into tmpinformes (codusu,nombre1,codigo1,nombre2,fecha1,importe1) "
+
+    If vParamAplic.FacturasVarias Then
+        sql2 = "select numconta from seccion "
+        BdConta = DevuelveValor(sql2)
+        If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, BdConta) Then
+            Set vEmpresaFac = New CempresaFac
+            If vEmpresaFac.LeerNiveles Then
+                SQL = " select " & vSesion.Codigo & ",'Facturas Varias' tipofact, 0, concat(cabfact.letraser,right(concat('0000000',numfactu),7)),fecfactu, totalfac  from cabfact where intconta = 0 "
+                If vEmpresaFac.TieneSII Then
+                    SQL = SQL & " and fecfactu >= " & DBSet(vEmpresaFac.SIIFechaInicio, "F") & " and fecfactu <= " & DBSet(DateAdd("d", -1, Now), "F")
+                End If
+                SQL = SQL & " union "
+            End If
+         End If
+    End If
+    
+    If vParamAplic.FactSocios Then
+        SQL = SQL & " select " & vSesion.Codigo & ",'Facturas Socios' tipofact, 1, right(concat('0000000',numfactu),7),fecfactu, totalfac  from factsocio where intconta = 0 "
+        If vEmpresaFacSoc.TieneSII Then
+            SQL = SQL & " and fecfactu >= " & DBSet(vEmpresaFacSoc.SIIFechaInicio, "F") & " and fecfactu <= " & DBSet(DateAdd("d", -1, Now), "F")
+        End If
+        SQL = SQL & " union "
+    End If
+    
+    If vParamAplic.Gasolinera Then
+        SQL = SQL & " select " & vSesion.Codigo & ",'Facturas Gasolinera' tipofact, 2, concat(gascabfac.letraser,right(concat('0000000',gascabfac.numfactu),7)),fecfactu, total  from gascabfac where intconta = 0 "
+        If vEmpresaGas.TieneSII Then
+            SQL = SQL & " and fecfactu >= " & DBSet(vEmpresaGas.SIIFechaInicio, "F") & " and fecfactu <= " & DBSet(DateAdd("d", -1, Now), "F")
+        End If
+        SQL = SQL & " union "
+    End If
+    
+    If vParamAplic.Telefonia Then
+        SQL = SQL & " select " & vSesion.Codigo & ",'Facturas Telefonia' tipofact, 3, concat(telmovil.numserie,right(concat('0000000',telmovil.numfactu),fecfactu, totalfac  from telmovil where intconta = 0 "
+        If vEmpresaTel.TieneSII Then
+            SQL = SQL & " and fecfactu >= " & DBSet(vEmpresaTel.SIIFechaInicio, "F") & " and fecfactu <= " & DBSet(DateAdd("d", -1, Now), "F")
+        End If
+        SQL = SQL & " union "
+    End If
+
+    If Trim(Mid(SQL, Len(SQL) - 7, 7)) = "union" Then SQL = Mid(SQL, 1, Len(SQL) - 7)
+
+
+    conn.Execute SqlInsert & SQL
+    
+    
+    SQL = "select codusu,nombre1,codigo1,nombre2,fecha1,importe1  from tmpinformes where codusu = " & vSesion.Codigo
+    
+    If TotalRegistros("select count(*) from (" & SQL & ") aaa") > 0 Then
+        Set frmMens = New frmMensaje
+
+        frmMens.OpcionMensaje = 12
+        frmMens.Cadena = SQL
+        frmMens.Show vbModal
+
+        Set frmMens = Nothing
+    End If
+
+        CerrarConexionConta
+        Exit Sub
+        
+    
+eFrasPendientesContabilizar:
+    MuestraError Err.Number, "Facturas Pendientes de Integrar a Contabilidad", Err.Description
+End Sub
+
+
+
+
 
 Private Sub MDIForm_Unload(Cancel As Integer)
     AccionesCerrar
@@ -738,11 +830,11 @@ End Sub
 ' ### [Monica] 05/09/2006
 Private Sub HabilitarSoloPrametros_o_Empresas(Habilitar As Boolean)
 Dim T As Control
-Dim cad As String
+Dim Cad As String
 
     On Error Resume Next
     For Each T In Me
-        cad = T.Name
+        Cad = T.Name
         If Mid(T.Name, 1, 2) = "mn" Then
             'If LCase(Mid(T.Name, 1, 8)) <> "mn_b" Then
                 T.Enabled = Habilitar
@@ -841,7 +933,7 @@ End Function
 
 Private Sub LanzaHome(Opcion As String)
     Dim i As Integer
-    Dim cad As String
+    Dim Cad As String
     On Error GoTo ELanzaHome
     
     'Obtenemos la pagina web de los parametros
@@ -852,16 +944,16 @@ Private Sub LanzaHome(Opcion As String)
     End If
         
     i = FreeFile
-    cad = ""
+    Cad = ""
     Open App.path & "\lanzaexp.dat" For Input As #i
-    Line Input #i, cad
+    Line Input #i, Cad
     Close #i
     
     'Lanzamos
-    If cad <> "" Then Shell cad & " " & CadenaDesdeOtroForm, vbMaximizedFocus
+    If Cad <> "" Then Shell Cad & " " & CadenaDesdeOtroForm, vbMaximizedFocus
     
 ELanzaHome:
-    If Err.Number <> 0 Then MuestraError Err.Number, cad & vbCrLf & Err.Description
+    If Err.Number <> 0 Then MuestraError Err.Number, Cad & vbCrLf & Err.Description
     CadenaDesdeOtroForm = ""
 End Sub
 

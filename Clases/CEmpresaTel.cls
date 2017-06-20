@@ -63,6 +63,9 @@ Private mvarDigitosNivelAnterior As Byte
 
 Private mvarNorma19_34Nueva As Byte
 
+Private mvarTieneSII As Boolean
+Private mvarSIIFechaInicio As Date
+Private mvarSIIDiasAviso As Byte
 
 '------------------------------------------------
 'Propiedades del modulo Cempresa
@@ -307,6 +310,19 @@ Public Property Get HayNorma19_34Nueva() As Byte
      HayNorma19_34Nueva = mvarNorma19_34Nueva
 End Property
 
+'[Monica]16/06/2017: fecha de inicio y dias de aviso del sii
+Public Property Get TieneSII() As Boolean
+     TieneSII = mvarTieneSII
+End Property
+
+Public Property Get SIIDiasAviso() As Byte
+     SIIDiasAviso = mvarSIIDiasAviso
+End Property
+
+Public Property Get SIIFechaInicio() As Date
+     SIIFechaInicio = mvarSIIFechaInicio
+End Property
+
 '------------------------------------------------
 'FUNCIONES del modulo Cempresa
 '------------------------------------------------
@@ -444,6 +460,9 @@ Dim SQL As String
         '[Monica]22/11/2013: miramos lo del iban
         mvarNorma19_34Nueva = TieneNorma19_34Nueva
          
+        '[Monica]16/06/2017: si hay sii
+        mvarTieneSII = LeerSII
+         
         LeerNiveles = True
     End If
 
@@ -459,6 +478,40 @@ ELeerNiv:
     Set Rs = Nothing
     LeerNiveles = False
 End Function
+
+
+Private Function LeerSII() As Boolean
+Dim SQL As String
+Dim Rs As ADODB.Recordset
+
+    On Error Resume Next
+
+    SQL = "select SIIFechaInicio, SIIDiasAviso from parametros "
+    
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, ConnContaGas, adOpenForwardOnly, adLockPessimistic, adCmdText
+    
+    LeerSII = True
+    If Not Rs.EOF Then
+        If Not IsNull(Rs!SIIFechaInicio) Then
+            mvarSIIFechaInicio = CDate(Rs!SIIFechaInicio)
+        Else
+            mvarSIIFechaInicio = Rs!SIIFechaInicio
+        End If
+        mvarSIIDiasAviso = DBLet(Rs!SIIDiasAviso, "N")
+    End If
+    Rs.Close
+    Set Rs = Nothing
+
+    If Err.Number <> 0 Then
+        LeerSII = False
+        Err.Clear
+    End If
+End Function
+
+
+
+
 
 Private Function TieneNorma19_34Nueva() As Byte
 Dim SQL As String

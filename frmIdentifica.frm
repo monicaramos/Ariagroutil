@@ -12,6 +12,11 @@ Begin VB.Form frmIdentifica
    ScaleWidth      =   7965
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'CenterScreen
+   Begin VB.Timer Timer1 
+      Interval        =   1000
+      Left            =   210
+      Top             =   3270
+   End
    Begin VB.TextBox Text1 
       Alignment       =   2  'Center
       Appearance      =   0  'Flat
@@ -53,6 +58,25 @@ Begin VB.Form frmIdentifica
       TabIndex        =   0
       Top             =   4020
       Width           =   3015
+   End
+   Begin VB.Label Label3 
+      BackStyle       =   0  'Transparent
+      Caption         =   "Label3"
+      BeginProperty Font 
+         Name            =   "Tahoma"
+         Size            =   8.25
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ForeColor       =   &H00FFFFFF&
+      Height          =   195
+      Left            =   270
+      TabIndex        =   6
+      Top             =   90
+      Width           =   7305
    End
    Begin VB.Label Label2 
       BackStyle       =   0  'Transparent
@@ -157,6 +181,7 @@ Option Explicit
 
 Dim PrimeraVez As Boolean
 Dim T1 As Single
+Dim vSegundos As Integer
 
 Private Sub Form_Activate()
     If PrimeraVez Then
@@ -170,13 +195,14 @@ Private Sub Form_Activate()
             PonerFoco Text1(0)
          End If
              
+         Me.Timer1.Enabled = True
+             
          'Leemos el ultimo usuario conectado
          NumeroEmpresaMemorizar True
          
          T1 = T1 + 2.5 - Timer
          If T1 > 0 Then espera T1
 
-         
          PonerVisible True
          If Text1(0).Text <> "" Then
             Text1(1).SetFocus
@@ -197,6 +223,10 @@ Private Sub Form_Load()
     PrimeraVez = True
     CargaImagen
     Label2.Caption = "Ver. " & App.Major & "." & App.Minor & "." & App.Revision
+    
+    Label3.Caption = ""
+    vSegundos = 60
+    Label3.Caption = ""
     
 End Sub
 
@@ -253,7 +283,7 @@ Dim Cad As String
 
     Set vSesion = New CSesion
 
-    If vSesion.Leer(Text1(0).Text) = 0 Then
+    If vSesion.leer(Text1(0).Text) = 0 Then
         'Con exito
         If vSesion.PasswdPROPIO = Text1(1).Text Then
             OK = 0
@@ -287,8 +317,6 @@ Dim Cad As String
             Me.Refresh
             espera 0.2
         
-            
-            
         '    If ComprovaVersio Then
         '        MsgBox "Existe una versión más reciente de la aplicación. Se va a proceder a la actualización", vbInformation
         '        Shell App.Path & "\PlannerUpdate.exe", vbNormalFocus
@@ -316,6 +344,9 @@ Dim Cad As String
 End Sub
 
 
+
+
+
 Private Sub PonerVisible(visible As Boolean)
     'Label1(2).visible = Not visible  'Cargando
     Text1(0).visible = visible
@@ -326,18 +357,18 @@ End Sub
 
 'Lo que haremos aqui es ver, o guardar, el ultimo numero de empresa
 'a la que ha entrado, y el usuario
-Private Sub NumeroEmpresaMemorizar(Leer As Boolean)
-Dim nf As Integer
+Private Sub NumeroEmpresaMemorizar(leer As Boolean)
+Dim NF As Integer
 Dim Cad As String
 On Error GoTo ENumeroEmpresaMemorizar
 
     Cad = App.path & "\ultusu.dat"
-    If Leer Then
+    If leer Then
         If Dir(Cad) <> "" Then
-            nf = FreeFile
-            Open Cad For Input As #nf
-            Line Input #nf, Cad
-            Close #nf
+            NF = FreeFile
+            Open Cad For Input As #NF
+            Line Input #NF, Cad
+            Close #NF
             Cad = Trim(Cad)
             
                 'El primer pipe es el usuario
@@ -345,13 +376,25 @@ On Error GoTo ENumeroEmpresaMemorizar
     
         End If
     Else 'Escribir
-        nf = FreeFile
-        Open Cad For Output As #nf
+        NF = FreeFile
+        Open Cad For Output As #NF
         Cad = Text1(0).Text
-        Print #nf, Cad
-        Close #nf
+        Print #NF, Cad
+        Close #NF
     End If
 ENumeroEmpresaMemorizar:
     Err.Clear
+End Sub
+
+
+Private Sub Timer1_Timer()
+    'Label3 = "Si no entra en " & vSegundos & " segundos. La aplicación se cerrará."
+    If vSegundos < 50 Then
+        Label3 = "Si no hace login, la pantalla se cerrará automáticamente en " & " " & vSegundos & " segundos"
+        Me.Refresh
+        DoEvents
+    End If
+    vSegundos = vSegundos - 1
+    If vSegundos = -1 Then Unload Me
 End Sub
 
