@@ -507,7 +507,7 @@ Private Sub Form_Load()
         PonerFrameCobrosPtesVisible True, 1000, 2000
         CargarListaErrComprobacion
         Me.Caption = "Errores de Comprobacion: "
-        PonerFocoBtn Me.CmdSalir
+        PonerFocoBtn Me.cmdSalir
     End If
     
 
@@ -616,7 +616,7 @@ Private Sub PonerFrameCobrosPtesVisible(visible As Boolean, ByRef h As Integer, 
             w = 9200
 '            Me.Label1(0).Top = 4800
 '            Me.Label1(0).Left = 3400
-            Me.CmdSalir.Caption = "&Salir"
+            Me.cmdSalir.Caption = "&Salir"
             PonerFrameVisible Me.FrameErrores, visible, h, w
             Me.frameAcercaDE.visible = False
             Me.FrameCobrosPtes.visible = False
@@ -640,8 +640,8 @@ Private Sub PonerFrameCobrosPtesVisible(visible As Boolean, ByRef h As Integer, 
             Me.FrameFrasPteContabilizar.visible = False
         
         Case 12
-            h = 5790
-            w = 9345
+            h = 6000
+            w = 9500
             PonerFrameVisible Me.FrameFrasPteContabilizar, visible, h, w
             Me.frameAcercaDE.visible = False
             Me.FrameErrores.visible = False

@@ -64,6 +64,9 @@ Private mvarNumdigi10 As Integer 'copia local
 Private mvarDigitosUltimoNivel As Byte
 Private mvarDigitosNivelAnterior As Byte
 
+Private mvarFechaIni As Date
+Private mvarFechaFin As Date
+
 
 Private mvarNorma19_34Nueva As Byte
 
@@ -311,6 +314,21 @@ Public Property Get HayNorma19_34Nueva() As Byte
      HayNorma19_34Nueva = mvarNorma19_34Nueva
 End Property
 
+Public Property Let FechaIni(ByVal vData As Date)
+     mvarFechaIni = vData
+End Property
+
+Public Property Get FechaIni() As Date
+     FechaIni = mvarFechaIni
+End Property
+
+Public Property Let FechaFin(ByVal vData As Date)
+     mvarFechaFin = vData
+End Property
+
+Public Property Get FechaFin() As Date
+     FechaFin = mvarFechaFin
+End Property
 
 
 '------------------------------------------------
@@ -448,6 +466,8 @@ Dim SQL As String
         'Fijamos la longitud maxima de digitos en ctas de ultimo nivel
         FijaLongitudMaxima
         
+        FijaAnalitica
+        
         '[Monica]22/11/2013: miramos lo del iban
         mvarNorma19_34Nueva = TieneNorma19_34Nueva
         
@@ -571,3 +591,21 @@ Err4:
 '    Modificar = 1
 End Function
 
+Private Sub FijaAnalitica()
+Dim SQL As String
+Dim Rs As ADODB.Recordset
+
+    SQL = "SELECT * FROM parametros "
+    
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, ConnConta, adOpenForwardOnly, adLockOptimistic, adCmdText
+    
+    If Not Rs.EOF Then
+        
+        mvarFechaIni = Rs!FechaIni
+        mvarFechaFin = Rs!FechaFin
+    End If
+    
+    Set Rs = Nothing
+    
+End Sub

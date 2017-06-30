@@ -70,6 +70,7 @@ Private mvarFechaFin As Date
 Private mvarNorma19_34Nueva As Byte
 
 
+
 Private mvarTieneSII As Boolean
 Private mvarSIIFechaInicio As Date
 Private mvarSIIDiasAviso As Byte
@@ -679,4 +680,6 @@ Err4:
 '    RS.Close
 '    Modificar = 1
 End Function
+
+
 

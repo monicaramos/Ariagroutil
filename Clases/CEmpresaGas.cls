@@ -60,6 +60,9 @@ Private mvarNumdigi10 As Integer 'copia local
 Private mvarDigitosUltimoNivel As Byte
 Private mvarDigitosNivelAnterior As Byte
 
+Private mvarFechaIni As Date
+Private mvarFechaFin As Date
+
 
 Private mvarNorma19_34Nueva As Byte
 
@@ -313,6 +316,24 @@ Public Property Get DigitosNivelAnterior() As Byte
      DigitosNivelAnterior = mvarDigitosNivelAnterior
 End Property
 
+Public Property Let FechaIni(ByVal vData As Date)
+     mvarFechaIni = vData
+End Property
+
+Public Property Get FechaIni() As Date
+     FechaIni = mvarFechaIni
+End Property
+
+Public Property Let FechaFin(ByVal vData As Date)
+     mvarFechaFin = vData
+End Property
+
+Public Property Get FechaFin() As Date
+     FechaFin = mvarFechaFin
+End Property
+
+
+
 
 '[Monica]16/06/2017: fecha de inicio y dias de aviso del sii
 Public Property Get TieneSII() As Boolean
@@ -381,15 +402,15 @@ Public Function LeerDatos(Codigo As Integer) As Boolean
 'Leer los parametros de una empresa
 'Lee de la BD: PlannerTours, Tabla: empresas
 Dim Rs As ADODB.Recordset
-Dim Sql As String
+Dim SQL As String
 
     On Error GoTo ELeer
     
-    Sql = "SELECT * FROM sempre WHERE codempre=1" ' & codigo 'vUsu.CadenaConexion
+    SQL = "SELECT * FROM sempre WHERE codempre=1" ' & codigo 'vUsu.CadenaConexion
 
 
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockOptimistic, adCmdText
     If Rs.EOF Then
         LeerDatos = False
     Else
@@ -421,10 +442,10 @@ Dim Sql As String
     Exit Function
 
 ELeer:
-    Sql = "Se ha producido un error. " & "Leyendo datos de la empresa." & vbCrLf
-    Sql = Sql & "Número: " & Err.Number & vbCrLf
-    Sql = Sql & "Descripción: " & Err.Description
-    MsgBox Sql, vbExclamation
+    SQL = "Se ha producido un error. " & "Leyendo datos de la empresa." & vbCrLf
+    SQL = SQL & "Número: " & Err.Number & vbCrLf
+    SQL = SQL & "Descripción: " & Err.Description
+    MsgBox SQL, vbExclamation
     Set Rs = Nothing
     LeerDatos = False
 End Function
@@ -435,15 +456,15 @@ End Function
 Public Function LeerNiveles() As Boolean
 'Leer los parametros de la empresa en BD de la Contabilidad
 Dim Rs As ADODB.Recordset
-Dim Sql As String
+Dim SQL As String
 
     On Error GoTo ELeerNiv
     
     'Lee de la Contabilidad
-    Sql = "SELECT * FROM empresa " 'WHERE codempre=" & codigo
+    SQL = "SELECT * FROM empresa " 'WHERE codempre=" & codigo
     
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, ConnContaGas, adOpenForwardOnly, adLockOptimistic, adCmdText
+    Rs.Open SQL, ConnContaGas, adOpenForwardOnly, adLockOptimistic, adCmdText
     
     If Rs.EOF Then
         LeerNiveles = False
@@ -462,7 +483,7 @@ Dim Sql As String
         mvarNumdigi10 = DBLet(Rs!numDigi10, "N")
         'Fijamos la longitud maxima de digitos en ctas de ultimo nivel
         FijaLongitudMaxima
-        
+        FijaAnalitica
         '[Monica]22/11/2013: miramos lo del iban
         mvarNorma19_34Nueva = TieneNorma19_34Nueva
          
@@ -479,24 +500,24 @@ Dim Sql As String
     Exit Function
 
 ELeerNiv:
-    Sql = "Se ha producido un error. " & "Leer niveles de contabilidad." & vbCrLf
-    Sql = Sql & "Número: " & Err.Number & vbCrLf
-    Sql = Sql & "Descripción: " & Err.Description
-    MsgBox Sql, vbExclamation
+    SQL = "Se ha producido un error. " & "Leer niveles de contabilidad." & vbCrLf
+    SQL = SQL & "Número: " & Err.Number & vbCrLf
+    SQL = SQL & "Descripción: " & Err.Description
+    MsgBox SQL, vbExclamation
     Set Rs = Nothing
     LeerNiveles = False
 End Function
 
 Private Function LeerSII() As Boolean
-Dim Sql As String
+Dim SQL As String
 Dim Rs As ADODB.Recordset
 
     On Error Resume Next
 
-    Sql = "select SIIFechaInicio, SIIDiasAviso from parametros "
+    SQL = "select SIIFechaInicio, SIIDiasAviso from parametros "
     
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, ConnContaGas, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open SQL, ConnContaGas, adOpenForwardOnly, adLockPessimistic, adCmdText
     
     LeerSII = True
     If Not Rs.EOF Then
@@ -519,7 +540,7 @@ End Function
 
 
 Private Function TieneNorma19_34Nueva() As Byte
-Dim Sql As String
+Dim SQL As String
 Dim Rs As ADODB.Recordset
 
     On Error GoTo eTieneNorma19_34Nueva
@@ -528,8 +549,8 @@ Dim Rs As ADODB.Recordset
 
     Set Rs = New ADODB.Recordset
 
-    Sql = "select norma19_34Nueva from paramtesor"
-    Rs.Open Sql, ConnContaGas, adOpenForwardOnly, adLockPessimistic, adCmdText
+    SQL = "select norma19_34Nueva from paramtesor"
+    Rs.Open SQL, ConnContaGas, adOpenForwardOnly, adLockPessimistic, adCmdText
          
     TieneNorma19_34Nueva = 1
     
@@ -620,4 +641,23 @@ Err4:
 '    RS.Close
 '    Modificar = 1
 End Function
+
+Private Sub FijaAnalitica()
+Dim SQL As String
+Dim Rs As ADODB.Recordset
+
+    SQL = "SELECT * FROM parametros "
+    
+    Set Rs = New ADODB.Recordset
+    Rs.Open SQL, ConnContaGas, adOpenForwardOnly, adLockOptimistic, adCmdText
+    
+    If Not Rs.EOF Then
+        
+        mvarFechaIni = Rs!FechaIni
+        mvarFechaFin = Rs!FechaFin
+    End If
+    
+    Set Rs = Nothing
+    
+End Sub
 

@@ -572,6 +572,10 @@ Dim frmMens As frmMensaje
     SQL = "delete from tmpinformes where codusu = " & vSesion.Codigo
     conn.Execute SQL
 
+
+    SQL = ""
+
+
     SqlInsert = "insert into tmpinformes (codusu,nombre1,codigo1,nombre2,fecha1,importe1) "
 
     If vParamAplic.FacturasVarias Then
@@ -613,11 +617,12 @@ Dim frmMens As frmMensaje
         SQL = SQL & " union "
     End If
 
-    If Trim(Mid(SQL, Len(SQL) - 7, 7)) = "union" Then SQL = Mid(SQL, 1, Len(SQL) - 7)
 
-
-    conn.Execute SqlInsert & SQL
+    If SQL <> "" Then
+        If Mid(Trim(SQL), Len(Trim(SQL)) - 4, 5) = "union" Then SQL = Mid(Trim(SQL), 1, Len(Trim(SQL)) - 6)
     
+        conn.Execute SqlInsert & SQL
+    End If
     
     SQL = "select codusu,nombre1,codigo1,nombre2,fecha1,importe1  from tmpinformes where codusu = " & vSesion.Codigo
     
@@ -631,7 +636,7 @@ Dim frmMens As frmMensaje
         Set frmMens = Nothing
     End If
 
-        CerrarConexionConta
+'        CerrarConexionConta
         Exit Sub
         
     

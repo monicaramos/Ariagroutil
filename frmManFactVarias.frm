@@ -2849,6 +2849,30 @@ Dim UltNiv As Integer
         End If
     End If
     
+    
+    '[Monica]20/06/2017: control de fechas que antes no estaba
+    If b And Text1(2).Text <> "" Then
+        If BdConta = 0 Then
+            MsgBox "No hay conexion a la contabilidad de la seccion. Revise", vbExclamation
+            b = False
+        Else
+            If AbrirConexionContaFac(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac, CByte(BdConta)) Then
+                Set vEmpresaFac = New CempresaFac
+                If vEmpresaFac.LeerNiveles Then
+                
+                    ResultadoFechaContaOK = EsFechaOKConta(CDate(Text1(2).Text))
+                    If ResultadoFechaContaOK > 0 Then
+                        If ResultadoFechaContaOK <> 4 Then MsgBox MensajeFechaOkConta, vbExclamation
+                        b = False
+                    End If
+                End If
+                Set vEmpresaFac = Nothing
+                CerrarConexionContaFac
+            End If
+        End If
+    End If
+    
+    
     'si hay porcentaje de retencion debe de haber cuenta de retencion e
     If b And Text1(26).Text <> "" And Text1(27).Text = "" Then
         If CInt(Text1(26).Text) <> 0 Then
@@ -4068,4 +4092,46 @@ End Sub
 Private Sub BotonCargaMasiva()
     frmCargaFactVar.Show vbModal
 End Sub
+
+
+Private Function EsFechaOKConta(fecha As Date) As Byte
+Dim F2 As Date
+
+    If vEmpresaFac.FechaIni > fecha Then
+        EsFechaOKConta = 1
+    Else
+        F2 = DateAdd("yyyy", 1, vEmpresaFac.FechaFin)
+        If fecha > F2 Then
+            EsFechaOKConta = 2
+        Else
+            'OK. Dentro de los ejercicios contables
+            EsFechaOKConta = 0
+        End If
+    End If
+    '[Monica]20/06/2017: de david
+    If EsFechaOKConta = 0 Then
+        'Si tiene SII
+        If vParamAplic.ContabilidadNueva Then
+            If vEmpresaFac.TieneSII Then
+                If DateDiff("d", fecha, Now) > vEmpresaFac.SIIDiasAviso Then
+                    MensajeFechaOkConta = "Fecha fuera de periodo de comunicación SII."
+                    'LLEVA SII y han trascurrido los dias
+                    If vSesion.Nivel = 0 Then
+                        If MsgBox(MensajeFechaOkConta & vbCrLf & "¿Continuar?", vbQuestion + vbYesNoCancel) <> vbYes Then
+                            EsFechaOKConta = 4
+                        End If
+                    Else
+                        'NO tienen nivel
+                        EsFechaOKConta = 5
+                    End If
+                End If
+            End If
+        End If
+    Else
+        MensajeFechaOkConta = "Fuera de ejercicios contables"
+    End If
+
+End Function
+
+
 
