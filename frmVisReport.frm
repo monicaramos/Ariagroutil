@@ -139,9 +139,18 @@ On Error GoTo Err_Carga
 
     If InfConta Then
         For i = 1 To mrpt.Database.Tables.Count
-           mrpt.Database.Tables(i).SetLogOnInfo "vconta", "conta" & vParamAplic.NumeroConta, "root", "aritel"
-           If InStr(1, mrpt.Database.Tables(i).Name, "_") = 0 Then
-                   mrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroConta & "." & mrpt.Database.Tables(i).Name
+           If vParamAplic.ContabilidadNueva Then
+                mrpt.Database.Tables(i).SetLogOnInfo "vconta", "ariconta" & vParamAplic.NumeroConta, "root", "aritel"
+            
+                If InStr(1, mrpt.Database.Tables(i).Name, "_") = 0 Then
+                       mrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroConta & "." & mrpt.Database.Tables(i).Name
+                End If
+           Else
+                mrpt.Database.Tables(i).SetLogOnInfo "vconta", "conta" & vParamAplic.NumeroConta, "root", "aritel"
+            
+                If InStr(1, mrpt.Database.Tables(i).Name, "_") = 0 Then
+                       mrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroConta & "." & mrpt.Database.Tables(i).Name
+                End If
            End If
         Next i
     End If
@@ -341,18 +350,18 @@ Private Sub Exportar()
 End Sub
 
 Private Sub PonerMargen()
-Dim cad As String
+Dim Cad As String
 Dim i As Integer
     On Error GoTo EPon
-    cad = Dir(App.path & "\*.mrg")
-    If cad <> "" Then
-        i = InStr(1, cad, ".")
+    Cad = Dir(App.path & "\*.mrg")
+    If Cad <> "" Then
+        i = InStr(1, Cad, ".")
         If i > 0 Then
-            cad = Mid(cad, 1, i - 1)
-            If IsNumeric(cad) Then
-                If Val(cad) > 4000 Then cad = "4000"
-                If Val(cad) > 0 Then
-                    mrpt.BottomMargin = mrpt.BottomMargin + Val(cad)
+            Cad = Mid(Cad, 1, i - 1)
+            If IsNumeric(Cad) Then
+                If Val(Cad) > 4000 Then Cad = "4000"
+                If Val(Cad) > 0 Then
+                    mrpt.BottomMargin = mrpt.BottomMargin + Val(Cad)
                 End If
             End If
         End If
@@ -419,48 +428,102 @@ Dim i As Byte
                            smrpt.Database.Tables(i).Location = "ariagroutil" & "." & smrpt.Database.Tables(i).Name
                         End If
                     ElseIf smrpt.Database.Tables(i).ConnectionProperties.Item("DSN") = "vConta" Then
-                        If Not Facturas Then
-                            'monica 05/06/2007
-                            Select Case Contabilidad
-                                Case cConta
-                                    smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroConta, vParamAplic.UsuarioConta, vParamAplic.PasswordConta
-                                Case cContaSeg
-                                    smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaSeg, vParamAplic.UsuarioContaSeg, vParamAplic.PasswordContaSeg
-                                Case cContaTel
-                                    smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaTel, vParamAplic.UsuarioContaTel, vParamAplic.PasswordContaTel
-                                Case cContaGas
-                                    smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaGas, vParamAplic.UsuarioContaGas, vParamAplic.PasswordContaGas
-                                Case cContaFacSoc
-                                    smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaFacSoc, vParamAplic.UsuarioContaGas, vParamAplic.PasswordContaFacSoc
-                                Case cContaCV
-                                    smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaCV, vParamAplic.UsuarioContaCV, vParamAplic.PasswordContaCV
-                                Case cContaCVV
-                                    smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaCVV, vParamAplic.UsuarioContaCV, vParamAplic.PasswordContaCV
-                            End Select
-                            If (InStr(1, smrpt.Database.Tables(i).Name, "_") = 0) Then
+                        If vParamAplic.ContabilidadNueva Then
+                        
+                            If Not Facturas Then
+                                'monica 05/06/2007
                                 Select Case Contabilidad
                                     Case cConta
-                                       smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroConta & "." & smrpt.Database.Tables(i).Name
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & vParamAplic.NumeroConta, vParamAplic.UsuarioConta, vParamAplic.PasswordConta
                                     Case cContaSeg
-                                       smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaSeg & "." & smrpt.Database.Tables(i).Name
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & vParamAplic.NumeroContaSeg, vParamAplic.UsuarioContaSeg, vParamAplic.PasswordContaSeg
                                     Case cContaTel
-                                       smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaTel & "." & smrpt.Database.Tables(i).Name
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & vParamAplic.NumeroContaTel, vParamAplic.UsuarioContaTel, vParamAplic.PasswordContaTel
                                     Case cContaGas
-                                       smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaGas & "." & smrpt.Database.Tables(i).Name
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & vParamAplic.NumeroContaGas, vParamAplic.UsuarioContaGas, vParamAplic.PasswordContaGas
                                     Case cContaFacSoc
-                                       smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaFacSoc & "." & smrpt.Database.Tables(i).Name
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & vParamAplic.NumeroContaFacSoc, vParamAplic.UsuarioContaGas, vParamAplic.PasswordContaFacSoc
                                     Case cContaCV
-                                       smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaCV & "." & smrpt.Database.Tables(i).Name
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & vParamAplic.NumeroContaCV, vParamAplic.UsuarioContaCV, vParamAplic.PasswordContaCV
                                     Case cContaCVV
-                                       smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaCVV & "." & smrpt.Database.Tables(i).Name
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & vParamAplic.NumeroContaCVV, vParamAplic.UsuarioContaCV, vParamAplic.PasswordContaCV
                                 End Select
-                                    
+                                If (InStr(1, smrpt.Database.Tables(i).Name, "_") = 0) Then
+                                    Select Case Contabilidad
+                                        Case cConta
+                                           smrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroConta & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaSeg
+                                           smrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroContaSeg & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaTel
+                                           smrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroContaTel & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaGas
+                                           smrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroContaGas & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaFacSoc
+                                           smrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroContaFacSoc & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaCV
+                                           smrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroContaCV & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaCVV
+                                           smrpt.Database.Tables(i).Location = "ariconta" & vParamAplic.NumeroContaCVV & "." & smrpt.Database.Tables(i).Name
+                                    End Select
+                                        
+                                End If
+                            Else ' venimos de facturas varias
+    '                            smrpt.Database.Tables(i).SetLogOnInfo vParamAplic.ServidorContaFac, "conta" & Contabilidad, vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac
+                                smrpt.Database.Tables(i).SetLogOnInfo "vConta", "ariconta" & Contabilidad, vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac
+                                If (InStr(1, smrpt.Database.Tables(i).Name, "_") = 0) Then
+                                    If smrpt.Database.Tables(i).Name = "sforpa" Then
+                                        smrpt.Database.Tables(i).Location = "ariconta" & Contabilidad & ".formapago"
+                                    Else
+                                        smrpt.Database.Tables(i).Location = "ariconta" & Contabilidad & "." & smrpt.Database.Tables(i).Name
+                                    End If
+                                End If
                             End If
-                        Else ' venimos de facturas varias
-'                            smrpt.Database.Tables(i).SetLogOnInfo vParamAplic.ServidorContaFac, "conta" & Contabilidad, vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac
-                            smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & Contabilidad, vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac
-                            If (InStr(1, smrpt.Database.Tables(i).Name, "_") = 0) Then
-                                smrpt.Database.Tables(i).Location = "conta" & Contabilidad & "." & smrpt.Database.Tables(i).Name
+                        
+                        Else
+                    
+                            If Not Facturas Then
+                                'monica 05/06/2007
+                                Select Case Contabilidad
+                                    Case cConta
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroConta, vParamAplic.UsuarioConta, vParamAplic.PasswordConta
+                                    Case cContaSeg
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaSeg, vParamAplic.UsuarioContaSeg, vParamAplic.PasswordContaSeg
+                                    Case cContaTel
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaTel, vParamAplic.UsuarioContaTel, vParamAplic.PasswordContaTel
+                                    Case cContaGas
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaGas, vParamAplic.UsuarioContaGas, vParamAplic.PasswordContaGas
+                                    Case cContaFacSoc
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaFacSoc, vParamAplic.UsuarioContaGas, vParamAplic.PasswordContaFacSoc
+                                    Case cContaCV
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaCV, vParamAplic.UsuarioContaCV, vParamAplic.PasswordContaCV
+                                    Case cContaCVV
+                                        smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & vParamAplic.NumeroContaCVV, vParamAplic.UsuarioContaCV, vParamAplic.PasswordContaCV
+                                End Select
+                                If (InStr(1, smrpt.Database.Tables(i).Name, "_") = 0) Then
+                                    Select Case Contabilidad
+                                        Case cConta
+                                           smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroConta & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaSeg
+                                           smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaSeg & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaTel
+                                           smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaTel & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaGas
+                                           smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaGas & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaFacSoc
+                                           smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaFacSoc & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaCV
+                                           smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaCV & "." & smrpt.Database.Tables(i).Name
+                                        Case cContaCVV
+                                           smrpt.Database.Tables(i).Location = "conta" & vParamAplic.NumeroContaCVV & "." & smrpt.Database.Tables(i).Name
+                                    End Select
+                                        
+                                End If
+                            Else ' venimos de facturas varias
+    '                            smrpt.Database.Tables(i).SetLogOnInfo vParamAplic.ServidorContaFac, "conta" & Contabilidad, vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac
+                                smrpt.Database.Tables(i).SetLogOnInfo "vConta", "conta" & Contabilidad, vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac
+                                If (InStr(1, smrpt.Database.Tables(i).Name, "_") = 0) Then
+                                    smrpt.Database.Tables(i).Location = "conta" & Contabilidad & "." & smrpt.Database.Tables(i).Name
+                                End If
                             End If
                         End If
                     End If

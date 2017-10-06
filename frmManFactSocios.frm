@@ -2090,14 +2090,14 @@ Dim i As Integer
     
 End Sub
 
-Private Function EsFechaOKConta(fecha As Date) As Byte
+Private Function EsFechaOKConta(Fecha As Date) As Byte
 Dim F2 As Date
 
-    If vEmpresaFacSoc.FechaIni > fecha Then
+    If vEmpresaFacSoc.FechaIni > Fecha Then
         EsFechaOKConta = 1
     Else
         F2 = DateAdd("yyyy", 1, vEmpresaFacSoc.FechaFin)
-        If fecha > F2 Then
+        If Fecha > F2 Then
             EsFechaOKConta = 2
         Else
             'OK. Dentro de los ejercicios contables
@@ -2109,7 +2109,10 @@ Dim F2 As Date
         'Si tiene SII
         If vParamAplic.ContabilidadNueva Then
             If vEmpresaFacSoc.TieneSII Then
-                If DateDiff("d", fecha, Now) > vEmpresaFacSoc.SIIDiasAviso Then
+                '[Monica]06/10/2017: añadida la segunda condicion: fecha > vEmpresa.SIIFechaInicio
+                '                    fallaba cuando la fecha es anterior a la declaracion del SII.
+                '                    Caso de Coopic con una factura interna
+                If DateDiff("d", Fecha, Now) > vEmpresaFacSoc.SIIDiasAviso And Fecha > vEmpresa.SIIFechaInicio Then
                     MensajeFechaOkConta = "Fecha fuera de periodo de comunicación SII."
                     'LLEVA SII y han trascurrido los dias
                     If vSesion.Nivel = 0 Then
