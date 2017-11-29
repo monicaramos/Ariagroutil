@@ -737,7 +737,7 @@ Private HaDevueltoDatos As Boolean
 
 Dim btnPrimero As Byte 'Variable que indica el nº del Botó PrimerRegistro en la Toolbar1
 'Dim CadAncho() As Boolean  'array, per a quan cridem al form de llínies
-Dim indice As Byte 'Indice del text1 donde se ponen los datos devueltos desde otros Formularios de Mtos
+Dim Indice As Byte 'Indice del text1 donde se ponen los datos devueltos desde otros Formularios de Mtos
 
 Private WithEvents frmC As frmCal 'calendario fechas
 Attribute frmC.VB_VarHelpID = -1
@@ -791,11 +791,11 @@ Private Sub Check1_KeyPress(Index As Integer, KeyAscii As Integer)
 End Sub
 
 Private Sub cmdAceptar_Click()
-Dim b As Boolean
+Dim B As Boolean
 Dim vSec As CSeccion 'Clase Seccion
 Dim vTabla As String
 Dim CtaClie As String
-Dim Cad As String
+Dim cad As String
 
 ' variables para el recalculo de iva y totales
     Dim i As Integer
@@ -817,18 +817,18 @@ Dim Cad As String
     On Error GoTo Error1
     
     ModoModificar = False
-    b = True
+    B = True
     Select Case Modo
         Case 1  'BUSQUEDA
             HacerBusqueda
             
         Case 3 'INSERTAR
-            If DatosOk Then
+            If DatosOK Then
                 If InsertarDesdeForm2(Me, 1) Then
                     Data1.RecordSource = "Select * from " & NomTabla & Ordenacion
-                    Cad = "numfactu = " & Text1(0).Text & " and fecfactu = " & DBSet(Text1(1).Text, "F")
-                    Cad = Cad & " and codmacta = " & DBSet(Text1(2).Text, "T")
-                    PosicionarData Cad
+                    cad = "numfactu = " & text1(0).Text & " and fecfactu = " & DBSet(text1(1).Text, "F")
+                    cad = cad & " and codmacta = " & DBSet(text1(2).Text, "T")
+                    PosicionarData cad
                     PonerModo 2
                 End If
             Else
@@ -836,7 +836,7 @@ Dim Cad As String
             End If
 
         Case 4  'MODIFICAR
-            If Not DatosOk Then
+            If Not DatosOK Then
                 ModoLineas = 0
                 Screen.MousePointer = vbDefault
                 Exit Sub
@@ -896,7 +896,7 @@ Dim Cad As String
 '                        End If
                     End If
                     TerminaBloquear
-                    PosicionarData "numfactu = " & DBSet(Text1(0).Text, "N") & " and fecfactu = " & DBSet(Text1(1).Text, "F") & " and codmacta = " & DBSet(Text1(2).Text, "T")
+                    PosicionarData "numfactu = " & DBSet(text1(0).Text, "N") & " and fecfactu = " & DBSet(text1(1).Text, "F") & " and codmacta = " & DBSet(text1(2).Text, "T")
                 End If
             End If
             
@@ -906,7 +906,7 @@ Dim Cad As String
  
 Error1:
     Screen.MousePointer = vbDefault
-    If Err.Number <> 0 Or Not b Then
+    If Err.Number <> 0 Or Not B Then
         MsgBox Err.Number & ": " & Err.Description, vbExclamation
 '        If ModoModificar Then
 '            conn.RollbackTrans
@@ -994,14 +994,14 @@ Dim sql2 As String
         PonerModo 0
     Else
         PonerModo 1
-        Text1(0).BackColor = vbYellow 'letraser
+        text1(0).BackColor = vbYellow 'letraser
     End If
     
     ModoLineas = 0
     
     
     If numfactu <> 0 Then
-        Text1(0).Text = numfactu
+        text1(0).Text = numfactu
 '        text1(1).Text = fecfactu
         PonerModo 1
         cmdAceptar_Click
@@ -1031,7 +1031,7 @@ End Sub
 '   formulario en funcion del modo en k vayamos a trabajar
 Private Sub PonerModo(Kmodo As Byte)
 Dim i As Integer, NumReg As Byte
-Dim b As Boolean
+Dim B As Boolean
 On Error GoTo EPonerModo
  
     Modo = Kmodo
@@ -1049,18 +1049,18 @@ On Error GoTo EPonerModo
     End If
     
     '=======================================
-    b = (Modo = 2)
+    B = (Modo = 2)
     'Poner Flechas de desplazamiento visibles
     NumReg = 1
     If Not Data1.Recordset.EOF Then
         If Data1.Recordset.RecordCount > 1 Then NumReg = 2 'Solo es para saber q hay + de 1 registro
     End If
-    DesplazamientoVisible Me.Toolbar1, btnPrimero, b, NumReg
+    DesplazamientoVisible Me.Toolbar1, btnPrimero, B, NumReg
     
 
-    b = Modo <> 0 And Modo <> 2
-    cmdCancelar.visible = b
-    cmdAceptar.visible = b
+    B = Modo <> 0 And Modo <> 2
+    cmdCancelar.visible = B
+    cmdAceptar.visible = B
     
     '---------------------------------------------
     
@@ -1069,17 +1069,17 @@ On Error GoTo EPonerModo
     BloquearText1 Me, Modo
     BloquearChecks Me, Modo
     
-    For i = 0 To Text1.Count - 1
-        Text1(i).Enabled = (Modo = 3 Or Modo = 4 Or Modo = 1)
+    For i = 0 To text1.Count - 1
+        text1(i).Enabled = (Modo = 3 Or Modo = 4 Or Modo = 1)
     Next i
     
     BloquearImgBuscar Me, Modo, ModoLineas
        
     'Bloquear los campos de clave primaria, NO se puede modificar
-    b = Not (Modo = 1 Or Modo = 3) 'solo al insertar/buscar estará activo
+    B = Not (Modo = 1 Or Modo = 3) 'solo al insertar/buscar estará activo
     For i = 0 To 2
-        BloquearTxt Text1(i), b, True
-        Text1(i).Enabled = Not b
+        BloquearTxt text1(i), B, True
+        text1(i).Enabled = Not B
     Next i
     
     ' el importe de retencion solo se puede consultar
@@ -1091,12 +1091,12 @@ On Error GoTo EPonerModo
 '[Monica] 25/01/2010 dejo introducir y modificar el importe de retencion y el total factura
 '    BloquearTxt Text1(12), Not (Modo = 1)
 '    Text1(12).Enabled = (Modo = 1)
-    Text1(12).BackColor = &HCAE3FD
+    text1(12).BackColor = &HCAE3FD
     
     
     'Los % de IVA siempre bloqueados
-    BloquearTxt Text1(7), True
-    Text1(7).Enabled = (Modo = 1)
+    BloquearTxt text1(7), True
+    text1(7).Enabled = (Modo = 1)
     
 
     ' **** si n'hi han imagens de buscar en la capçalera *****
@@ -1104,13 +1104,13 @@ On Error GoTo EPonerModo
 '    BloquearImgZoom Me, Modo, ModoLineas
     ' ********************************************************
 
-    b = (Modo = 3) Or (Modo = 1)
-    Me.imgBuscar(0).Enabled = b
-    Me.imgBuscar(0).visible = b
+    B = (Modo = 3) Or (Modo = 1)
+    Me.imgBuscar(0).Enabled = B
+    Me.imgBuscar(0).visible = B
     
-    b = (Modo = 3) Or (Modo = 1) Or (Modo = 4)
-    Me.imgBuscar(2).Enabled = b
-    Me.imgBuscar(2).visible = b
+    B = (Modo = 3) Or (Modo = 1) Or (Modo = 4)
+    Me.imgBuscar(2).Enabled = B
+    Me.imgBuscar(2).visible = B
     
     
     'Imagen Calendario fechas
@@ -1153,30 +1153,30 @@ End Sub
 
 Private Sub PonerModoOpcionesMenu(Modo)
 'Activas unas Opciones de Menu y Toolbar según el modo en que estemos
-Dim b As Boolean, bAux As Boolean
+Dim B As Boolean, bAux As Boolean
 Dim i As Byte
 
     '-----  TOOLBAR DE LA CABECERA
     '------------------------------------------
     'b = (Modo = 2 Or Modo = 0 Or Modo = 1)
-    b = (Modo = 2 Or Modo = 0)
+    B = (Modo = 2 Or Modo = 0)
     'Buscar
-    Toolbar1.Buttons(3).Enabled = b
-    Me.mnBuscar.Enabled = b
+    Toolbar1.Buttons(3).Enabled = B
+    Me.mnBuscar.Enabled = B
     'Ver Todos
-    Toolbar1.Buttons(4).Enabled = b
-    Me.mnVerTodos.Enabled = b
+    Toolbar1.Buttons(4).Enabled = B
+    Me.mnVerTodos.Enabled = B
     'Insertar
-    Toolbar1.Buttons(7).Enabled = b
-    Me.mnNuevo.Enabled = b
+    Toolbar1.Buttons(7).Enabled = B
+    Me.mnNuevo.Enabled = B
     
-    b = (Modo = 2 And Data1.Recordset.RecordCount > 0) 'And (Check1(1).Value = 0)
+    B = (Modo = 2 And Data1.Recordset.RecordCount > 0) 'And (Check1(1).Value = 0)
     'Modificar
-    Toolbar1.Buttons(8).Enabled = b
-    Me.mnModificar.Enabled = b
+    Toolbar1.Buttons(8).Enabled = B
+    Me.mnModificar.Enabled = B
     'eliminar
-    Toolbar1.Buttons(9).Enabled = b
-    Me.mnEliminar.Enabled = b
+    Toolbar1.Buttons(9).Enabled = B
+    Me.mnEliminar.Enabled = B
  
     'Imprimir
     'VRS:2.0.1(3)
@@ -1202,11 +1202,11 @@ Private Sub frmB_Selecionado(CadenaDevuelta As String)
         'Sabemos que campos son los que nos devuelve
         'Creamos una cadena consulta y ponemos los datos
         CadB = ""
-        Aux = ValorDevueltoFormGrid(Text1(0), CadenaDevuelta, 1) 'numfactu
+        Aux = ValorDevueltoFormGrid(text1(0), CadenaDevuelta, 1) 'numfactu
         CadB = Aux
-        Aux = ValorDevueltoFormGrid(Text1(1), CadenaDevuelta, 2) 'fecfactu
+        Aux = ValorDevueltoFormGrid(text1(1), CadenaDevuelta, 2) 'fecfactu
         CadB = CadB & " AND " & Aux
-        Aux = ValorDevueltoFormGrid(Text1(2), CadenaDevuelta, 3) 'codvarie
+        Aux = ValorDevueltoFormGrid(text1(2), CadenaDevuelta, 3) 'codvarie
         CadB = CadB & " AND " & Aux
         '   Como la clave principal es unica, con poner el sql apuntando
         '   al valor devuelto sobre la clave ppal es suficiente
@@ -1218,32 +1218,32 @@ End Sub
 
 Private Sub frmC_Selec(vFecha As Date)
     'Fecha
-    Text1(CByte(imgFec(1).Tag)).Text = Format(vFecha, "dd/mm/yyyy")
+    text1(CByte(imgFec(1).Tag)).Text = Format(vFecha, "dd/mm/yyyy")
 End Sub
 
 Private Sub frmCtas_DatoSeleccionado(CadenaSeleccion As String)
-    Text1(indice).Text = RecuperaValor(CadenaSeleccion, 1) 'codmacta
-    Text2(indice).Text = RecuperaValor(CadenaSeleccion, 2) 'nommacta
+    text1(Indice).Text = RecuperaValor(CadenaSeleccion, 1) 'codmacta
+    Text2(Indice).Text = RecuperaValor(CadenaSeleccion, 2) 'nommacta
 End Sub
 
 Private Sub frmVar_DatoSeleccionado(CadenaSeleccion As String)
-Dim Cad As String
-    Text1(3).Text = RecuperaValor(CadenaSeleccion, 1) 'codvarie
+Dim cad As String
+    text1(3).Text = RecuperaValor(CadenaSeleccion, 1) 'codvarie
     Text2(3).Text = RecuperaValor(CadenaSeleccion, 2) 'nomvarie
 End Sub
 
 Private Sub frmTipIVA_DatoSeleccionado(CadenaSeleccion As String)
 'Tipos de IVA (de la Contabilidad)
-    Text1(indice).Text = RecuperaValor(CadenaSeleccion, 1) 'codigiva
-    FormateaCampo Text1(indice)
-    Text1(indice + 1).Text = RecuperaValor(CadenaSeleccion, 3) '% iva
+    text1(Indice).Text = RecuperaValor(CadenaSeleccion, 1) 'codigiva
+    FormateaCampo text1(Indice)
+    text1(Indice + 1).Text = RecuperaValor(CadenaSeleccion, 3) '% iva
     If Modo <> 1 Then
-        Text1(indice + 3).Text = RecuperaValor(CadenaSeleccion, 4) '% rec
+        text1(Indice + 3).Text = RecuperaValor(CadenaSeleccion, 4) '% rec
     End If
 End Sub
 
 Private Sub frmZ_Actualizar(vCampo As String)
-     Text1(indice).Text = vCampo
+     text1(Indice).Text = vCampo
 End Sub
 
 Private Sub imgBuscar_Click(Index As Integer)
@@ -1254,39 +1254,39 @@ Private Sub imgBuscar_Click(Index As Integer)
         Case 0 'Cuenta Contable
             If vParamAplic.NumeroContaFacSoc = 0 Then Exit Sub
             
-            indice = Index + 2
+            Indice = Index + 2
             Set frmCtas = New frmCtasConta
             frmCtas.NumDigit = 0
             frmCtas.Facturas = False
             frmCtas.CadBusqueda = vParamAplic.RaizCtaFacSoc
             frmCtas.DatosADevolverBusqueda = "0|1|"
-            frmCtas.CodigoActual = Text2(indice).Text
+            frmCtas.CodigoActual = Text2(Indice).Text
             frmCtas.Conexion = cContaFacSoc
             frmCtas.Show vbModal
             Set frmCtas = Nothing
-            PonerFoco Text1(indice)
+            PonerFoco text1(Indice)
 
         Case 1 'Variedad
-            indice = 3
+            Indice = 3
             Set frmVar = New frmManVariedad
             frmVar.DatosADevolverBusqueda = "0|1|"
-            frmVar.CodigoActual = Text1(3).Text
+            frmVar.CodigoActual = text1(3).Text
             frmVar.Show vbModal
             Set frmVar = Nothing
             
         Case 2 'tipo de iva
             If vParamAplic.NumeroContaFacSoc = 0 Then Exit Sub
             
-            indice = Index + 4
+            Indice = Index + 4
             
             Set frmTipIVA = New frmTipIVAConta
             frmTipIVA.Facturas = False
             frmTipIVA.Conexion = cContaFacSoc
             frmTipIVA.DatosADevolverBusqueda = "0|1|"
-            frmTipIVA.CodigoActual = Text1(indice).Text
+            frmTipIVA.CodigoActual = text1(Indice).Text
             frmTipIVA.Show vbModal
             Set frmTipIVA = Nothing
-            PonerFoco Text1(indice)
+            PonerFoco text1(Indice)
             
     End Select
     
@@ -1325,11 +1325,11 @@ Private Sub imgFec_Click(Index As Integer)
        
     ' ***canviar l'index de imgFec pel 1r index de les imagens de buscar data***
     imgFec(1).Tag = Index 'independentment de les dates que tinga, sempre pose l'index en la 27
-    If Text1(Index).Text <> "" Then frmC.NovaData = Text1(Index).Text
+    If text1(Index).Text <> "" Then frmC.NovaData = text1(Index).Text
 
     frmC.Show vbModal
     Set frmC = Nothing
-    PonerFoco Text1(CByte(imgFec(1).Tag))
+    PonerFoco text1(CByte(imgFec(1).Tag))
     ' ***************************
 End Sub
 
@@ -1359,8 +1359,8 @@ Private Sub mnImprimir_Click()
     ' he añadido estas dos lineas para que llame al rpt correspondiente
 
     cadNombreRPT = nomDocu
-    cadFormula = "({" & NomTabla & ".numfactu} = " & Text1(0).Text & ") AND "
-    cadFormula = cadFormula & "{" & NomTabla & ".codmacta} = """ & Text1(2).Text & """ AND {" & NomTabla & ".fecfactu} = cdate(""" & Text1(1).Text & """) "
+    cadFormula = "({" & NomTabla & ".numfactu} = " & text1(0).Text & ") AND "
+    cadFormula = cadFormula & "{" & NomTabla & ".codmacta} = """ & text1(2).Text & """ AND {" & NomTabla & ".fecfactu} = cdate(""" & text1(1).Text & """) "
     
     '23022007 Monica: la separacion de la bonificacion solo la quieren en Alzira
 '    If vParamAplic.Cooperativa = 1 Then cadFormula = cadFormula & " and {slhfac.numalbar} <> 'BONIFICA'" ' AND ({ssocio.impfactu}<=1)"
@@ -1406,7 +1406,7 @@ Private Sub mnVerTodos_Click()
 End Sub
 
 Private Sub Toolbar1_ButtonClick(ByVal Button As MSComctlLib.Button)
-Dim Cad As String
+Dim cad As String
     
     
     Select Case Button.Index
@@ -1438,14 +1438,14 @@ Private Sub BotonBuscar()
         'LimpiarDataGrids
         PonerModo 1
         'Si pasamos el control aqui lo ponemos en amarillo
-        PonerFoco Text1(0)
-        Text1(0).BackColor = vbYellow
+        PonerFoco text1(0)
+        text1(0).BackColor = vbYellow
     Else
         HacerBusqueda
         If Data1.Recordset.EOF Then
-            Text1(kCampo).Text = ""
-            Text1(kCampo).BackColor = vbYellow
-            PonerFoco Text1(kCampo)
+            text1(kCampo).Text = ""
+            text1(kCampo).BackColor = vbYellow
+            PonerFoco text1(kCampo)
         End If
     End If
 End Sub
@@ -1462,26 +1462,26 @@ Dim CadB As String
         CadenaConsulta = "select * from " & NomTabla & " WHERE " & CadB & " " & Ordenacion
         PonerCadenaBusqueda
     Else
-        PonerFoco Text1(0)
+        PonerFoco text1(0)
     End If
 End Sub
 
 Private Sub MandaBusquedaPrevia(CadB As String)
-Dim Cad As String
+Dim cad As String
         'Llamamos a al form
         '##A mano
-        Cad = ""
-        Cad = Cad & "Factura|" & NomTabla & ".numfactu|N|" & FormatoCampo(Text1(0)) & "|15·"
-        Cad = Cad & ParaGrid(Text1(1), 15, "Fecha")
-        Cad = Cad & "Cta.Contable|" & NomTabla & ".codmacta|T|" & Text1(2) & "|15·"
-        Cad = Cad & "Variedad|" & NomTabla & ".codvarie|T|" & Text1(3) & "|15·"
-        Cad = Cad & "Descripcion|variedad.nomvarie|T|" & Text2(3) & "|40·"
-        If Cad <> "" Then
+        cad = ""
+        cad = cad & "Factura|" & NomTabla & ".numfactu|N|" & FormatoCampo(text1(0)) & "|15·"
+        cad = cad & ParaGrid(text1(1), 15, "Fecha")
+        cad = cad & "Cta.Contable|" & NomTabla & ".codmacta|T|" & text1(2) & "|15·"
+        cad = cad & "Variedad|" & NomTabla & ".codvarie|T|" & text1(3) & "|15·"
+        cad = cad & "Descripcion|variedad.nomvarie|T|" & Text2(3) & "|40·"
+        If cad <> "" Then
             Screen.MousePointer = vbHourglass
             Set frmB = New frmBuscaGrid
-            frmB.vCampos = Cad
+            frmB.vCampos = cad
             frmB.vTabla = NomTabla & " INNER JOIN variedad ON " & NomTabla & ".codvarie=variedad.codvarie "
-            frmB.vSQL = CadB
+            frmB.vSql = CadB
             HaDevueltoDatos = False
             '###A mano
             frmB.vDevuelve = "0|1|2|"
@@ -1496,13 +1496,13 @@ Dim Cad As String
                 If (Not Data1.Recordset.EOF) And DatosADevolverBusqueda <> "" Then _
                     cmdRegresar_Click
             Else   'de ha devuelto datos, es decir NO ha devuelto datos
-                PonerFoco Text1(kCampo)
+                PonerFoco text1(kCampo)
             End If
         End If
 End Sub
 
 Private Sub cmdRegresar_Click()
-Dim Cad As String
+Dim cad As String
 Dim Aux As String
 Dim i As Integer
 Dim J As Integer
@@ -1512,7 +1512,7 @@ Dim J As Integer
         Exit Sub
     End If
     
-    Cad = ""
+    cad = ""
     i = 0
     Do
         J = i + 1
@@ -1520,10 +1520,10 @@ Dim J As Integer
         If i > 0 Then
             Aux = Mid(DatosADevolverBusqueda, J, i - J)
             J = Val(Aux)
-            Cad = Cad & Text1(J).Text & "|"
+            cad = cad & text1(J).Text & "|"
         End If
     Loop Until i = 0
-    RaiseEvent DatoSeleccionado(Cad)
+    RaiseEvent DatoSeleccionado(cad)
     Unload Me
 End Sub
 
@@ -1578,8 +1578,8 @@ Private Sub BotonAnyadir()
     PonerModo 3
 
     'Quan afegixc pose en Fecha
-    Text1(1).Text = Format(Now, "dd/mm/yyyy")
-    Text1(10).Text = Format(vParamAplic.PorcreteFacSoc, "##0.00")
+    text1(1).Text = Format(Now, "dd/mm/yyyy")
+    text1(10).Text = Format(vParamAplic.PorcreteFacSoc, "##0.00")
     
 
     'Total Factura (por defecto=0)
@@ -1587,18 +1587,18 @@ Private Sub BotonAnyadir()
 '    text1(19).Text = "0"
 
     'em posicione en el 1r tab
-    PonerFoco Text1(0)
+    PonerFoco text1(0)
 End Sub
 
 Private Sub BotonModificar()
 Dim vSec As CSeccion
-Dim Cad As String
+Dim cad As String
 
     '++monica:12/02/2008
     If CByte(Data1.Recordset!intconta) = 1 Then
-       Cad = "   Se dispone a realizar cambios en los datos de la Factura.     " & vbCrLf & vbCrLf & _
+       cad = "   Se dispone a realizar cambios en los datos de la Factura.     " & vbCrLf & vbCrLf & _
              "Recuerde modificar la Contabilidad y Tesoreria correspondiente!!!"
-       MsgBox Cad, vbExclamation
+       MsgBox cad, vbExclamation
     End If
     '++
 
@@ -1606,11 +1606,11 @@ Dim Cad As String
     PonerModo 4
     
     'Quan modifique pose en la F.Modificación la data actual
-    PonerFoco Text1(3)
+    PonerFoco text1(3)
 End Sub
 
 Private Sub BotonEliminar()
-Dim Cad As String
+Dim cad As String
 Dim vSec As CSeccion
 Dim NumFacElim As Long 'Numero de la Factura que se ha Eliminado
 Dim NumSecElim As Integer 'Numero de la Seccion que se ha eliminado
@@ -1623,8 +1623,8 @@ Dim NumSecElim As Integer 'Numero de la Seccion que se ha eliminado
     
     '++monica:12/02/2008
     If CByte(Data1.Recordset!intconta) = 1 Then
-       Cad = "No se permite eliminar una Factura Contabilizada!!!"
-       MsgBox Cad, vbExclamation
+       cad = "No se permite eliminar una Factura Contabilizada!!!"
+       MsgBox cad, vbExclamation
        Exit Sub
     End If
     '++
@@ -1632,13 +1632,13 @@ Dim NumSecElim As Integer 'Numero de la Seccion que se ha eliminado
 '    'El registre de codi 0 no es pot Modificar ni Eliminar
 '    If EsCodigoCero(CStr(Data1.Recordset.Fields(1).Value), FormatoCampo(text1(1))) Then Exit Sub
 
-    Cad = "¿Seguro que desea eliminar la factura?"
-    Cad = Cad & vbCrLf & "Factura: " & Format(Data1.Recordset!numfactu, FormatoCampo(Text1(0)))
-    Cad = Cad & vbCrLf & "Fecha: " & Data1.Recordset.Fields("fecfactu")
-    Cad = Cad & vbCrLf & "Cta.Contable: " & Data1.Recordset!Codmacta
+    cad = "¿Seguro que desea eliminar la factura?"
+    cad = cad & vbCrLf & "Factura: " & Format(Data1.Recordset!numfactu, FormatoCampo(text1(0)))
+    cad = cad & vbCrLf & "Fecha: " & Data1.Recordset.Fields("fecfactu")
+    cad = cad & vbCrLf & "Cta.Contable: " & Data1.Recordset!Codmacta
     
     'Borramos
-    If MsgBox(Cad, vbQuestion + vbYesNo) = vbYes Then
+    If MsgBox(cad, vbQuestion + vbYesNo) = vbYes Then
         'Hay que eliminar
         On Error GoTo EEliminar
         Screen.MousePointer = vbHourglass
@@ -1672,8 +1672,8 @@ Dim vSec As CSeccion
     
     'Recuperar Descripciones de los campos de Codigo
     '--------------------------------------------------
-    Text2(3).Text = PonerNombreDeCod(Text1(3), "variedad", "nomvarie")
-    Text2(2).Text = PonerNombreCuenta(Text1(2), Modo, , cContaFacSoc, False)
+    Text2(3).Text = PonerNombreDeCod(text1(3), "variedad", "nomvarie")
+    Text2(2).Text = PonerNombreCuenta(text1(2), Modo, , cContaFacSoc, False)
     
     '-- Esto permanece para saber donde estamos
     lblIndicador.Caption = Data1.Recordset.AbsolutePosition & " de " & Data1.Recordset.RecordCount
@@ -1693,45 +1693,45 @@ Dim V
                     PonerModo 2
                     PonerCampos
                 End If
-                PonerFoco Text1(0)
+                PonerFoco text1(0)
 
         Case 4  'Modificar
                 TerminaBloquear
                 PonerModo 2
                 PonerCampos
-                PonerFoco Text1(0)
+                PonerFoco text1(0)
         
     End Select
 End Sub
 
-Private Function DatosOk() As Boolean
-Dim b As Boolean
-Dim Cad As String
+Private Function DatosOK() As Boolean
+Dim B As Boolean
+Dim cad As String
 
     On Error GoTo EDatosOK
 
-    DatosOk = False
-    b = CompForm2(Me, 1) 'Comprobar formato datos ok
-    If Not b Then Exit Function
+    DatosOK = False
+    B = CompForm2(Me, 1) 'Comprobar formato datos ok
+    If Not B Then Exit Function
     
-    If Mid(Text1(2).Text, 1, vEmpresaFacSoc.DigitosNivelAnterior) <> vParamAplic.RaizCtaFacSoc Then
-        Cad = "La Cuenta contable no coincide con la Raiz del Socio." & vbCrLf & vbCrLf & "         ¿Desea continuar?"
-        If MsgBox(Cad, vbQuestion + vbYesNo + vbDefaultButton1) = vbNo Then
-            b = False
-            PonerFoco Text1(2)
+    If Mid(text1(2).Text, 1, vEmpresaFacSoc.DigitosNivelAnterior) <> vParamAplic.RaizCtaFacSoc Then
+        cad = "La Cuenta contable no coincide con la Raiz del Socio." & vbCrLf & vbCrLf & "         ¿Desea continuar?"
+        If MsgBox(cad, vbQuestion + vbYesNo + vbDefaultButton1) = vbNo Then
+            B = False
+            PonerFoco text1(2)
         End If
     End If
     
     '[Monica]20/06/2017: control de fechas que antes no estaba
-    If b And Text1(1).Text <> "" Then
+    If B And text1(1).Text <> "" Then
         If AbrirConexionContaFacSoc(vParamAplic.UsuarioContaFac, vParamAplic.PasswordContaFac) Then
             Set vEmpresaFacSoc = New CempresaFacSoc
             If vEmpresaFacSoc.LeerNiveles Then
             
-                ResultadoFechaContaOK = EsFechaOKConta(CDate(Text1(2).Text))
+                ResultadoFechaContaOK = EsFechaOKConta(CDate(text1(2).Text))
                 If ResultadoFechaContaOK > 0 Then
                     If ResultadoFechaContaOK <> 4 Then MsgBox MensajeFechaOkConta, vbExclamation
-                    b = False
+                    B = False
                 End If
             End If
             Set vEmpresaFacSoc = Nothing
@@ -1741,18 +1741,18 @@ Dim Cad As String
     
     
     
-    DatosOk = b
+    DatosOK = B
     
 EDatosOK:
     If Err.Number <> 0 Then MsgBox Err.Number & ": " & Err.Description, vbExclamation
 End Function
 
-Private Sub PosicionarData(Cad As String)
+Private Sub PosicionarData(cad As String)
 'Dim cad As String
 Dim Indicador As String
     
   '  cad = ""
-    If SituarDataMULTI(Data1, Cad, Indicador) Then
+    If SituarDataMULTI(Data1, cad, Indicador) Then
         If ModoLineas <> 1 Then
             PonerModo 2
         End If
@@ -1788,15 +1788,15 @@ End Function
 
 Private Sub Text1_GotFocus(Index As Integer)
     kCampo = Index
-    ConseguirFoco Text1(Index), Modo
+    ConseguirFoco text1(Index), Modo
 End Sub
 
 Private Sub Text1_LostFocus(Index As Integer)
-Dim Cad As String, Datos As String
+Dim cad As String, Datos As String
 Dim Suma As Currency
 Dim i As Integer
 
-    If Not PerderFocoGnral(Text1(Index), Modo) Then Exit Sub
+    If Not PerderFocoGnral(text1(Index), Modo) Then Exit Sub
     
     'Si se ha abierto otro formulario, es que se ha pinchado en prismaticos y no
     'mostrar mensajes ni hacer nada
@@ -1804,30 +1804,30 @@ Dim i As Integer
     
     Select Case Index
         Case 0 'Nº factura
-            If Text1(Index).Text <> "" Then FormateaCampo Text1(Index)
+            If text1(Index).Text <> "" Then FormateaCampo text1(Index)
                         
         Case 1 'Fecha
-            If Text1(Index).Text <> "" Then PonerFormatoFecha Text1(Index)
+            If text1(Index).Text <> "" Then PonerFormatoFecha text1(Index)
             
         Case 3 'Variedad
-            If Text1(Index).Text <> "" Then
-                If PonerFormatoEntero(Text1(3)) Then
-                    Text2(Index).Text = PonerNombreDeCod(Text1(Index), "variedad", "nomvarie", "codvarie", "N")
+            If text1(Index).Text <> "" Then
+                If PonerFormatoEntero(text1(3)) Then
+                    Text2(Index).Text = PonerNombreDeCod(text1(Index), "variedad", "nomvarie", "codvarie", "N")
                     If Text2(Index).Text = "" Then
-                        Cad = "No existe la Variedad: " & Text1(Index).Text & vbCrLf
-                        Cad = Cad & "¿Desea crearla?" & vbCrLf
-                        If MsgBox(Cad, vbQuestion + vbYesNo) = vbYes Then
+                        cad = "No existe la Variedad: " & text1(Index).Text & vbCrLf
+                        cad = cad & "¿Desea crearla?" & vbCrLf
+                        If MsgBox(cad, vbQuestion + vbYesNo) = vbYes Then
                             Set frmVar = New frmManVariedad
                             frmVar.DatosADevolverBusqueda = "0|1|"
-                            Text1(Index).Text = ""
+                            text1(Index).Text = ""
                             TerminaBloquear
                             frmVar.Show vbModal
                             Set frmVar = Nothing
                             If Modo = 4 Then BLOQUEADesdeFormulario2 Me, Data1, 1
                         Else
-                            Text1(Index).Text = ""
+                            text1(Index).Text = ""
                         End If
-                        PonerFoco Text1(Index)
+                        PonerFoco text1(Index)
                     End If
                 Else
                     Text2(Index).Text = ""
@@ -1835,32 +1835,32 @@ Dim i As Integer
             End If
             
         Case 2 'Cta Contable
-            If Text1(Index).Text = "" Then Exit Sub
-            Text2(Index).Text = PonerNombreCuenta(Text1(Index), Modo, , cContaFacSoc)
+            If text1(Index).Text = "" Then Exit Sub
+            Text2(Index).Text = PonerNombreCuenta(text1(Index), Modo, , cContaFacSoc)
         
         Case 4 'kilos facturados
-            PonerFormatoEntero Text1(Index)
+            PonerFormatoEntero text1(Index)
             
         Case 5, 8, 9 ', 11, 12 'IMPORTES Base, IVA
-            If Text1(Index).Text = "" Then Exit Sub
+            If text1(Index).Text = "" Then Exit Sub
             If Modo = 1 Then Exit Sub
-            If PonerFormatoDecimal(Text1(Index), 1) Then CalculoTotales
+            If PonerFormatoDecimal(text1(Index), 1) Then CalculoTotales
             
 '[Monica] 25/01/2010 lo he quitado de arriba y lo he dejado modificar
         Case 11, 12  'IMPORTES Base, IVA
             If Modo = 1 Then Exit Sub
-            PonerFormatoDecimal Text1(Index), 1
+            PonerFormatoDecimal text1(Index), 1
             
         Case 7, 10 'porcentajes
-            If Text1(Index).Text = "" Then Exit Sub
+            If text1(Index).Text = "" Then Exit Sub
             If Modo = 1 Then Exit Sub
-            If PonerFormatoDecimal(Text1(Index), 7) Then CalculoTotales
+            If PonerFormatoDecimal(text1(Index), 7) Then CalculoTotales
         
         Case 6 'cod. IVA
-           If Text1(Index).Text = "" Then
-              Text1(Index + 1).Text = ""
+           If text1(Index).Text = "" Then
+              text1(Index + 1).Text = ""
            Else
-              Text1(Index + 1).Text = DevuelveDesdeBDNew(cContaFacSoc, "tiposiva", "porceiva", "codigiva", Text1(Index).Text, "N")
+              text1(Index + 1).Text = DevuelveDesdeBDNew(cContaFacSoc, "tiposiva", "porceiva", "codigiva", text1(Index).Text, "N")
            End If
            CalculoTotales
     End Select
@@ -1881,7 +1881,7 @@ Private Sub Text1_KeyPress(Index As Integer, KeyAscii As Integer)
             End Select
         End If
     Else
-        If Not Text1(Index).MultiLine Then
+        If Not text1(Index).MultiLine Then
             KEYpress KeyAscii
         End If
     End If
@@ -1901,23 +1901,23 @@ Private Sub KEYpress(KeyAscii As Integer)
     End If
 End Sub
 
-Private Sub KEYBusqueda(KeyAscii As Integer, indice As Integer)
+Private Sub KEYBusqueda(KeyAscii As Integer, Indice As Integer)
     KeyAscii = 0
-    imgBuscar_Click (indice)
+    imgBuscar_Click (Indice)
 End Sub
 
-Private Sub KEYFecha(KeyAscii As Integer, indice As Integer)
+Private Sub KEYFecha(KeyAscii As Integer, Indice As Integer)
     KeyAscii = 0
-    imgFec_Click (indice)
+    imgFec_Click (Indice)
 End Sub
 
 Private Function ObtenerWhereCab(conW As Boolean) As String
 Dim vWhere As String
     vWhere = ""
     If conW Then vWhere = " WHERE "
-    vWhere = vWhere & " numfactu = " & Text1(0).Text
-    vWhere = vWhere & " AND fecfactu= '" & Format(Text1(1).Text, FormatoFecha) & "'"
-    vWhere = vWhere & " AND codmacta= '" & Trim(Text1(2).Text) & "'"
+    vWhere = vWhere & " numfactu = " & text1(0).Text
+    vWhere = vWhere & " AND fecfactu= '" & Format(text1(1).Text, FormatoFecha) & "'"
+    vWhere = vWhere & " AND codmacta= '" & Trim(text1(2).Text) & "'"
     ObtenerWhereCab = vWhere
 End Function
 
@@ -2030,8 +2030,8 @@ Dim PorRet As Currency
 Dim ImpRet As Currency
 Dim TotFac As Currency
 
-    Base = CCur(ComprobarCero(Text1(5).Text))
-    PorIva = CCur(ComprobarCero(Text1(7).Text))
+    Base = CCur(ComprobarCero(text1(5).Text))
+    PorIva = CCur(ComprobarCero(text1(7).Text))
     impiva = Round2(Base * PorIva / 100, 2)
     
     Select Case Combo1(0).ListIndex
@@ -2045,34 +2045,34 @@ Dim TotFac As Currency
     
     'solo en el caso de que estemos insertando y modificando y no haya % de retencion
     'le daremos el que hay en parametros
-    If Text1(10).Text = "" And Combo1(0).ListIndex <> 2 And (Modo = 3 Or Modo = 4) Then
-        Text1(10).Text = CCur(ComprobarCero(vParamAplic.PorcreteFacSoc))
+    If text1(10).Text = "" And Combo1(0).ListIndex <> 2 And (Modo = 3 Or Modo = 4) Then
+        text1(10).Text = CCur(ComprobarCero(vParamAplic.PorcreteFacSoc))
     End If
     
     ' calculo de la retencion
-    PorRet = CCur(ComprobarCero(Text1(10).Text))
+    PorRet = CCur(ComprobarCero(text1(10).Text))
     ImpRet = Round2(BaseReten * PorRet / 100, 2)
     
     TotFac = Base + impiva - ImpRet
 
-    Text1(8).Text = Format(impiva, "#,###,###,##0.00")
+    text1(8).Text = Format(impiva, "#,###,###,##0.00")
     
     If BaseReten = 0 Then
-        Text1(9).Text = ""
+        text1(9).Text = ""
     Else
-        Text1(9).Text = Format(BaseReten, "#,###,###,##0.00")
+        text1(9).Text = Format(BaseReten, "#,###,###,##0.00")
     End If
     
     If ImpRet = 0 Then
-        Text1(11).Text = ""
+        text1(11).Text = ""
     Else
-        Text1(11).Text = ImpRet
+        text1(11).Text = ImpRet
     End If
     
     If TotFac = 0 Then
-        Text1(12).Text = ""
+        text1(12).Text = ""
     Else
-        Text1(12).Text = Format(TotFac, "#,###,###,##0.00")
+        text1(12).Text = Format(TotFac, "#,###,###,##0.00")
     End If
 End Sub
 
@@ -2081,9 +2081,9 @@ Dim i As Integer
     If Not (Modo = 3 Or Modo = 4) Then Exit Sub
     
     For i = 9 To 11
-        Text1(i).Enabled = (Combo1(0).ListIndex <> 2)
+        text1(i).Enabled = (Combo1(0).ListIndex <> 2)
         If (Combo1(0).ListIndex = 2) Then
-             Text1(i).Text = ""
+             text1(i).Text = ""
         End If
     Next i
     
@@ -2112,7 +2112,7 @@ Dim F2 As Date
                 '[Monica]06/10/2017: añadida la segunda condicion: fecha > vEmpresa.SIIFechaInicio
                 '                    fallaba cuando la fecha es anterior a la declaracion del SII.
                 '                    Caso de Coopic con una factura interna
-                If DateDiff("d", Fecha, Now) > vEmpresaFacSoc.SIIDiasAviso And Fecha > vEmpresa.SIIFechaInicio Then
+                If DateDiff("d", Fecha, Now) > vEmpresaFacSoc.SIIDiasAviso And Fecha > vEmpresaFacSoc.SIIFechaInicio Then
                     MensajeFechaOkConta = "Fecha fuera de periodo de comunicación SII."
                     'LLEVA SII y han trascurrido los dias
                     If vSesion.Nivel = 0 Then

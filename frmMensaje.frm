@@ -13,116 +13,64 @@ Begin VB.Form frmMensaje
    ScaleWidth      =   9435
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'CenterScreen
-   Begin VB.Frame FrameFrasPteContabilizar 
-      Height          =   5790
-      Left            =   0
-      TabIndex        =   20
-      Top             =   0
-      Width           =   9345
-      Begin VB.ComboBox Combo1 
-         BeginProperty Font 
-            Name            =   "Verdana"
-            Size            =   9.75
-            Charset         =   0
-            Weight          =   400
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
-         Height          =   360
-         Index           =   0
-         ItemData        =   "frmMensaje.frx":0000
-         Left            =   270
-         List            =   "frmMensaje.frx":000A
-         Style           =   2  'Dropdown List
-         TabIndex        =   24
-         Tag             =   "Tipo de cliente|N|N|0|2|ssocio|tipsocio|||"
-         Top             =   240
-         Width           =   2055
-      End
-      Begin VB.CommandButton cmdCerrarFras 
-         Caption         =   "Continuar"
-         BeginProperty Font 
-            Name            =   "Verdana"
-            Size            =   9.75
-            Charset         =   0
-            Weight          =   400
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
+   Begin VB.Frame FrameErrores 
+      Height          =   5505
+      Left            =   60
+      TabIndex        =   4
+      Top             =   90
+      Width           =   8835
+      Begin VB.CommandButton CmdSalir 
+         Caption         =   "&Salir"
          Height          =   375
-         Index           =   5
-         Left            =   7950
-         TabIndex        =   21
-         Top             =   5280
-         Width           =   1215
+         Left            =   6930
+         TabIndex        =   5
+         Top             =   4830
+         Width           =   1035
       End
-      Begin MSComctlLib.ListView ListView22 
-         Height          =   4545
-         Left            =   240
-         TabIndex        =   22
-         Top             =   630
-         Width           =   8940
-         _ExtentX        =   15769
-         _ExtentY        =   8017
+      Begin MSComctlLib.ListView ListView2 
+         Height          =   4155
+         Left            =   210
+         TabIndex        =   6
+         Top             =   540
+         Width           =   7785
+         _ExtentX        =   13732
+         _ExtentY        =   7329
          View            =   3
          LabelWrap       =   -1  'True
          HideSelection   =   -1  'True
-         FullRowSelect   =   -1  'True
          _Version        =   393217
          ForeColor       =   -2147483640
          BackColor       =   -2147483643
          BorderStyle     =   1
          Appearance      =   1
-         BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-            Name            =   "Verdana"
-            Size            =   9.75
-            Charset         =   0
-            Weight          =   400
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
-         NumItems        =   4
-         BeginProperty ColumnHeader(1) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
-            Text            =   "Código"
-            Object.Width           =   1764
-         EndProperty
-         BeginProperty ColumnHeader(2) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
-            SubItemIndex    =   1
-            Text            =   "Variedad"
-            Object.Width           =   3881
-         EndProperty
-         BeginProperty ColumnHeader(3) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
-            SubItemIndex    =   2
-            Text            =   "Clase "
-            Object.Width           =   1411
-         EndProperty
-         BeginProperty ColumnHeader(4) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
-            SubItemIndex    =   3
-            Text            =   "Descripcion"
-            Object.Width           =   3706
-         EndProperty
+         NumItems        =   0
       End
-      Begin VB.Label Label24 
-         Alignment       =   1  'Right Justify
-         Caption         =   "Facturas Pendientes de Contabilizar"
+      Begin VB.Label Label2 
+         Caption         =   "Errores de Comprobación"
          BeginProperty Font 
-            Name            =   "Verdana"
-            Size            =   11.25
+            Name            =   "Tahoma"
+            Size            =   9.75
             Charset         =   0
             Weight          =   700
             Underline       =   0   'False
             Italic          =   0   'False
             Strikethrough   =   0   'False
          EndProperty
-         ForeColor       =   &H00972E0B&
-         Height          =   375
-         Left            =   780
-         TabIndex        =   23
-         Top             =   300
-         Width           =   8355
+         ForeColor       =   &H000000C0&
+         Height          =   255
+         Left            =   270
+         TabIndex        =   8
+         Top             =   210
+         Width           =   3585
+      End
+      Begin VB.Label Label1 
+         Caption         =   "Label2"
+         Height          =   345
+         Index           =   2
+         Left            =   450
+         TabIndex        =   7
+         Top             =   1470
+         Width           =   3555
       End
    End
    Begin VB.Frame frameAcercaDE 
@@ -302,66 +250,6 @@ Begin VB.Form frmMensaje
          Width           =   5355
       End
    End
-   Begin VB.Frame FrameErrores 
-      Height          =   5505
-      Left            =   60
-      TabIndex        =   4
-      Top             =   90
-      Width           =   8835
-      Begin VB.CommandButton CmdSalir 
-         Caption         =   "&Salir"
-         Height          =   375
-         Left            =   6930
-         TabIndex        =   5
-         Top             =   4830
-         Width           =   1035
-      End
-      Begin MSComctlLib.ListView ListView2 
-         Height          =   4155
-         Left            =   210
-         TabIndex        =   6
-         Top             =   540
-         Width           =   7785
-         _ExtentX        =   13732
-         _ExtentY        =   7329
-         View            =   3
-         LabelWrap       =   -1  'True
-         HideSelection   =   -1  'True
-         _Version        =   393217
-         ForeColor       =   -2147483640
-         BackColor       =   -2147483643
-         BorderStyle     =   1
-         Appearance      =   1
-         NumItems        =   0
-      End
-      Begin VB.Label Label2 
-         Caption         =   "Errores de Comprobación"
-         BeginProperty Font 
-            Name            =   "Tahoma"
-            Size            =   9.75
-            Charset         =   0
-            Weight          =   700
-            Underline       =   0   'False
-            Italic          =   0   'False
-            Strikethrough   =   0   'False
-         EndProperty
-         ForeColor       =   &H000000C0&
-         Height          =   255
-         Left            =   270
-         TabIndex        =   8
-         Top             =   210
-         Width           =   3585
-      End
-      Begin VB.Label Label1 
-         Caption         =   "Label2"
-         Height          =   345
-         Index           =   2
-         Left            =   450
-         TabIndex        =   7
-         Top             =   1470
-         Width           =   3555
-      End
-   End
    Begin VB.Frame FrameCobrosPtes 
       Height          =   5430
       Left            =   45
@@ -429,6 +317,118 @@ Begin VB.Form frmMensaje
          TabIndex        =   3
          Top             =   1470
          Width           =   3555
+      End
+   End
+   Begin VB.Frame FrameFrasPteContabilizar 
+      Height          =   5790
+      Left            =   0
+      TabIndex        =   20
+      Top             =   0
+      Width           =   9345
+      Begin VB.ComboBox Combo1 
+         BeginProperty Font 
+            Name            =   "Verdana"
+            Size            =   9.75
+            Charset         =   0
+            Weight          =   400
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         Height          =   360
+         Index           =   0
+         ItemData        =   "frmMensaje.frx":0000
+         Left            =   270
+         List            =   "frmMensaje.frx":000A
+         Style           =   2  'Dropdown List
+         TabIndex        =   24
+         Tag             =   "Tipo de cliente|N|N|0|2|ssocio|tipsocio|||"
+         Top             =   240
+         Width           =   2055
+      End
+      Begin VB.CommandButton cmdCerrarFras 
+         Caption         =   "Continuar"
+         BeginProperty Font 
+            Name            =   "Verdana"
+            Size            =   9.75
+            Charset         =   0
+            Weight          =   400
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         Height          =   375
+         Index           =   5
+         Left            =   7950
+         TabIndex        =   21
+         Top             =   5280
+         Width           =   1215
+      End
+      Begin MSComctlLib.ListView ListView22 
+         Height          =   4545
+         Left            =   240
+         TabIndex        =   22
+         Top             =   630
+         Width           =   8940
+         _ExtentX        =   15769
+         _ExtentY        =   8017
+         View            =   3
+         LabelWrap       =   -1  'True
+         HideSelection   =   -1  'True
+         FullRowSelect   =   -1  'True
+         _Version        =   393217
+         ForeColor       =   -2147483640
+         BackColor       =   -2147483643
+         BorderStyle     =   1
+         Appearance      =   1
+         BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+            Name            =   "Verdana"
+            Size            =   9.75
+            Charset         =   0
+            Weight          =   400
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         NumItems        =   4
+         BeginProperty ColumnHeader(1) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
+            Text            =   "Código"
+            Object.Width           =   1764
+         EndProperty
+         BeginProperty ColumnHeader(2) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
+            SubItemIndex    =   1
+            Text            =   "Variedad"
+            Object.Width           =   3881
+         EndProperty
+         BeginProperty ColumnHeader(3) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
+            SubItemIndex    =   2
+            Text            =   "Clase "
+            Object.Width           =   1411
+         EndProperty
+         BeginProperty ColumnHeader(4) {BDD1F052-858B-11D1-B16A-00C0F0283628} 
+            SubItemIndex    =   3
+            Text            =   "Descripcion"
+            Object.Width           =   3706
+         EndProperty
+      End
+      Begin VB.Label Label24 
+         Alignment       =   1  'Right Justify
+         Caption         =   "Facturas Pendientes de Contabilizar"
+         BeginProperty Font 
+            Name            =   "Verdana"
+            Size            =   11.25
+            Charset         =   0
+            Weight          =   700
+            Underline       =   0   'False
+            Italic          =   0   'False
+            Strikethrough   =   0   'False
+         EndProperty
+         ForeColor       =   &H00972E0B&
+         Height          =   375
+         Left            =   780
+         TabIndex        =   23
+         Top             =   300
+         Width           =   8355
       End
    End
 End
@@ -556,15 +556,15 @@ Private Sub CargarListaErrContab()
 'en un ListView
 Dim Rs As ADODB.Recordset
 Dim ItmX As ListItem
-Dim SQL As String
+Dim Sql As String
 
     On Error GoTo ECargarList
 
-    SQL = " SELECT  * "
-    SQL = SQL & " FROM tmperrfac "
+    Sql = " SELECT  * "
+    Sql = Sql & " FROM tmperrfac "
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         ListView1.Height = 4500
         ListView1.Width = 7400
@@ -679,15 +679,15 @@ Private Sub CargarListaErrComprobacion()
 'en un ListView
 Dim Rs As ADODB.Recordset
 Dim ItmX As ListItem
-Dim SQL As String
+Dim Sql As String
 
     On Error GoTo ECargarListErrComprobacion
 
-    SQL = " SELECT  * "
-    SQL = SQL & " FROM tmperrcomprob "
+    Sql = " SELECT  * "
+    Sql = Sql & " FROM tmperrcomprob "
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         'Los encabezados
         ListView2.ColumnHeaders.Clear
@@ -732,15 +732,15 @@ Private Sub CargarListaErrContabFacSoc()
 'en un ListView
 Dim Rs As ADODB.Recordset
 Dim ItmX As ListItem
-Dim SQL As String
+Dim Sql As String
 
     On Error GoTo ECargarList
 
-    SQL = " SELECT  * "
-    SQL = SQL & " FROM tmperrfac "
+    Sql = " SELECT  * "
+    Sql = Sql & " FROM tmperrfac "
     
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
 
         'Los encabezados
@@ -771,7 +771,7 @@ End Sub
 
 
 Private Sub CargarFacturasPendientesContabilizar()
-Dim SQL As String
+Dim Sql As String
 Dim sql2 As String
 Dim Rs As ADODB.Recordset
 Dim IT As ListItem
@@ -779,24 +779,24 @@ Dim TotalArray As Long
 Dim BdConta As Integer
 
 
-    SQL = Cadena
+    Sql = Cadena
     Select Case Combo1(0).ListIndex
         Case 0
         
         Case 1
-            SQL = SQL & " and codigo1 = 0 "
+            Sql = Sql & " and codigo1 = 0 "
         Case 2
-            SQL = SQL & " and codigo1 = 1 "
+            Sql = Sql & " and codigo1 = 1 "
         Case 3
-            SQL = SQL & " and codigo1 = 2 "
+            Sql = Sql & " and codigo1 = 2 "
         Case 4
-            SQL = SQL & " and codigo1 = 3 "
+            Sql = Sql & " and codigo1 = 3 "
     End Select
-    SQL = SQL & " order by fecha1 "
+    Sql = Sql & " order by fecha1 "
      
      
     Set Rs = New ADODB.Recordset
-    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     
     ListView22.ColumnHeaders.Clear
 
