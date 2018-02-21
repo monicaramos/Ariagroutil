@@ -556,15 +556,15 @@ Private Sub CargarListaErrContab()
 'en un ListView
 Dim Rs As ADODB.Recordset
 Dim ItmX As ListItem
-Dim Sql As String
+Dim SQL As String
 
     On Error GoTo ECargarList
 
-    Sql = " SELECT  * "
-    Sql = Sql & " FROM tmperrfac "
+    SQL = " SELECT  * "
+    SQL = SQL & " FROM tmperrfac "
     
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         ListView1.Height = 4500
         ListView1.Width = 7400
@@ -679,15 +679,15 @@ Private Sub CargarListaErrComprobacion()
 'en un ListView
 Dim Rs As ADODB.Recordset
 Dim ItmX As ListItem
-Dim Sql As String
+Dim SQL As String
 
     On Error GoTo ECargarListErrComprobacion
 
-    Sql = " SELECT  * "
-    Sql = Sql & " FROM tmperrcomprob "
+    SQL = " SELECT  * "
+    SQL = SQL & " FROM tmperrcomprob "
     
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
         'Los encabezados
         ListView2.ColumnHeaders.Clear
@@ -732,15 +732,15 @@ Private Sub CargarListaErrContabFacSoc()
 'en un ListView
 Dim Rs As ADODB.Recordset
 Dim ItmX As ListItem
-Dim Sql As String
+Dim SQL As String
 
     On Error GoTo ECargarList
 
-    Sql = " SELECT  * "
-    Sql = Sql & " FROM tmperrfac "
+    SQL = " SELECT  * "
+    SQL = SQL & " FROM tmperrfac "
     
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     If Not Rs.EOF Then
 
         'Los encabezados
@@ -771,7 +771,7 @@ End Sub
 
 
 Private Sub CargarFacturasPendientesContabilizar()
-Dim Sql As String
+Dim SQL As String
 Dim sql2 As String
 Dim Rs As ADODB.Recordset
 Dim IT As ListItem
@@ -779,24 +779,24 @@ Dim TotalArray As Long
 Dim BdConta As Integer
 
 
-    Sql = Cadena
+    SQL = Cadena
     Select Case Combo1(0).ListIndex
         Case 0
         
         Case 1
-            Sql = Sql & " and codigo1 = 0 "
+            SQL = SQL & " and codigo1 = 0 "
         Case 2
-            Sql = Sql & " and codigo1 = 1 "
+            SQL = SQL & " and codigo1 = 1 "
         Case 3
-            Sql = Sql & " and codigo1 = 2 "
+            SQL = SQL & " and codigo1 = 2 "
         Case 4
-            Sql = Sql & " and codigo1 = 3 "
+            SQL = SQL & " and codigo1 = 3 "
     End Select
-    Sql = Sql & " order by fecha1 "
+    SQL = SQL & " order by fecha1 "
      
      
     Set Rs = New ADODB.Recordset
-    Rs.Open Sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+    Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
     
     ListView22.ColumnHeaders.Clear
 
@@ -828,11 +828,20 @@ Dim BdConta As Integer
                     Set vEmpresaFac = New CempresaFac
                     If vEmpresaFac.LeerNiveles Then
                         If vEmpresaFac.TieneSII Then
-                            If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaFac.SIIDiasAviso * (-1), Now) Then
+'                            If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaFac.SIIDiasAviso * (-1), Now) Then
+                            '[Monica]20/02/2018: por fin de semana
+                            If DBLet(Rs!Fecha1, "F") < UltimaFechaCorrectaSII(vEmpresaFac.SIIDiasAviso, Now) Then
                                 IT.ForeColor = vbRed
                                 IT.ListSubItems.Item(1).ForeColor = vbRed
                                 IT.ListSubItems.Item(2).ForeColor = vbRed
                                 IT.ListSubItems.Item(3).ForeColor = vbRed
+                            Else
+                                If DBLet(Rs!Fecha1, "F") = UltimaFechaCorrectaSII(vEmpresaFac.SIIDiasAviso, Now) Then
+                                    IT.ForeColor = vbRed
+                                    IT.ListSubItems.Item(1).ForeColor = vbBlue
+                                    IT.ListSubItems.Item(2).ForeColor = vbBlue
+                                    IT.ListSubItems.Item(3).ForeColor = vbBlue
+                                End If
                             End If
                         End If
                     End If
@@ -843,33 +852,60 @@ Dim BdConta As Integer
                  
             Case 1 ' facturas de socio
                 If vEmpresaFacSoc.TieneSII Then
-                    If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaFacSoc.SIIDiasAviso * (-1), Now) Then
+'                    If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaFacSoc.SIIDiasAviso * (-1), Now) Then
+                    '[Monica]20/02/2018: por fin de semana
+                    If DBLet(Rs!Fecha1, "F") < UltimaFechaCorrectaSII(vEmpresaFacSoc.SIIDiasAviso, Now) Then
                         IT.ForeColor = vbRed
                         IT.ListSubItems.Item(1).ForeColor = vbRed
                         IT.ListSubItems.Item(2).ForeColor = vbRed
                         IT.ListSubItems.Item(3).ForeColor = vbRed
+                    Else
+                        If DBLet(Rs!Fecha1, "F") = UltimaFechaCorrectaSII(vEmpresaFacSoc.SIIDiasAviso, Now) Then
+                            IT.ForeColor = vbBlue
+                            IT.ListSubItems.Item(1).ForeColor = vbBlue
+                            IT.ListSubItems.Item(2).ForeColor = vbBlue
+                            IT.ListSubItems.Item(3).ForeColor = vbBlue
+                        End If
                     End If
                 End If
                 IT.SmallIcon = 18
             
             Case 2 ' facturas de gasolinera
                 If vEmpresaGas.TieneSII Then
-                    If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaGas.SIIDiasAviso * (-1), Now) Then
+'                    If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaGas.SIIDiasAviso * (-1), Now) Then
+                    '[Monica]20/02/2018: por fin de semana
+                    If DBLet(Rs!Fecha1, "F") < UltimaFechaCorrectaSII(vEmpresaGas.SIIDiasAviso, Now) Then
                         IT.ForeColor = vbRed
                         IT.ListSubItems.Item(1).ForeColor = vbRed
                         IT.ListSubItems.Item(2).ForeColor = vbRed
                         IT.ListSubItems.Item(3).ForeColor = vbRed
+                    Else
+                        If DBLet(Rs!Fecha1, "F") = UltimaFechaCorrectaSII(vEmpresaGas.SIIDiasAviso, Now) Then
+                            IT.ForeColor = vbBlue
+                            IT.ListSubItems.Item(1).ForeColor = vbBlue
+                            IT.ListSubItems.Item(2).ForeColor = vbBlue
+                            IT.ListSubItems.Item(3).ForeColor = vbBlue
+                        End If
                     End If
                 End If
                 IT.SmallIcon = 16
 
             Case 3 ' facturas de telefonia
                 If vEmpresaTel.TieneSII Then
-                    If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaTel.SIIDiasAviso * (-1), Now) Then
+'                    If DBLet(Rs!Fecha1, "F") < DateAdd("d", vEmpresaTel.SIIDiasAviso * (-1), Now) Then
+                    '[Monica]20/02/2018: por fin de semana
+                    If DBLet(Rs!Fecha1, "F") < UltimaFechaCorrectaSII(vEmpresaTel.SIIDiasAviso, Now) Then
                         IT.ForeColor = vbRed
                         IT.ListSubItems.Item(1).ForeColor = vbRed
                         IT.ListSubItems.Item(2).ForeColor = vbRed
                         IT.ListSubItems.Item(3).ForeColor = vbRed
+                    Else
+                        If DBLet(Rs!Fecha1, "F") = UltimaFechaCorrectaSII(vEmpresaTel.SIIDiasAviso, Now) Then
+                            IT.ForeColor = vbBlue
+                            IT.ListSubItems.Item(1).ForeColor = vbBlue
+                            IT.ListSubItems.Item(2).ForeColor = vbBlue
+                            IT.ListSubItems.Item(3).ForeColor = vbBlue
+                        End If
                     End If
                 End If
                 IT.SmallIcon = 14

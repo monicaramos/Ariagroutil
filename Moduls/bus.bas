@@ -156,6 +156,43 @@ Public Sub Main()
     
 End Sub
 
+
+Public Function UltimaFechaCorrectaSII(DiasAVisoSII As Integer, FechaPresentacion As Date) As Date
+Dim DiaSemanaPresen As Integer
+Dim DiaSemanaUltimoDiaPresentar As Integer
+Dim F As Date
+Dim Resta As Integer
+    
+    If DiasAVisoSII > 5 Then
+        UltimaFechaCorrectaSII = DateAdd("d", -DiasAVisoSII, FechaPresentacion)
+    Else
+        DiaSemanaPresen = Weekday(FechaPresentacion, vbMonday)
+        If DiaSemanaPresen >= 6 Then
+            'Si presento el sabado o el domingo tengo mas dias
+            If DiaSemanaPresen = 6 Then
+                Resta = DiasAVisoSII
+            Else
+                Resta = DiasAVisoSII + 1
+            End If
+        Else
+            F = DateAdd("d", -DiasAVisoSII, FechaPresentacion)
+            DiaSemanaUltimoDiaPresentar = Weekday(F, vbMonday)
+            If DiaSemanaUltimoDiaPresentar > DiaSemanaPresen Then
+                Resta = DiasAVisoSII + 2
+            Else
+                'Directamente la resta son 4
+                Resta = DiasAVisoSII
+            End If
+        End If
+        UltimaFechaCorrectaSII = DateAdd("d", -Resta, FechaPresentacion)
+    End If
+    UltimaFechaCorrectaSII = Format(UltimaFechaCorrectaSII, "dd/mm/yyyy")
+
+End Function
+
+
+
+
 Public Function ComprovaVersio() As Boolean
   
 '    Dim RS2 As Recordset

@@ -182,7 +182,7 @@ Dim indCodigo As Integer 'indice para txtCodigo
 'Se inicializan para cada Informe (tabla de BD a la que hace referencia
 Dim Codigo As String 'Código para FormulaSelection de Crystal Report
 Dim TipCod As String
-Dim cad As String
+Dim Cad As String
 Dim cadTABLA As String
 
 Dim vContad As Long
@@ -198,12 +198,12 @@ Private Sub KEYpress(KeyAscii As Integer)
 End Sub
 
 Private Sub cmdAceptar_Click()
-Dim Sql As String
+Dim SQL As String
 Dim i As Byte
 Dim cadwhere As String
 Dim b As Boolean
-Dim nomfic As String
-Dim CADENA As String
+Dim NomFic As String
+Dim Cadena As String
 Dim cadena1 As String
 
 On Error GoTo eError
@@ -254,9 +254,9 @@ On Error GoTo eError
                 cadTABLA = "tmpinformes"
                 cadFormula = "{tmpinformes.codusu} = " & vSesion.Codigo
                 
-                Sql = "select count(*) from tmpinformes where codusu = " & vSesion.Codigo
+                SQL = "select count(*) from tmpinformes where codusu = " & vSesion.Codigo
                 
-                If TotalRegistros(Sql) <> 0 Then
+                If TotalRegistros(SQL) <> 0 Then
                     MsgBox "Hay errores en la Importación de datos de Agroweb. Debe corregirlos previamente.", vbExclamation
                     cadTitulo = "Errores de Importación"
                     cadNombreRPT = "rErroresImporte.rpt"
@@ -389,33 +389,33 @@ Dim NF As Integer
     RecuperaFichero = False
     NF = FreeFile
     Open App.path For Input As #NF ' & "\BV" & Format(CDate(txtcodigo(0).Text), "ddmmyy") & "." & Format(txtcodigo(1).Text, "000") For Input As #NF
-    Line Input #NF, cad
+    Line Input #NF, Cad
     Close #NF
-    If cad <> "" Then RecuperaFichero = True
+    If Cad <> "" Then RecuperaFichero = True
     
 End Function
 
 
-Private Function ProcesarFichero(nomfich As String) As Boolean
+Private Function ProcesarFichero(nomFich As String) As Boolean
 Dim NF As Long
-Dim cad As String
+Dim Cad As String
 Dim i As Integer
 Dim longitud As Long
-Dim RS As ADODB.Recordset
+Dim Rs As ADODB.Recordset
 Dim Rs1 As ADODB.Recordset
 Dim NumReg As Long
-Dim Sql As String
+Dim SQL As String
 Dim SQL1 As String
-Dim Total As Long
+Dim total As Long
 Dim b As Boolean
 
     ProcesarFichero = False
     NF = FreeFile
     
-    Open nomfich For Input As #NF
+    Open nomFich For Input As #NF
     
-    lblProgres(0).Caption = "Procesando Fichero: " & nomfich
-    longitud = FileLen(nomfich)
+    lblProgres(0).Caption = "Procesando Fichero: " & nomFich
+    longitud = FileLen(nomFich)
     
     Pb1.visible = True
     Me.Pb1.Max = longitud + 1
@@ -424,26 +424,26 @@ Dim b As Boolean
     b = True
     
     For i = 1 To 2 '[Monica]30/01/2012: antes saltabamos 6 lineas, ahora 1
-        Line Input #NF, cad
-        Me.Pb1.Value = Me.Pb1.Value + Len(cad)
+        Line Input #NF, Cad
+        Me.Pb1.Value = Me.Pb1.Value + Len(Cad)
         Me.Refresh
     Next i
     
     i = 0
     ' PROCESO DEL FICHERO
     While Not EOF(NF) And b
-        cad = cad & ";"
+        Cad = Cad & ";"
         
         i = i + 1
        
         lblProgres(1).Caption = "Linea " & i '[Monica]30/01/2012: antes: & RecuperaValor(cad, 1, ";")
         Me.Refresh
-        If Mid(cad, 1, 1) <> ";" Then '[Monica]30/01/2012:antes:  =";"
-            b = InsertarLinea(cad)
+        If Mid(Cad, 1, 1) <> ";" Then '[Monica]30/01/2012:antes:  =";"
+            b = InsertarLinea(Cad)
         End If
         
-        Line Input #NF, cad
-        Me.Pb1.Value = Me.Pb1.Value + Len(cad) - 1
+        Line Input #NF, Cad
+        Me.Pb1.Value = Me.Pb1.Value + Len(Cad) - 1
     Wend
     Close #NF
     
@@ -455,32 +455,32 @@ Dim b As Boolean
 
 End Function
                 
-Private Function ProcesarFichero2(nomfich As String) As Boolean
+Private Function ProcesarFichero2(nomFich As String) As Boolean
 Dim NF As Long
-Dim cad As String
+Dim Cad As String
 Dim i As Integer
 Dim longitud As Long
-Dim RS As ADODB.Recordset
-Dim Sql As String
-Dim NifSocio As String
+Dim Rs As ADODB.Recordset
+Dim SQL As String
+Dim Nifsocio As String
 Dim CtaSocio As String
 Dim Mens As String
 
 Dim Referencia As String
 Dim Plan As String
 Dim Linea As String
-Dim Sql2 As String
+Dim sql2 As String
 
     On Error GoTo eProcesarFichero2
     
     ProcesarFichero2 = False
     NF = FreeFile
-    Open nomfich For Input As #NF
+    Open nomFich For Input As #NF
     
     i = 0
     
-    lblProgres(0).Caption = "Comprobando NIF Socios: " & nomfich
-    longitud = FileLen(nomfich)
+    lblProgres(0).Caption = "Comprobando NIF Socios: " & nomFich
+    longitud = FileLen(nomFich)
     
     Pb1.visible = True
     Me.Pb1.Max = longitud + 1
@@ -489,8 +489,8 @@ Dim Sql2 As String
     
     ' saltamos las 6 primeras lineas
     For i = 1 To 2 '[Monica]30/01/2012: antes saltabamos 6 lineas
-        Line Input #NF, cad
-        Me.Pb1.Value = Me.Pb1.Value + Len(cad)
+        Line Input #NF, Cad
+        Me.Pb1.Value = Me.Pb1.Value + Len(Cad)
     Next i
     
     ' PROCESO DEL FICHERO
@@ -501,7 +501,7 @@ Dim Sql2 As String
         lblProgres(1).Caption = "Linea " & i '[Monica]30/01/2012: antes: & RecuperaValor(cad, 2, ";")
         Me.Refresh
         
-        If Mid(cad, 1, 1) <> ";" Then
+        If Mid(Cad, 1, 1) <> ";" Then
             '30/01/2012: Cambiamos posiciones
             'NifSocio = RecuperaValor(cad, 6, ";")
             '[Monica]08/01/2013: han cambiado de aseguradora
@@ -510,17 +510,17 @@ Dim Sql2 As String
             'NifSocio = RecuperaValor(cad, 7, ";")
             '[Monica]25/01/2016: han vuelto a cambiar de aseguradora
             'NifSocio = RecuperaValor(cad, 2, ";")
-            NifSocio = RecuperaValor(cad, 7, ";")
+            Nifsocio = RecuperaValor(Cad, 7, ";")
             
             'MIRAMOS SI EXISTE EL NIF
-            CtaSocio = CtaContableSocio(NifSocio, cContaSeg)
+            CtaSocio = CtaContableSocio(Nifsocio, cContaSeg)
 
             If CtaSocio = "" Then
                 Mens = "Cta.Contable para NIF socio no existe"
-                Sql = "insert into tmpinformes (codusu, nombre1, importe1, nombre2) values (" & _
-                      vSesion.Codigo & "," & DBSet(NifSocio, "T") & "," & RecuperaValor(cad, 6, ";") & "," & DBSet(Mens, "T") & ")"
+                SQL = "insert into tmpinformes (codusu, nombre1, importe1, nombre2) values (" & _
+                      vSesion.Codigo & "," & DBSet(Nifsocio, "T") & "," & RecuperaValor(Cad, 6, ";") & "," & DBSet(Mens, "T") & ")"
 
-                conn.Execute Sql
+                conn.Execute SQL
             End If
             
 '            '[Monica]15/05/2014: han cambiado de empresa
@@ -530,34 +530,34 @@ Dim Sql2 As String
 '            Linea = RecuperaValor(cad, 5, ";")      ' antes 6
             
             '[Monica]25/01/2016: han cambiado de empresa
-            Referencia = RecuperaValor(cad, 2, ";")
-            Plan = RecuperaValor(cad, 5, ";")
-            Linea = RecuperaValor(cad, 6, ";")
+            Referencia = RecuperaValor(Cad, 2, ";")
+            Plan = RecuperaValor(Cad, 5, ";")
+            Linea = RecuperaValor(Cad, 6, ";")
             
             If Trim(Referencia) = "" Or Len(Referencia) = 1 Then
                 Mens = "No hay Referencia"
-                Sql = "insert into tmpinformes (codusu, nombre1, importe1, nombre2) values (" & _
-                      vSesion.Codigo & "," & DBSet(NifSocio, "T") & "," & RecuperaValor(cad, 6, ";") & "," & DBSet(Mens, "T") & ")"
+                SQL = "insert into tmpinformes (codusu, nombre1, importe1, nombre2) values (" & _
+                      vSesion.Codigo & "," & DBSet(Nifsocio, "T") & "," & RecuperaValor(Cad, 6, ";") & "," & DBSet(Mens, "T") & ")"
 
-                conn.Execute Sql
+                conn.Execute SQL
             End If
             
-            Sql2 = "select count(*) from segpoliza where codrefer = " & DBSet(Referencia, "T") & " and codiplan = " & DBSet(Plan, "N") & " and codlinea = " & DBSet(Linea, "N")
-            If TotalRegistros(Sql2) <> 0 Then
+            sql2 = "select count(*) from segpoliza where codrefer = " & DBSet(Referencia, "T") & " and codiplan = " & DBSet(Plan, "N") & " and codlinea = " & DBSet(Linea, "N")
+            If TotalRegistros(sql2) <> 0 Then
                 Mens = "Referencia ya existe"
-                Sql = "insert into tmpinformes (codusu, nombre1, importe1, nombre2) values (" & _
-                      vSesion.Codigo & "," & DBSet(Referencia, "T") & "," & RecuperaValor(cad, 6, ";") & "," & DBSet(Mens, "T") & ")"
+                SQL = "insert into tmpinformes (codusu, nombre1, importe1, nombre2) values (" & _
+                      vSesion.Codigo & "," & DBSet(Referencia, "T") & "," & RecuperaValor(Cad, 6, ";") & "," & DBSet(Mens, "T") & ")"
 
-                conn.Execute Sql
+                conn.Execute SQL
             End If
         End If
         
-        Line Input #NF, cad
-        Me.Pb1.Value = Me.Pb1.Value + Len(cad)
+        Line Input #NF, Cad
+        Me.Pb1.Value = Me.Pb1.Value + Len(Cad)
     Wend
     Close #NF
     
-    If cad <> "" Then ProcesarFichero2 = True
+    If Cad <> "" Then ProcesarFichero2 = True
     
     Pb1.visible = False
     lblProgres(0).Caption = ""
@@ -569,10 +569,10 @@ eProcesarFichero2:
     End If
 End Function
             
-Private Function InsertarLinea(cad As String) As Boolean
+Private Function InsertarLinea(Cad As String) As Boolean
 Dim b As Boolean
-Dim Sql As String
-Dim Sql2 As String
+Dim SQL As String
+Dim sql2 As String
 Dim registro As String
 Dim CtaSocio As String
 Dim Plan As String
@@ -653,15 +653,19 @@ Dim NuevoImporte As Currency
 '    Referencia = Replace(Referencia, ".", "")
 
 '[Monica]25/01/2016: han cambiado de aseguradora
-    Plan = RecuperaValor(cad, 5, ";")
-    Linea = RecuperaValor(cad, 6, ";")
-    Colectivo = RecuperaValor(cad, 3, ";")
-    nif = RecuperaValor(cad, 7, ";")
-    Nombre = RecuperaValor(cad, 8, ";")
-    Estado = RecuperaValor(cad, 9, ";")
-    FechaEnvio = RecuperaValor(cad, 12, ";") ' cogemos la fecha de pago del fichero
-    ImpNeto = RecuperaValor(cad, 10, ";")
-    Referencia = RecuperaValor(cad, 2, ";")
+    Plan = RecuperaValor(Cad, 5, ";")
+    Linea = RecuperaValor(Cad, 6, ";")
+    Colectivo = RecuperaValor(Cad, 3, ";")
+    nif = RecuperaValor(Cad, 7, ";")
+    Nombre = RecuperaValor(Cad, 8, ";")
+    Estado = RecuperaValor(Cad, 9, ";")
+    
+    '[Monica]19/02/2018 : han cambiado a la 14, cambiarlo para Catadau antes era la 12
+    FechaEnvio = RecuperaValor(Cad, 14, ";") ' cogemos la fecha de pago del fichero
+    
+    
+    ImpNeto = RecuperaValor(Cad, 10, ";")
+    Referencia = RecuperaValor(Cad, 2, ";")
     Referencia = Replace(Referencia, ".", "")
 
 
@@ -682,27 +686,27 @@ Dim NuevoImporte As Currency
         Existe = ""
         Existe = DevuelveDesdeBDNew(cPTours, "seglinea", "nomlinea", "codlinea", Linea, "N")
         If Existe = "" Then
-            Sql2 = "insert into seglinea (codlinea, nomlinea) values (" & DBSet(Linea, "N") & ",'AUTOMATICA')"
-            conn.Execute Sql2
+            sql2 = "insert into seglinea (codlinea, nomlinea) values (" & DBSet(Linea, "N") & ",'AUTOMATICA')"
+            conn.Execute sql2
         End If
     
         NuevoImporte = Round2(ImpNeto * ((ImporteFormateado(txtCodigo(0).Text / 100))), 2)
     
-        Sql = "insert into segpoliza(codrefer, codiplan, codlinea, colectiv, codmacta, nifasegu, nomasegu, "
-        Sql = Sql & "fechaenv, imppoliz, impinter, impampli, impreduc, intconta, inttesor) values ( "
-        Sql = Sql & DBSet(Referencia, "T") & ","
-        Sql = Sql & DBSet(Plan, "N") & ","
-        Sql = Sql & DBSet(Linea, "N") & ","
-        Sql = Sql & DBSet(Colectivo, "N") & ","
-        Sql = Sql & DBSet(CtaSocio, "T") & ","
-        Sql = Sql & DBSet(nif, "T") & ","
-        Sql = Sql & DBSet(NomAsegu, "T") & ","
-        Sql = Sql & DBSet(FechaEnvio, "F") & ","
-        Sql = Sql & DBSet(ImpNeto, "N") & ","
-        Sql = Sql & DBSet(NuevoImporte, "N") & ",0,0,0,0)"
+        SQL = "insert into segpoliza(codrefer, codiplan, codlinea, colectiv, codmacta, nifasegu, nomasegu, "
+        SQL = SQL & "fechaenv, imppoliz, impinter, impampli, impreduc, intconta, inttesor) values ( "
+        SQL = SQL & DBSet(Referencia, "T") & ","
+        SQL = SQL & DBSet(Plan, "N") & ","
+        SQL = SQL & DBSet(Linea, "N") & ","
+        SQL = SQL & DBSet(Colectivo, "N") & ","
+        SQL = SQL & DBSet(CtaSocio, "T") & ","
+        SQL = SQL & DBSet(nif, "T") & ","
+        SQL = SQL & DBSet(NomAsegu, "T") & ","
+        SQL = SQL & DBSet(FechaEnvio, "F") & ","
+        SQL = SQL & DBSet(ImpNeto, "N") & ","
+        SQL = SQL & DBSet(NuevoImporte, "N") & ",0,0,0,0)"
 '        Sql = Sql & DBSet(ImpNeto, "N") & ",0,0,0,0)"
         
-        conn.Execute Sql
+        conn.Execute SQL
     
     End If
     
@@ -728,13 +732,13 @@ Private Sub LlamarImprimir()
 End Sub
 
 Private Sub InicializarTabla()
-Dim Sql As String
-    Sql = "delete from tmpinformes where codusu = " & vSesion.Codigo
+Dim SQL As String
+    SQL = "delete from tmpinformes where codusu = " & vSesion.Codigo
     
-    conn.Execute Sql
+    conn.Execute SQL
 End Sub
 
-Private Sub Txtcodigo_GotFocus(Index As Integer)
+Private Sub txtCodigo_GotFocus(Index As Integer)
     ConseguirFoco txtCodigo(Index), 0
 End Sub
 
@@ -748,14 +752,14 @@ Private Sub txtCodigo_KeyPress(Index As Integer, KeyAscii As Integer)
 End Sub
 
 Private Sub txtCodigo_LostFocus(Index As Integer)
-Dim cadmen As String
+Dim cadMen As String
 
         
     Select Case 0
         Case 0 'Porcentajes
            
-            cadmen = TransformaPuntosComas(txtCodigo(Index).Text)
-            txtCodigo(Index).Text = Format(cadmen, "##0.00")
+            cadMen = TransformaPuntosComas(txtCodigo(Index).Text)
+            txtCodigo(Index).Text = Format(cadMen, "##0.00")
     End Select
 End Sub
 

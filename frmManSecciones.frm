@@ -687,7 +687,7 @@ Private Sub BotonBuscar()
     '*******************************************************************************
 
     ' *** canviar-ho pels valors per defecte al buscar (dins i fora del grid);
-    For i = 0 To 6
+    For i = 0 To 7
         txtAux(i).Text = ""
     Next i
     chkAux(1).Value = 0

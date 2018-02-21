@@ -5,7 +5,7 @@ Begin VB.MDIForm MDIppal
    Caption         =   "AriagroUtil"
    ClientHeight    =   7860
    ClientLeft      =   225
-   ClientTop       =   1170
+   ClientTop       =   1155
    ClientWidth     =   11160
    Icon            =   "MDIppal.frx":0000
    LinkTopic       =   "MDIForm1"
@@ -643,9 +643,6 @@ Dim frmMens As frmMensaje
 eFrasPendientesContabilizar:
     MuestraError Err.Number, "Facturas Pendientes de Integrar a Contabilidad", Err.Description
 End Sub
-
-
-
 
 
 Private Sub MDIForm_Unload(Cancel As Integer)
