@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "comdlg32.ocx"
+Object = "{F9043C88-F6F2-101A-A3C9-08002B2F49FB}#1.2#0"; "COMDLG32.OCX"
 Begin VB.Form frmRenAvnics 
    BorderStyle     =   3  'Fixed Dialog
    Caption         =   "Renovación AVNICS"
@@ -188,19 +188,19 @@ Private Sub cmdAceptar_Click()
 'Obtener la cadena SQL para eliminar los registros seleccionados
 Dim cDesde As String 'Ejercicio
 Dim fDesde As String 'Fecha Vto.
-Dim sql As String
+Dim SQL As String
 
     If Not DatosOk Then Exit Sub
 
     InicializarVbles
-    sql = ""
+    SQL = ""
     'Valores para Formula seleccion del informe
     cDesde = Trim(txtCodigo(0).Text)
     fDesde = Trim(txtCodigo(2).Text)
     
-    sql = "WHERE avnic.codialta <> 2"
+    SQL = "WHERE avnic.codialta <> 2"
     
-    RenovarAvnics sql
+    RenovarAvnics SQL
     
 End Sub
 
@@ -326,16 +326,16 @@ Private Function RenovarAvnics(cadW As String) As Boolean
 'Eliminar Albaranes de Fecha y Turno: Tabla (scaalb)
 'que cumplan los criterios seleccionados en la cadena WHERE cadW
 
-Dim cad As String, sql As String
+Dim Cad As String, SQL As String
 Dim Rs As ADODB.Recordset
 Dim todasElim As Boolean
 
     On Error GoTo EEliminar
 
-    cad = "Va a renovar los AVNICS." & vbCrLf
-    cad = cad & vbCrLf & vbCrLf & "¿Desea Comenzar? "
+    Cad = "Va a renovar los AVNICS." & vbCrLf
+    Cad = Cad & vbCrLf & vbCrLf & "¿Desea Comenzar? "
     
-    If MsgBox(cad, vbQuestion + vbYesNoCancel) = vbYes Then     'Empezamos
+    If MsgBox(Cad, vbQuestion + vbYesNoCancel) = vbYes Then     'Empezamos
         'Hay que eliminar
         On Error GoTo EEliminar
         Screen.MousePointer = vbHourglass
@@ -357,11 +357,11 @@ End Function
 
 Private Function CrearAvnics(FecVto As String, AnoEje As String) As Boolean
 'Eliminar las lineas y la Cabecera de un Caja. Tablas: cajascab, cajaslin
-Dim sql As String
-Dim Sql2 As String
+Dim SQL As String
+Dim sql2 As String
 Dim b As Boolean
 Dim Rs As ADODB.Recordset
-Dim cadena As String
+Dim Cadena As String
 Dim Mes As Integer
 Dim Ano As Integer
 Dim Fecha1 As String
@@ -374,57 +374,57 @@ Dim Fecha As Date
     conn.BeginTrans
     
     If Me.Check1.Value = False Then
-        sql = "insert into `avnic` (`codavnic`,`nombrper`,`nifperso`,`nifrepre`,"
-        sql = sql & "`codposta`,`nomcalle`,`poblacio`,`provinci`,`codialta`,`codbanco`,`codsucur`,"
-        sql = sql & "`cuentaba`,`digcontr`,`imporper`,`imporret`,`anoejerc`,`nifpers1`,`fechalta`,`nombper1`,"
-        sql = sql & "`nomcall1`,`poblaci1`,`provinc1`,`codpost1`,`fechavto`,`porcinte`,"
-        sql = sql & "`importes`,`codmacta`,`observac`) "
-        sql = sql & "SELECT codavnic,nombrper,nifperso,nifrepre,"
-        sql = sql & "codposta,nomcalle,poblacio,provinci,0,codbanco,codsucur,"
-        sql = sql & "cuentaba,digcontr,0,0," & AnoEje & ",nifpers1,fechalta,nombper1,"
-        sql = sql & "nomcall1,poblaci1,provinc1,codpost1,'" & Format(FecVto, FormatoFecha) & "',porcinte,"
-        sql = sql & "importes,codmacta,observac FROM avnic "
-        sql = sql & "WHERE codialta <> 2 AND anoejerc =" & AnoEje - 1
+        SQL = "insert into `avnic` (`codavnic`,`nombrper`,`nifperso`,`nifrepre`,"
+        SQL = SQL & "`codposta`,`nomcalle`,`poblacio`,`provinci`,`codialta`,`codbanco`,`codsucur`,"
+        SQL = SQL & "`cuentaba`,`digcontr`,`imporper`,`imporret`,`anoejerc`,`nifpers1`,`fechalta`,`nombper1`,"
+        SQL = SQL & "`nomcall1`,`poblaci1`,`provinc1`,`codpost1`,`fechavto`,`porcinte`,"
+        SQL = SQL & "`importes`,`codmacta`,`observac`,`iban`) "
+        SQL = SQL & "SELECT codavnic,nombrper,nifperso,nifrepre,"
+        SQL = SQL & "codposta,nomcalle,poblacio,provinci,0,codbanco,codsucur,"
+        SQL = SQL & "cuentaba,digcontr,0,0," & AnoEje & ",nifpers1,fechalta,nombper1,"
+        SQL = SQL & "nomcall1,poblaci1,provinc1,codpost1,'" & Format(FecVto, FormatoFecha) & "',porcinte,"
+        SQL = SQL & "importes,codmacta,observac, iban FROM avnic "
+        SQL = SQL & "WHERE codialta <> 2 AND anoejerc =" & AnoEje - 1
         'AVNICS
-        conn.Execute sql
+        conn.Execute SQL
     Else
-        sql = "SELECT codavnic,nombrper,nifperso,nifrepre,"
-        sql = sql & "codposta,nomcalle,poblacio,provinci,0,codbanco,codsucur,"
-        sql = sql & "cuentaba,digcontr,0,0," & AnoEje & ",nifpers1,fechalta,nombper1,"
-        sql = sql & "nomcall1,poblaci1,provinc1,codpost1,fechavto,porcinte,"
-        sql = sql & "importes,codmacta,observac FROM avnic "
-        sql = sql & "WHERE codialta <> 2 AND anoejerc =" & AnoEje - 1
+        SQL = "SELECT codavnic,nombrper,nifperso,nifrepre,"
+        SQL = SQL & "codposta,nomcalle,poblacio,provinci,0,codbanco,codsucur,"
+        SQL = SQL & "cuentaba,digcontr,0,0," & AnoEje & ",nifpers1,fechalta,nombper1,"
+        SQL = SQL & "nomcall1,poblaci1,provinc1,codpost1,fechavto,porcinte,"
+        SQL = SQL & "importes,codmacta,observac, iban FROM avnic "
+        SQL = SQL & "WHERE codialta <> 2 AND anoejerc =" & AnoEje - 1
     
         
-        Sql2 = "insert into `avnic` (`codavnic`,`nombrper`,`nifperso`,`nifrepre`,"
-        Sql2 = Sql2 & "`codposta`,`nomcalle`,`poblacio`,`provinci`,`codialta`,`codbanco`,`codsucur`,"
-        Sql2 = Sql2 & "`cuentaba`,`digcontr`,`imporper`,`imporret`,`anoejerc`,`nifpers1`,`fechalta`,`nombper1`,"
-        Sql2 = Sql2 & "`nomcall1`,`poblaci1`,`provinc1`,`codpost1`,`fechavto`,`porcinte`,"
-        Sql2 = Sql2 & "`importes`,`codmacta`,`observac`) values "
+        sql2 = "insert into `avnic` (`codavnic`,`nombrper`,`nifperso`,`nifrepre`,"
+        sql2 = sql2 & "`codposta`,`nomcalle`,`poblacio`,`provinci`,`codialta`,`codbanco`,`codsucur`,"
+        sql2 = sql2 & "`cuentaba`,`digcontr`,`imporper`,`imporret`,`anoejerc`,`nifpers1`,`fechalta`,`nombper1`,"
+        sql2 = sql2 & "`nomcall1`,`poblaci1`,`provinc1`,`codpost1`,`fechavto`,`porcinte`,"
+        sql2 = sql2 & "`importes`,`codmacta`,`observac`,`iban`) values "
         
         Set Rs = New ADODB.Recordset
-        Rs.Open sql, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
+        Rs.Open SQL, conn, adOpenForwardOnly, adLockPessimistic, adCmdText
         While Not Rs.EOF
             Fecha1 = CStr(DateAdd("m", CInt(txtCodigo(1).Text), Rs!fechavto)) ' le suma el numero de meses a la fecha de vto
             
-            cadena = "(" & DBSet(Rs!codavnic, "N") & "," & DBSet(Rs!nombrper, "T") & "," & DBSet(Rs!nifperso, "T") & "," & DBSet(Rs!nifrepre, "T") & ","
-            cadena = cadena & DBSet(Rs!codposta, "T") & "," & DBSet(Rs!nomcalle, "T") & "," & DBSet(Rs!poblacio, "T") & "," & DBSet(Rs!provinci, "T") & ","
-            cadena = cadena & "0" & "," & DBSet(Rs!codbanco, "N") & "," & DBSet(Rs!codsucur, "N") & ","
-            cadena = cadena & DBSet(Rs!cuentaba, "T") & "," & DBSet(Rs!digcontr, "T") & ",0,0," & AnoEje & "," & DBSet(Rs!nifpers1, "T") & ","
-            cadena = cadena & DBSet(Rs!fechalta, "F") & "," & DBSet(Rs!nombper1, "T") & ","
-            cadena = cadena & DBSet(Rs!nomcall1, "T") & "," & DBSet(Rs!poblaci1, "T") & "," & DBSet(Rs!provinc1, "T") & "," & DBSet(Rs!codpost1, "T") & ","
-            cadena = cadena & DBSet(Fecha1, "F") & "," & DBSet(Rs!Porcinte, "N") & ","
-            cadena = cadena & DBSet(Rs!importes, "N") & "," & DBSet(Rs!Codmacta, "T") & "," & DBSet(Rs!observac, "T") & ")"
+            Cadena = "(" & DBSet(Rs!codavnic, "N") & "," & DBSet(Rs!nombrper, "T") & "," & DBSet(Rs!nifperso, "T") & "," & DBSet(Rs!nifrepre, "T") & ","
+            Cadena = Cadena & DBSet(Rs!Codposta, "T") & "," & DBSet(Rs!nomcalle, "T") & "," & DBSet(Rs!poblacio, "T") & "," & DBSet(Rs!provinci, "T") & ","
+            Cadena = Cadena & "0" & "," & DBSet(Rs!codbanco, "N") & "," & DBSet(Rs!codsucur, "N") & ","
+            Cadena = Cadena & DBSet(Rs!cuentaba, "T") & "," & DBSet(Rs!digcontr, "T") & ",0,0," & AnoEje & "," & DBSet(Rs!nifpers1, "T") & ","
+            Cadena = Cadena & DBSet(Rs!fechalta, "F") & "," & DBSet(Rs!nombper1, "T") & ","
+            Cadena = Cadena & DBSet(Rs!nomcall1, "T") & "," & DBSet(Rs!poblaci1, "T") & "," & DBSet(Rs!provinc1, "T") & "," & DBSet(Rs!codpost1, "T") & ","
+            Cadena = Cadena & DBSet(Fecha1, "F") & "," & DBSet(Rs!Porcinte, "N") & ","
+            Cadena = Cadena & DBSet(Rs!importes, "N") & "," & DBSet(Rs!Codmacta, "T") & "," & DBSet(Rs!observac, "T") & "," & DBSet(Rs!Iban, "T") & ")"
         
-            Sql2 = Sql2 & cadena & ","
+            sql2 = sql2 & Cadena & ","
         
             Rs.MoveNext
         Wend
     
         ' quitamos la ultima coma del ultimo registro
-        Sql2 = Mid(Sql2, 1, Len(Sql2) - 1)
+        sql2 = Mid(sql2, 1, Len(sql2) - 1)
         
-        conn.Execute Sql2
+        conn.Execute sql2
         Set Rs = Nothing
     
     End If
@@ -448,7 +448,7 @@ End Function
 
 
 Private Function DatosOk() As Boolean
-Dim sql As String
+Dim SQL As String
 Dim b As Boolean
     b = True
     If Me.Check1.Value = 1 Then
